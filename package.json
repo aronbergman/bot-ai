@@ -1,59 +1,45 @@
 {
-  "name": "bot-ai",
-  "version": "1.0.0",
-  "description": "Chat for Telegram bot",
-  "main": "./src",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aronbergman/bot-ai"
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.5.0",
+    "dotenv": "^16.3.1",
+    "freezer-midjourney-api": "^4.0.6",
+    "midjourney": "^4.3.11",
+    "mongoose": "^7.5.0",
+    "node-telegram-bot-api": "^0.61.0",
+    "@ffmpeg-installer/ffmpeg": "1.1.0",
+    "fluent-ffmpeg": "2.1.2",
+    "openai": "3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.2.5"
+  },
+  "name": "node-midjourney-telegram-bot",
+  "version": "1.1.2",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "eslint . --ext .js --fix",
+    "format": "prettier --write .",
+    "server:up": "pm2 start app.js --name node-mj --watch",
+    "server:restart": "pm2 restart app.js",
+    "server:down": "pm2 delete app.js"
   },
   "keywords": [
+    "midjourney",
+    "node",
     "telegram",
-    "bot",
-    "chat",
-    "gpt",
-    "chatgpt",
-    "voicebot",
-    "nodejs",
-    "openai"
+    "bot"
   ],
-  "scripts": {
-    "start": "npm run rm:public && cross-env NODE_ENV=production ts-node --files -r tsconfig-paths/register ./src",
-    "watch": "npm run rm:public && cross-env ts-node-dev --files --respawn --inspect -r tsconfig-paths/register ./src",
-    "build": "npm run rm:public && cross-env NODE_ENV=production tsc && tsc-alias && npm run copy:files",
-    "rm:public": "rm -rf ./public",
-    "copy:files": "cp .env ./public/.env && cp -R ./src/templates ./public",
-    "lint": "eslint --debug ./src",
-    "lint:write": "eslint --debug ./src --fix",
-    "prettier": "prettier \"**/*.+(js|jsx|json|css|md)\"",
-    "prettier:write": "prettier --write \"**/*.+(js|jsx|json|css|md)\""
-  },
+  "author": "joybiswas007",
   "license": "MIT",
-  "devDependencies": {
-    "@types/fluent-ffmpeg": "2.1.21",
-    "@types/node": "18.8.3",
-    "@typescript-eslint/eslint-plugin": "5.39.0",
-    "@typescript-eslint/parser": "5.39.0",
-    "cross-env": "7.0.3",
-    "eslint": "8.25.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "eslint-plugin-unicorn": "44.0.2",
-    "prettier": "2.7.1",
-    "ts-node": "10.9.1",
-    "ts-node-dev": "2.0.0",
-    "tsc-alias": "1.7.0",
-    "tsconfig-paths": "4.1.0",
-    "typescript": "4.8.4"
-  },
-  "dependencies": {
-    "mongoose": "^7.5.0",
-    "freezer-midjourney-api": "^4.0.6",
-    "@ffmpeg-installer/ffmpeg": "1.1.0",
-    "dotenv": "16.0.3",
-    "fluent-ffmpeg": "2.1.2",
-    "openai": "3.2.1",
-    "telegraf": "4.12.2"
-  }
+  "description": "A Telegram bot created in Node.js using the unofficial Midjourney Node.js client."
 }

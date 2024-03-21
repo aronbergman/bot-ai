@@ -1,110 +1,66 @@
-## Chat GPT Telegram BOT `TypeScript`
+# node-midJourney-telegram-bot
 
-The Chat GPT Telegram bot is powered by advanced natural language processing (NLP) algorithms, which allow it to understand and respond to complex queries with high accuracy. Whether you're looking for quick answers to common questions or engaging in a more in-depth conversation, Chat GPT can handle it all.
+A Telegram bot created in Node.js using the unofficial Midjourney Node.js client.
 
-### Package list
+## Commands
 
-| Package                  | Description                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ts-node                  | TypeScript execution and REPL for node.js, with source map and native ESM support.                                                                                                                                                                                                                                                                             |
-| ts-node-dev              | It restarts target node process when any of required files changes (as standard node-dev) but shares Typescript compilation process between restarts. This significantly increases speed of restarting comparing to node-dev -r ts-node/register ..., nodemon -x ts-node ... variations because there is no need to instantiate ts-node compilation each time. |
-| tsc-alias                | Replace alias paths with relative paths after typescript compilation. You can add aliases that reference other projects outside your tsconfig.json project by providing a relative path to the baseUrl.                                                                                                                                                        |
-| tsconfig-paths           | Use this to load modules whose location is specified in the paths section of tsconfig.json or jsconfig.json. Both loading at run-time and via API are supported.                                                                                                                                                                                               |
-| typescript               | TypeScript is a language for application-scale JavaScript. TypeScript adds optional types to JavaScript that support tools for large-scale JavaScript applications for any browser, for any host, on any OS                                                                                                                                                    |
-| cross-env                | Run scripts that set and use environment variables across platforms                                                                                                                                                                                                                                                                                            |
-| dotenv                   | Dotenv is a zero-dependency module that loads environment variables from a .env file into process.env. Storing configuration in the environment separate from code is based on The Twelve-Factor App methodology.                                                                                                                                              |
-| eslint                   | An AST-based pattern checker for JavaScript.                                                                                                                                                                                                                                                                                                                   |
-| eslint-config-prettier   | Turns off all rules that are unnecessary or might conflict with Prettier.                                                                                                                                                                                                                                                                                      |
-| eslint-plugin-import     | This plugin intends to support linting of ES2015+ (ES6+) import/export syntax, and prevent issues with misspelling of file paths and import names. All the goodness that the ES2015+ static module syntax intends to provide, marked up in your editor.                                                                                                        |
-| eslint-plugin-prettier   | Runs Prettier as an ESLint rule and reports differences as individual ESLint issues.                                                                                                                                                                                                                                                                           |
-| eslint-plugin-unicorn    | More than 100 powerful ESLint rules                                                                                                                                                                                                                                                                                                                            |
-| prettier                 | Prettier is an opinionated code formatter                                                                                                                                                                                                                                                                                                                      |
-| @types/fluent-ffmpeg     | This package contains type definitions for node-fluent-ffmpeg                                                                                                                                                                                                                                                                                                  |
-| @ffmpeg-installer/ffmpeg | Platform independent binary installer of FFmpeg for node projects                                                                                                                                                                                                                                                                                              |
-| fluent-ffmpeg            | A fluent API to FFMPEG                                                                                                                                                                                                                                                                                                                                         |
-| openai                   | Node.js library for the OpenAI API                                                                                                                                                                                                                                                                                                                             |
-| telegraf                 | Modern Telegram Bot Framework                                                                                                                                                                                                                                                                                                                                  |
+```
+User Commands:
+/start or /echo
+/mj "prompt"
 
-<hr/>
-
-### Setup
-
-You can install Node modules using either [npm](https://www.npmjs.com/) or [Yarn](https://yarnpkg.com/), which are both package managers for Node.js.
-
-```bash
-yarn install # or npm install
+Owner Commands:
+/sudo 123456789 - pass user id to add users to sudoers
+/rm 1234556789 - pass user id to remove user from sudoers
+/ls - list how many users are added to sudoers
 ```
 
-COPY .env.example to .env
+## Requirements
 
-```bash
-cp .env.example .env
+Navigate to the cloned directory
+
+Install dependencies: `npm install`
+
+Create a `.env` or copy the `.env.sample` to `.env` using this command
+`cp .env.sample .env` file inside the directory and fill in all the details.
+
+Example `.env` file:
+
+```
+#Paste the owner telegram user id
+SUDO_USER=1234567789
+
+#Grab your telegram bot token from BotFather
+TG_BOT_TOKEN=1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+#Discord Server ID. Add midjourney bot in your server
+SERVER_ID=12345678901111
+
+#Discord Channel ID
+CHANNEL_ID=01234567899012312432
+
+#Grab the 72 character long SALAI_TOKEN from Discord
+SALAI_TOKEN=72CHARLONGSALAITOKEN
+
+#Database
+MONGO_DB=EnterYourMongoDBUrlHere
 ```
 
-### API Start
+### Start server
 
-```bash
-yarn start # or npm start
-yarn watch # or npm run watch - watch mode
-yarn build # or npm run build - production build
-```
+To run the server on your local machine, execute the following command: `npm run dev`
+<br>On the server, use: `npm run start`
+You also have the option to run it using `pm2`. If you don't have `pm2` installed, install it using the following command: `npm i pm2 -g`. Ensure pm2 automatically starts up when the server restarts.
+To launch the API, use: `npm run server:up`
+To refresh the API, use: `npm run server:restart`
+To shut down the API, use: `npm run server:down`
 
-### ESlint Start
+It's recommend to running the API with PM2. It allows you to keep your Node. js applications running continuously: PM2 can automatically restart your application if it crashes, and it can also automatically reload your application when you update your code
 
-```bash
-yarn lint # or npm run link
-yarn lint:write # or npm run lint:write - with prefix --fix
-```
+## Functionality
 
-### Prettier Start
+The bot currently supports image generation, variants generation, and upscaling. Feel free to send pull requests.
 
-```bash
-yarn prettier # or npm run prettier
-yarn prettier:write # or npm run prettier:write - with prefix --fix
-```
+## Credits
 
-### To install [Prettier](https://prettier.io/) and [ESLint](https://eslint.org/) in [Visual Studio Code](https://code.visualstudio.com/), you can follow these steps:
-
-- Open Visual Studio Code and navigate to your project folder.
-- Press Ctrl + Shift + P (Windows) or Cmd + Shift + P (Mac) to open the Command Palette.
-- Type "Extensions: Install Extensions" and select the first option that appears.
-- In the search bar, type "Prettier" and select the first result that appears.
-- Click the "Install" button to install Prettier.
-- Repeat step 4 and 5 to install ESLint.
-
-### API Structure
-
-```bash
-.
-├── src
-│  ├── @types
-│  │  └── global.d.ts
-│  ├── constants
-│  │  └── index.ts
-│  ├── contracts
-│  │  └── telegramBot.ts
-│  ├── infrastructure
-│  │  ├── index.ts
-│  │  ├── oggConverter.ts
-│  │  ├── oggDownloader.ts
-│  │  ├── openAi.ts
-│  │  └── telegramBot.ts
-│  └── index.ts
-├── .env
-├── .env.example
-├── .eslintrc
-├── .gitignore
-├── .nvmrc
-├── .prettierrc
-├── LICENSE
-├── package.json
-├── README.md
-├── tsconfig.json
-└── yarn.lock
-```
-
-**Note:** For any question [issues](https://github.com/watscho/chat-gpt-telegram-bot/issues)
-
-## License
-
-This project is an open-source with an [MIT License](https://github.com/watscho/chat-gpt-telegram-bot/blob/master/LICENSE)
+Thanks a ton to [erictik/midjourney-api](https://github.com/erictik/midjourney-api) for the amazing library to interact with Midjourney ❤️
