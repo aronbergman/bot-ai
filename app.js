@@ -10,6 +10,7 @@ import { removeSudoer } from "./bot/commands/removeSudoer.js";
 import { listSudoers } from "./bot/commands/listSudoers.js";
 import { onMessageText } from "./bot/commands/onMessageText.js";
 import { onMessageVoice } from "./bot/commands/onMessageVoice.js";
+import { textToSpeach } from './bot/commands/textToSpeach.js'
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ const bot = new TelegramBot(TG_BOT_TOKEN, { polling: true });
 
 // Use command
 startBot(bot);
+textToSpeach(bot);
 midJourney(bot, sudoUser);
 addSudoer(bot, sudoUser);
 removeSudoer(bot, sudoUser);
