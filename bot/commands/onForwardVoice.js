@@ -2,6 +2,7 @@ import { INITIAL_SESSION } from '../constants/index.js'
 import { OggDownloader } from '../utils/oggDownloader.js'
 import { OggConverter } from '../utils/oggConverter.js'
 import { OpenAI } from '../utils/openAi.js'
+import { spinnerOff } from '../utils/spinner.js'
 
 export const onForwardVoice = async (bot, msg) => {
   const { id: chatID } = msg.chat
@@ -28,7 +29,7 @@ export const onForwardVoice = async (bot, msg) => {
   bot.context.answer_message_id = question.message_id
 }
 
-export const onCreateAnswer = async (bot, answerType) => {
+export const onCreateAnswer = async (bot, spinnerId, answerType) => {
   const msg = bot.context
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -68,6 +69,7 @@ export const onCreateAnswer = async (bot, answerType) => {
 
     if (answerType == 'translate') {
       await oggConverter.delete()
+      await spinnerOff(bot, chatID, spinnerId)
       return await bot.sendMessage(
         chatID,
         data.text,
@@ -92,6 +94,8 @@ export const onCreateAnswer = async (bot, answerType) => {
       role: openAi.roles.Assistant,
       content: response.content
     })
+
+    await spinnerOff(bot, chatID, spinnerId)
 
     await bot.sendMessage(
       chatID,

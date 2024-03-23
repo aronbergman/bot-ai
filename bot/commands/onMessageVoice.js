@@ -3,6 +3,7 @@ import { OggDownloader } from '../utils/oggDownloader.js'
 import { OggConverter } from '../utils/oggConverter.js'
 import { OpenAI } from '../utils/openAi.js'
 import { onCreateAnswer, onForwardVoice } from './onForwardVoice.js'
+import { spinnerOn } from '../utils/spinner.js'
 
 export const onMessageVoice = (bot) => {
   bot.on('voice', async (msg, match) => {
@@ -102,17 +103,20 @@ export const onMessageVoice = (bot) => {
     const { message_id } = query.message
     const selectedLabel = query.data
 
-    if (bot.context.answer_message_id)
+    if (bot.context?.answer_message_id)
       await bot.deleteMessage(
         chat_id,
-        bot.context.answer_message_id,
-        { parse_mode: 'HTML' }
+        bot.context.answer_message_id
       )
 
-    if (selectedLabel.includes('translate')) {
-      await onCreateAnswer(bot, 'translate')
-    } else if (selectedLabel.includes('question')) {
-      await onCreateAnswer(bot, 'question')
+    const spinId = await spinnerOn(bot, chat_id)
+
+    if (bot.context) {
+      if (selectedLabel.includes('translate')) {
+        await onCreateAnswer(bot, spinId, 'translate')
+      } else if (selectedLabel.includes('question')) {
+        await onCreateAnswer(bot, spinId, 'question')
+      }
     }
     bot.context = null
   })
