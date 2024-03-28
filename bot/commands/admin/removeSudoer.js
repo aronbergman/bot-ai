@@ -1,6 +1,6 @@
 // Add sudo users who'll have ability to run the bot
 // import { SUDOER } from "../db/mjSchema.js";
-import { sequelize } from '../db/index.js'
+import { sequelize } from '../../db/index.js'
 
 export const removeSudoer = (bot, sudoUser) => {
   bot.onText(/\/rm/, async (msg, match) => {

@@ -1,4 +1,4 @@
-# node-midJourney-telegram-bot
+# node-midjourney-telegram-bot
 
 A Telegram bot created in Node.js using the unofficial Midjourney Node.js client.
 

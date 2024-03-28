@@ -1,6 +1,7 @@
 // Add sudo users who'll have ability to run the bot
-import { sequelize } from '../db/index.js'
+import { sequelize } from '../../db/index.js'
 
+// TODO: УДАЛИТЬ ЭТОТ ФАЙЛ ПОСЛЕ СОЗДАНИЯ МОДЕЛИ ВАЛИДАЦИИ ОПЛАТЫ
 export const addSudoer = (bot, sudoUser) => {
   let sudoId
   bot.onText(/\/sudo/, async (msg, match) => {

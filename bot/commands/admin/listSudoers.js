@@ -1,5 +1,5 @@
 // Add sudo users who'll have ability to run the bot
-import { sequelize } from '../db/index.js'
+import { sequelize } from '../../db/index.js'
 
 export const listSudoers = (bot, sudoUser) => {
   bot.onText(/\/ls/, async msg => {

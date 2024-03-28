@@ -1,6 +1,6 @@
-import { INITIAL_SESSION } from '../constants/index.js'
+import { INITIAL_SESSION } from '../../constants/index.js'
 
-export const adminCommands = bot => {
+export const getId = bot => {
   bot.onText(/\/id/, async msg => {
     const { id: chatId } = msg.chat
     const msgId = msg.message_id

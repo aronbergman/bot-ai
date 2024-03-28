@@ -1,6 +1,5 @@
 // Only specified user can run the bot
-
-import { SUDOER } from "../db/mjSchema.js";
+import { sequelize } from '../db/index.js'
 
 export const sudoChecker = async (
   userId,
@@ -11,18 +10,20 @@ export const sudoChecker = async (
   options
 ) => {
   if (userId !== sudoUser) {
-    const foundSudoer = await SUDOER.findOne(
-      { sudoer: chatID } || { sudoer: userId }
-    );
-    if (!foundSudoer) {
+    sequelize.sudouser.findOne({
+      where: {
+        userId: chatID || userId
+      }
+    }).then(() => {})
+      .catch(() => {
       bot.sendMessage(
         chatID,
         `@${username} you don't have enough permission to run this command.`,
         options || {}
-      );
-      return false;
-    }
+      )
+      return false
+    })
   }
 
-  return true;
-};
+  return true
+}

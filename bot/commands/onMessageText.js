@@ -1,59 +1,43 @@
-import { INITIAL_SESSION } from "../constants/index.js";
-import { OpenAI } from "./../utils/openAi.js";
+import { modeChatGPT } from './modes/chatGPT.js'
+import { modeMidjourney } from './modes/midjourney.js'
+import { sequelize } from '../db/index.js'
 
-export const onMessageText = (bot) => {
-  bot.onText(/\/text/, async (msg, match) => {
-    const { id: userId } = msg.from;
-    const { id: chatID } = msg.chat;
-    const msgId = msg.message_id;
+export const onMessageText = (bot, sudoUser) => {
+  bot.on('text', async (msg, match) => {
+    if (msg.text.match(/^\/+/ig))
+      return
+    // TODO: Рефакторинг для минимизации обращения к бд.
+    const { id: userId } = msg.from
+    const { id: chatID } = msg.chat
+    const msgId = msg.message_id
     const options = {
-      parse_mode: "HTML",
+      parse_mode: 'HTML',
       reply_to_message_id: msgId
-    };
+    }
     try {
-      msg.ctx ??= INITIAL_SESSION;
-
-      let res;
-      res = await bot.sendMessage(
-        chatID,
-        "...",
-        options
-      );
-
-      const openAi = new OpenAI();
-
-     await msg?.ctx.messages.push({
-        role: openAi.roles.User,
-        content: msg.text
-      });
-
-      const response = await openAi.chat(msg?.ctx.messages);
-
-      if (!response) {
-        throw new Error("Something went wrong please try again.");
-      }
-
-      msg?.ctx.messages.push({
-        role: openAi.roles.Assistant,
-        content: response.content
-      });
-
-      await bot.editMessageText(
-        response.content,
-        {
-          ...options,
-          message_id: res.message_id
+      sequelize.modeuser.findOne({
+        where: {
+          chat_id: chatID
         }
-      );
-
+      }).then(async (res) => {
+        const { mode } = res.dataValues
+        console.log('mode', mode)
+        if (mode.match(/\/text|\/chat/)) {
+          console.log('CHAT')
+          await modeChatGPT(bot, msg)
+        } else if (mode.match(/\/midjourney|\/image/)) {
+          console.log('IMAGE')
+          await modeMidjourney(bot, sudoUser, msg, match)
+        }
+      })
     } catch (error) {
       if (error instanceof Error) {
         return await bot.sendMessage(
-        chatID,
-        error.message,
-        options
-      );
+          chatID,
+          error.message,
+          options
+        )
       }
     }
-  });
-};
+  })
+}

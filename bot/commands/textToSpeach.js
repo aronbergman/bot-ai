@@ -1,6 +1,7 @@
 import { INITIAL_SESSION } from '../constants/index.js'
 
-import { exec} from 'node:child_process';
+import { exec } from 'node:child_process'
+import axios from 'axios'
 
 export const textToSpeach = bot => {
   bot.onText(/\/tts/, async msg => {
@@ -22,13 +23,17 @@ export const textToSpeach = bot => {
     //   await bot.sendMessage(chatId, `${error.message}`, options)
     // }
 
-    exec('tts --text "Salut! Je m\'appelle Aron Bergman, J\'habite a paris" --model_name "tts_models/fr/css10/vits"', (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`)
-        return
-      }
-      console.log(`stdout: ${stdout}`)
-      console.error(`stderr: ${stderr}`)
+    axios.post('http://154.56.63.128:7000/ajax/ajax', {
+      text: msg.message_id,
+      search: 'q',
+      email: 'brgmn@icloud.com',
+      telephone: '0679765152'
     })
+      .then(function(response) {
+        console.log(response)
+      })
+      .catch(function(error) {
+        console.log(error)
+      })
   })
 }
