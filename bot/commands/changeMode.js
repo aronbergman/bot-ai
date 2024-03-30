@@ -2,11 +2,11 @@ import { sequelize } from '../db/index.js'
 
 export const changeMode = bot => {
   const sendChatGPT = async (bot, chatId, options) => {
-    await bot.sendMessage(chatId, `🤖 <b>Выбран режим ChatGPT 3.5</b>`, options)
+    await bot.sendMessage(chatId, `🤖 Выбран <b>ChatGPT 3.5</b>`, options)
   }
 
   const sendMidjourney = async (bot, chatId, options) => {
-    await bot.sendMessage(chatId, `✏️ <b>Выбран режим Midjourney</b>`, options)
+    await bot.sendMessage(chatId, `✏️ Выбран <b>Midjourney</b>`, options)
   }
 
   bot.onText(/\/text|\/chat/, async msg => {
