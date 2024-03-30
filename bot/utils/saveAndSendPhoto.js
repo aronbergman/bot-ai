@@ -1,5 +1,5 @@
-import axios from "axios";
-import fs from "fs";
+import axios from 'axios'
+import fs from 'fs'
 
 export const saveAndSendPhoto = async (
   imgUrl,
@@ -7,23 +7,26 @@ export const saveAndSendPhoto = async (
   filePath,
   chatID,
   bot,
-  options
+  options,
+  editMessage
 ) => {
   try {
     if (!fs.existsSync(imgDir)) {
-      fs.mkdirSync(imgDir);
+      fs.mkdirSync(imgDir)
     }
     await axios
-      .get(imgUrl, { responseType: "arraybuffer" })
+      .get(imgUrl, { responseType: 'arraybuffer' })
       .then(response => {
-        fs.writeFileSync(filePath, Buffer.from(response.data, "binary"));
-        const stream = fs.createReadStream(filePath);
-        bot.sendDocument(chatID, stream, options || {});
+        fs.writeFileSync(filePath, Buffer.from(response.data, 'binary'))
+        const stream = fs.createReadStream(filePath)
+        if (!editMessage) {
+          bot.sendPhoto(chatID, stream, options || {})
+        }
       })
       .catch(error => {
-        console.error(error);
-      });
+        console.error(error)
+      })
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}

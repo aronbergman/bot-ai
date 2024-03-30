@@ -11,7 +11,6 @@ import { onMessageVoice } from "./bot/commands/onMessageVoice.js";
 import { textToSpeach } from './bot/commands/textToSpeach.js'
 import { getId } from './bot/commands/admin/getId.js'
 import { changeMode } from './bot/commands/changeMode.js'
-import { midjourneyCallbackQuery } from './bot/commands/modes/midjourneyCollbackQuery.js'
 import { getInfo } from './bot/commands/account.js'
 
 dotenv.config();
@@ -27,7 +26,7 @@ changeMode(bot);
 getId(bot);
 getInfo(bot)
 textToSpeach(bot);
-midjourneyCallbackQuery(bot);
+// midjourneyCallbackQuery(bot);
 addSudoer(bot, sudoUser);
 removeSudoer(bot, sudoUser);
 listSudoers(bot, sudoUser);

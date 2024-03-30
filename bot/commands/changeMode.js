@@ -1,6 +1,14 @@
 import { sequelize } from '../db/index.js'
 
 export const changeMode = bot => {
+  const sendChatGPT = async (bot, chatId, options) => {
+    await bot.sendMessage(chatId, `🤖 <b>Выбран режим ChatGPT 3.5</b>`, options)
+  }
+
+  const sendMidjourney = async (bot, chatId, options) => {
+    await bot.sendMessage(chatId, `✏️ <b>Выбран режим Midjourney</b>`, options)
+  }
+
   bot.onText(/\/text|\/chat/, async msg => {
     const { id: chatId } = msg.chat
     const msgId = msg.message_id
@@ -16,14 +24,14 @@ export const changeMode = bot => {
         }
       }).then(res => {
         if (res?.mode.match(/\/text|\/chat/))
-          return
+          return sendChatGPT(bot, chatId, options)
         else if (res?.mode) {
           sequelize.modeuser.update(
             { mode: '/chat' },
             { where: { chat_id: chatId } }
           ).then(res => {
             bot.select_mode = '/chat'
-            return bot.sendMessage(chatId, `🤖 <b>Выбран режим ChatGPT</b>\n\n<i>Все готово, жду ваше сообщение.</i>`, options)
+            return sendChatGPT(bot, chatId, options)
           })
         } else {
           sequelize.modeuser.create({
@@ -32,7 +40,7 @@ export const changeMode = bot => {
             mode: '/chat'
           }).then(res => {
             bot.select_mode = '/chat'
-            return bot.sendMessage(chatId, `🤖 <b>Выбран режим ChatGPT</b>\n\n<i>Все готово, жду ваше сообщение.</i>`, options)
+            return sendChatGPT(bot, chatId, options)
           })
         }
       })
@@ -57,14 +65,14 @@ export const changeMode = bot => {
           }
         }).then(res => {
           if (res?.mode.match(/\/midjourney|\/image/))
-            return
+            return sendMidjourney(bot, chatId, options)
           else if (res?.mode) {
             sequelize.modeuser.update(
               { mode: '/image' },
               { where: { chat_id: chatId } }
             ).then(res => {
               bot.select_mode = '/image'
-              return bot.sendMessage(chatId, `✏️ <b>Выбран режим Midjourney</b>\n\n<i>Какое изображение вы бы хотели сгенерировать?</i>`, options)
+              return sendMidjourney(bot, chatId, options)
             })
           } else {
             sequelize.modeuser.create({
@@ -73,7 +81,7 @@ export const changeMode = bot => {
               mode: '/image'
             }).then(res => {
               bot.select_mode = '/image'
-              return bot.sendMessage(chatId, `✏️ <b>Выбран режим Midjourney</b>\n\n<i>Какое изображение вы бы хотели сгенерировать?</i>`, options)
+              return sendMidjourney(bot, chatId, options)
             })
           }
         })

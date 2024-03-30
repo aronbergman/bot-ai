@@ -20,6 +20,8 @@ export const onMessageText = (bot, sudoUser) => {
           chat_id: chatID
         }
       }).then(async (res) => {
+        if (!res?.dataValues)
+          return
         const { mode } = res.dataValues
         console.log('mode', mode)
         if (mode.match(/\/text|\/chat/)) {

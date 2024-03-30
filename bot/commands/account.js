@@ -17,13 +17,25 @@ export const getInfo = bot => {
           chat_id: chatId
         }
       }).then(async (res) => {
-        const { mode } = res.dataValues;
+        if (!res)
+          return
+        let mode
+        switch (res?.dataValues.mode) {
+          case '/image':
+            mode = 'MidJourney'
+            break;
+          case '/chat':
+            mode = 'ChatGPT'
+            break;
+          default:
+            mode = '.'
+        }
         return bot.sendMessage(
           chatId,
           `
 Текущий режим: ${mode}
 
-Доступные режимы /midjourney /chat (сделать кнопками под сообщением)`,
+Доступные режимы в <i>lite</i> версии: \n<b>ChatGPT 3.5</b> \n<b>MidJourney</b> \n<b>Speech to Text</b> \n<b>PDF Converter</b>`,
           options
         )
       })
