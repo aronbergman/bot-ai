@@ -12,7 +12,7 @@ export const getInfo = bot => {
     }
     msg['ctx'] = INITIAL_SESSION
     try {
-      sequelize.modeuser.findOne({
+      sequelize.user.findOne({
         where: {
           chat_id: chatId
         }

@@ -15,7 +15,7 @@ export const onMessageText = (bot, sudoUser) => {
       reply_to_message_id: msgId
     }
     try {
-      sequelize.modeuser.findOne({
+      sequelize.user.findOne({
         where: {
           chat_id: chatID
         }
@@ -24,7 +24,7 @@ export const onMessageText = (bot, sudoUser) => {
           return
         const { mode } = res.dataValues
         console.log('mode', mode)
-        if (mode.match(/\/text|\/chat/)) {
+        if (mode.match(/\/gpt|\/chat/)) {
           console.log('CHAT')
           await modeChatGPT(bot, msg)
         } else if (mode.match(/\/midjourney|\/image/)) {

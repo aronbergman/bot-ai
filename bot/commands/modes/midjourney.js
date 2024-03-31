@@ -53,7 +53,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
       Ws: true
     })
     await client.init()
-    let interval
+
     Imagine = await client.Imagine(prompt, async (uri, progress) => {
       console.log(`Loading: ${uri}, progress: ${progress}`)
       await bot.editMessageText(
@@ -64,7 +64,6 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
           }
         )
     })
-    clearInterval(interval)
 
     const options = {
       reply_markup: JSON.stringify({
@@ -88,8 +87,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const imgDir = './Imagines'
     const filePath = `${imgDir}/${userMessageId}.png`
     // await bot.sendMessage(chatID, 'Choose What to do')
-    await spinnerOff(bot, chatID, spinner)
-    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options)
+
+    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, spinner)
   } catch (error) {
     await bot.sendMessage(chatID, `${error}`)
   }

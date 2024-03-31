@@ -2,14 +2,14 @@ import { sequelize } from '../db/index.js'
 
 export const changeMode = bot => {
   const sendChatGPT = async (bot, chatId, options) => {
-    await bot.sendMessage(chatId, `🤖 Выбран <b>ChatGPT 3.5</b>`, options)
+    await bot.sendMessage(chatId, `🤖 Выбран <b>ChatGPT</b> 3.5`, options)
   }
 
   const sendMidjourney = async (bot, chatId, options) => {
     await bot.sendMessage(chatId, `✏️ Выбран <b>Midjourney</b>`, options)
   }
 
-  bot.onText(/\/text|\/chat/, async msg => {
+  bot.onText(/\/gpt|\/chat/, async msg => {
     const { id: chatId } = msg.chat
     const msgId = msg.message_id
     const options = {
@@ -17,16 +17,16 @@ export const changeMode = bot => {
       reply_to_message_id: msgId
     }
     try {
-      sequelize.modeuser.findOne({
+      sequelize.user.findOne({
         where: {
           chat_id: chatId,
           user_id: msg.from.id
         }
       }).then(res => {
-        if (res?.mode.match(/\/text|\/chat/))
+        if (res?.mode.match(/\/gpt|\/chat/))
           return sendChatGPT(bot, chatId, options)
         else if (res?.mode) {
-          sequelize.modeuser.update(
+          sequelize.user.update(
             { mode: '/chat' },
             { where: { chat_id: chatId } }
           ).then(res => {
@@ -34,7 +34,7 @@ export const changeMode = bot => {
             return sendChatGPT(bot, chatId, options)
           })
         } else {
-          sequelize.modeuser.create({
+          sequelize.user.create({
             chat_id: chatId,
             user_id: msg.from.id,
             mode: '/chat'
@@ -58,7 +58,7 @@ export const changeMode = bot => {
         reply_to_message_id: msgId
       }
       try {
-        sequelize.modeuser.findOne({
+        sequelize.user.findOne({
           where: {
             chat_id: chatId,
             user_id: msg.from.id
@@ -67,7 +67,7 @@ export const changeMode = bot => {
           if (res?.mode.match(/\/midjourney|\/image/))
             return sendMidjourney(bot, chatId, options)
           else if (res?.mode) {
-            sequelize.modeuser.update(
+            sequelize.user.update(
               { mode: '/image' },
               { where: { chat_id: chatId } }
             ).then(res => {
@@ -75,7 +75,7 @@ export const changeMode = bot => {
               return sendMidjourney(bot, chatId, options)
             })
           } else {
-            sequelize.modeuser.create({
+            sequelize.user.create({
               chat_id: chatId,
               user_id: msg.from.id,
               mode: '/image'

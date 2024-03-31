@@ -1,6 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize'
 import MidjourneySchema from './models/midjourney.model.js'
-import ModeUserSchema from './models/mode.model.js'
+import UserSchema from './models/user.model.js'
 import SudoUserSchema from './models/sudoer.model.js'
 import { dbConfig } from "./db.config.js";
 
@@ -26,7 +26,7 @@ try {
 }
 
 sequelize.midjourney = MidjourneySchema(sequelize, DataTypes)
-sequelize.modeuser = ModeUserSchema(sequelize, DataTypes)
+sequelize.user = UserSchema(sequelize, DataTypes)
 sequelize.sudouser = SudoUserSchema(sequelize, DataTypes)
 
 sequelize.sync().then(() => {

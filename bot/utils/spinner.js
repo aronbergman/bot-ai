@@ -8,7 +8,7 @@ export const spinnerOn = async (bot, chat_id) => {
 }
 
 export const spinnerOff = async (bot, chat_id, message_id) => {
-   await bot.deleteMessage(
+   return bot.deleteMessage(
         chat_id,
         message_id
       )

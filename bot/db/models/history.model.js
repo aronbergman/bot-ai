@@ -1,5 +1,5 @@
 export default (sequelize, DataTypes) => {
-  const ModeUserSchema = sequelize.define('modeuser',
+  const HistorySchema = sequelize.define('history',
     {
       chat_id: {
         type: DataTypes.DOUBLE,
@@ -10,10 +10,16 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         required: true
       },
-      mode: {
+      nickname: {
+        type: DataTypes.STRING
+      },
+      request: {
+        type: DataTypes.STRING
+      },
+      response: {
         type: DataTypes.STRING
       }
     }
   )
-  return ModeUserSchema;
+  return HistorySchema;
 }
