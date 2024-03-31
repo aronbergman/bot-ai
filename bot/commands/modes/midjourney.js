@@ -2,8 +2,10 @@ import { Midjourney } from 'freezer-midjourney-api'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { sequelize } from '../../db/index.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
-import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
+import { spinnerOn } from '../../utils/spinner.js'
+import dotenv from 'dotenv'
 
+dotenv.config()
 
 export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   let userMessageId
@@ -57,12 +59,12 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     Imagine = await client.Imagine(prompt, async (uri, progress) => {
       console.log(`Loading: ${uri}, progress: ${progress}`)
       await bot.editMessageText(
-          `✏️ Midjourney: ${prompt} 🚀 ${progress}`,
-          {
-            message_id: waiting.message_id,
-            chat_id: chatID
-          }
-        )
+        `✏️ Midjourney: ${prompt} 🚀 ${progress}`,
+        {
+          message_id: waiting.message_id,
+          chat_id: chatID
+        }
+      )
     })
 
     const options = {
