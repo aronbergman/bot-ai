@@ -3,6 +3,9 @@ import {
   Configuration,
   OpenAIApi
 } from 'openai'
+import dotenv from 'dotenv'
+
+dotenv.config({ path: '../.env' })
 
 export class OpenAI {
   roles = {
