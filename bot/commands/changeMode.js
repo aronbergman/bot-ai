@@ -1,12 +1,13 @@
 import { sequelize } from '../db/index.js'
+import { autoRemoveMessage } from './hoc/autoRemoveMessage.js'
 
 export const changeMode = bot => {
   const sendChatGPT = async (bot, chatId, options) => {
-    await bot.sendMessage(chatId, `🤖 Выбран <b>ChatGPT</b> 3.5`, options)
+    await autoRemoveMessage(`🤖 Выбран <b>ChatGPT</b> 3.5`, bot, chatId, options, 5000)
   }
 
   const sendMidjourney = async (bot, chatId, options) => {
-    await bot.sendMessage(chatId, `✏️ Выбран <b>Midjourney</b>`, options)
+    await autoRemoveMessage(`✏️ Выбран <b>Midjourney</b>`, bot, chatId, options, 5000)
   }
 
   bot.onText(/\/gpt|\/chat/, async msg => {

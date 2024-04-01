@@ -8,8 +8,7 @@ export const saveAndSendPhoto = async (
   filePath,
   chatID,
   bot,
-  options,
-  spinner
+  options
 ) => {
   try {
     if (!fs.existsSync(imgDir)) {
@@ -20,11 +19,7 @@ export const saveAndSendPhoto = async (
       .then(response => {
         fs.writeFileSync(filePath, Buffer.from(response.data, 'binary'))
         const stream = fs.createReadStream(filePath)
-        spinnerOff(bot, chatID, spinner).then(res => {
-          console.log("🟢 spinner off")
-          bot.sendPhoto(chatID, stream, options || {})
-        })
-
+        bot.sendPhoto(chatID, stream, options || {})
       })
       .catch(error => {
         console.error(error)

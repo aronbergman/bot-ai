@@ -1,8 +1,10 @@
 import { INITIAL_SESSION } from '../../constants/index.js'
 import { OpenAI } from '../../utils/openAi.js'
 import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
+import { errorMessage } from '../hoc/errorMessage.js'
 
 export const modeChatGPT = async (bot, msg) => {
+  let res
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -14,7 +16,6 @@ export const modeChatGPT = async (bot, msg) => {
   try {
     msg.ctx ??= INITIAL_SESSION
 
-    let res
     res = await spinnerOn(bot, chatID)
 
     const openAi = new OpenAI()
@@ -45,11 +46,8 @@ export const modeChatGPT = async (bot, msg) => {
 
   } catch (error) {
     if (error instanceof Error) {
-      return await bot.sendMessage(
-        chatID,
-        error.message,
-        options
-      )
+      await spinnerOff(bot, chatID, res)
+      return errorMessage(bot, error, chatID, options)
     }
   }
 }

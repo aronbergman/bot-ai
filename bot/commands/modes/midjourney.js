@@ -2,7 +2,7 @@ import { Midjourney } from 'freezer-midjourney-api'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { sequelize } from '../../db/index.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
-import { spinnerOn } from '../../utils/spinner.js'
+import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -88,9 +88,10 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const imgUrl = Imagine.uri
     const imgDir = './Imagines'
     const filePath = `${imgDir}/${userMessageId}.png`
-    // await bot.sendMessage(chatID, 'Choose What to do')
 
-    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, spinner)
+    await spinnerOff(bot, chatID, spinner)
+      .then(() => bot.deleteMessage(chatID, waiting.message_id))
+    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options)
   } catch (error) {
     await bot.sendMessage(chatID, `${error}`)
   }
@@ -99,6 +100,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data
+    let loadingMessage
     try {
       if (selectedLabel.includes('U')) {
         await bot.sendMessage(chat_id, `Upscaling Image ${selectedLabel}`)
@@ -111,12 +113,10 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
           customId: UCustomID,
           loading: (uri, progress) => {
             console.log(`Loading: ${uri}, progress: ${progress}`)
-            bot.editMessageText(
+            loadingMessage = bot.sendMessage(
+              chat_id,
               `Loading: ${prompt} 🚀 ${progress}`,
-              {
-                ...options,
-                message_id: waiting.message_id
-              }
+              options
             )
           }
         })
@@ -127,7 +127,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
         const options = {
           reply_to_message_id: userMessageId
         }
-
+        await bot.deleteMessage(chat_id, loadingMessage.message_id)
         await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options)
       } else if (selectedLabel.includes('V')) {
         await bot.deleteMessage(chat_id, message_id)
@@ -143,6 +143,11 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
           content: prompt,
           loading: (uri, progress) => {
             console.log(`Loading: ${uri}, progress: ${progress}`)
+            loadingMessage = bot.sendMessage(
+              chat_id,
+              `MidJourney: ${progress}`,
+              options
+            )
           }
         })
 
@@ -179,6 +184,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
         const imgDir = './Variations'
         const filePath = `${imgDir}/${message_id}.png`
 
+        await bot.deleteMessage(chat_id, loadingMessage.message_id)
         await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options)
 
         bot.on('callback_query', async query_up => {
@@ -215,6 +221,11 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
             customId: upscaleCustomID,
             loading: (uri, progress) => {
               console.log(`Loading: ${uri}, progress: ${progress}`)
+              loadingMessage = bot.sendMessage(
+                chat_id,
+                `MidJourney: ${progress}`,
+                options
+              )
             }
           })
 
@@ -226,6 +237,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
           const options = {
             reply_to_message_id: userMessageId
           }
+
+          await bot.deleteMessage(chat_id, loadingMessage.message_id)
           await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options)
         })
       }
