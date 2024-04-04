@@ -1,6 +1,6 @@
 import axios from 'axios'
 import fs from 'fs'
-import { spinnerOff } from './spinner.js'
+import { TYPE_RESPONSE_MJ } from '../constants/index.js'
 
 export const saveAndSendPhoto = async (
   imgUrl,
@@ -8,7 +8,8 @@ export const saveAndSendPhoto = async (
   filePath,
   chatID,
   bot,
-  options
+  options,
+  typeResponse
 ) => {
   try {
     if (!fs.existsSync(imgDir)) {
@@ -19,7 +20,10 @@ export const saveAndSendPhoto = async (
       .then(response => {
         fs.writeFileSync(filePath, Buffer.from(response.data, 'binary'))
         const stream = fs.createReadStream(filePath)
-        bot.sendPhoto(chatID, stream, options || {})
+        if (typeResponse = TYPE_RESPONSE_MJ.PHOTO)
+          bot.sendPhoto(chatID, stream, options || {})
+        else if (typeResponse = TYPE_RESPONSE_MJ.DOCUMENT)
+          bot.sendDocument(chatID, stream, options || {})
       })
       .catch(error => {
         console.error(error)

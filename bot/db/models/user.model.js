@@ -1,22 +1,23 @@
 import { BOOLEAN } from 'sequelize/lib/data-types'
 
 export default (sequelize, DataTypes) => {
-  const UserSchema = sequelize.define('user',
+  const UserSchema = sequelize.define('users',
     {
-      chat_id: {
-        type: DataTypes.DOUBLE,
-        required: true,
-        unique: true
-      },
-      user_id: {
+      telegram_id: {
         type: DataTypes.DOUBLE,
         required: true
       },
-      mode: {
-        type: DataTypes.STRING
+      username: {
+        type: DataTypes.STRING,
+        required: true
       },
-      premium: {
-        type: DataTypes.BOOLEAN
+      password: {
+        type: DataTypes.STRING,
+        required: true
+      },
+      email: {
+        type: DataTypes.STRING,
+        required: true
       }
     }
   )

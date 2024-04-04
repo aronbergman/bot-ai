@@ -1,6 +1,6 @@
 import { modeChatGPT } from './modes/chatGPT.js'
 import { modeMidjourney } from './modes/midjourney.js'
-import { sequelize } from '../db/index.js'
+import { db } from '../db/index.js'
 
 export const onMessageText = (bot, sudoUser) => {
   bot.on('text', async (msg, match) => {
@@ -15,7 +15,7 @@ export const onMessageText = (bot, sudoUser) => {
       reply_to_message_id: msgId
     }
     try {
-      sequelize.user.findOne({
+      db.user.findOne({
         where: {
           chat_id: chatID
         }

@@ -1,5 +1,5 @@
 import { INITIAL_SESSION } from '../constants/index.js'
-import { sequelize } from '../db/index.js'
+import { db } from '../db/index.js'
 
 export const getInfo = bot => {
   bot.onText(/\/account|\/acc/, async msg => {
@@ -12,7 +12,7 @@ export const getInfo = bot => {
     }
     msg['ctx'] = INITIAL_SESSION
     try {
-      sequelize.user.findOne({
+      db.user.findOne({
         where: {
           chat_id: chatId
         }

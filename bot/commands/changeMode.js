@@ -1,4 +1,4 @@
-import { sequelize } from '../db/index.js'
+import { db } from '../db/index.js'
 import { autoRemoveMessage } from './hoc/autoRemoveMessage.js'
 
 export const changeMode = bot => {
@@ -18,7 +18,7 @@ export const changeMode = bot => {
       reply_to_message_id: msgId
     }
     try {
-      sequelize.user.findOne({
+      db.user.findOne({
         where: {
           chat_id: chatId,
           user_id: msg.from.id
@@ -27,7 +27,7 @@ export const changeMode = bot => {
         if (res?.mode.match(/\/gpt|\/chat/))
           return sendChatGPT(bot, chatId, options)
         else if (res?.mode) {
-          sequelize.user.update(
+          db.user.update(
             { mode: '/chat' },
             { where: { chat_id: chatId } }
           ).then(res => {
@@ -35,7 +35,7 @@ export const changeMode = bot => {
             return sendChatGPT(bot, chatId, options)
           })
         } else {
-          sequelize.user.create({
+          db.user.create({
             chat_id: chatId,
             user_id: msg.from.id,
             mode: '/chat'
@@ -59,7 +59,7 @@ export const changeMode = bot => {
         reply_to_message_id: msgId
       }
       try {
-        sequelize.user.findOne({
+        db.user.findOne({
           where: {
             chat_id: chatId,
             user_id: msg.from.id
@@ -68,7 +68,7 @@ export const changeMode = bot => {
           if (res?.mode.match(/\/midjourney|\/image/))
             return sendMidjourney(bot, chatId, options)
           else if (res?.mode) {
-            sequelize.user.update(
+            db.user.update(
               { mode: '/image' },
               { where: { chat_id: chatId } }
             ).then(res => {
@@ -76,7 +76,7 @@ export const changeMode = bot => {
               return sendMidjourney(bot, chatId, options)
             })
           } else {
-            sequelize.user.create({
+            db.user.create({
               chat_id: chatId,
               user_id: msg.from.id,
               mode: '/image'

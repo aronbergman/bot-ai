@@ -1,5 +1,5 @@
 // Add sudo users who'll have ability to run the bot
-import { sequelize } from '../../db/index.js'
+import { db } from '../../db/index.js'
 
 export const listSudoers = (bot, sudoUser) => {
   bot.onText(/\/ls/, async msg => {
@@ -20,11 +20,11 @@ export const listSudoers = (bot, sudoUser) => {
     }
 
     try {
-      sequelize.sudouser.count()
+      db.sudouser.count()
         .then(res => {
           console.log(res)
           if (res > 0) {
-            sequelize.sudouser.findAll({
+            db.sudouser.findAll({
               limit: 10,
               subQuery: false,
               order: [['createdAt', 'DESC']]

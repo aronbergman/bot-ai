@@ -1,5 +1,5 @@
 // Add sudo users who'll have ability to run the bot
-import { sequelize } from '../../db/index.js'
+import { db } from '../../db/index.js'
 
 // TODO: УДАЛИТЬ ЭТОТ ФАЙЛ ПОСЛЕ СОЗДАНИЯ МОДЕЛИ ВАЛИДАЦИИ ОПЛАТЫ
 export const addSudoer = (bot, sudoUser) => {
@@ -32,7 +32,7 @@ export const addSudoer = (bot, sudoUser) => {
     }
 
     try {
-      sequelize.sudouser.create({
+      db.sudouser.create({
         userId: parseInt(sudoId, 10)
       }).then(() => {
         bot.sendMessage(

@@ -1,5 +1,5 @@
 // Only specified user can run the bot
-import { sequelize } from '../db/index.js'
+import { db } from '../db/index.js'
 
 export const sudoChecker = async (
   userId,
@@ -10,7 +10,7 @@ export const sudoChecker = async (
   options
 ) => {
   if (userId !== sudoUser) {
-    sequelize.sudouser.findOne({
+    db.sudouser.findOne({
       where: {
         userId: chatID || userId
       }

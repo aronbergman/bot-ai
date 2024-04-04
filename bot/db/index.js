@@ -1,10 +1,13 @@
 import { DataTypes, Sequelize } from 'sequelize'
 import MidjourneySchema from './models/midjourney.model.js'
 import UserSchema from './models/user.model.js'
+import SubscriberSchema from './models/subscriber.model.js'
+import RoleSchema from './models/role.model.js'
+import UserRolesSchema from './models/user_roles.model.js'
 import SudoUserSchema from './models/sudoer.model.js'
-import { dbConfig } from "./db.config.js";
+import { dbConfig } from './db.config.js'
 
-export const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   port: dbConfig.port,
@@ -17,20 +20,42 @@ export const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASS
   }
 })
 
-try {
-  await sequelize.authenticate()
-  console.log('Connection has been established successfully.')
-} catch (error) {
-  console.log(`>> ${dbConfig.HOST}:${dbConfig.port}`)
-  console.error('Unable to connect to the database:', error)
-}
+// try {
+//   await sequelize.authenticate()
+//   console.log('Connection has been established successfully.')
+// } catch (error) {
+//   console.log(`>> ${dbConfig.HOST}:${dbConfig.port}`)
+//   console.error('Unable to connect to the database:', error)
+// }
 
-sequelize.midjourney = MidjourneySchema(sequelize, DataTypes)
-sequelize.user = UserSchema(sequelize, DataTypes)
-sequelize.sudouser = SudoUserSchema(sequelize, DataTypes)
+export const db = {}
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.user = UserSchema(sequelize, DataTypes)
+db.role = RoleSchema(sequelize, DataTypes)
+db.midjourney = MidjourneySchema(sequelize, DataTypes)
+db.subscriber = SubscriberSchema(sequelize, DataTypes)
+db.userRoles = UserRolesSchema(sequelize, DataTypes)
+db.sudouser = SudoUserSchema(sequelize, DataTypes)
+
+db.role.belongsToMany(db.user, {
+  through: "user_roles",
+  foreignKey: "roleId",
+  otherKey: "userId"
+});
+
+db.user.belongsToMany(db.role, {
+  through: "user_roles",
+  foreignKey: "userId",
+  otherKey: "roleId"
+});
+
+db.ROLES = ['user', 'admin', 'moderator']
 
 sequelize.sync().then(() => {
-  console.log(`>> ${dbConfig.HOST}:${dbConfig.port} – tables created successfully!`)
+  console.log(`🟢 ${dbConfig.HOST}:${dbConfig.port} – sequelize.sync successfully!`)
 }).catch((error) => {
   console.error('Unable to create table : ', error)
 })
