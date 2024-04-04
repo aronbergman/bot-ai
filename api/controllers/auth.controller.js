@@ -1,16 +1,15 @@
-import jwt from "jsonwebtoken"
-// import * as crypto from "crypto-js";
-import { default as bcrypt } from "bcryptjs";
+import jwt from 'jsonwebtoken'
+import { default as bcrypt } from 'bcryptjs'
 import { db } from '../../bot/db/index.js'
-import config from "./../../bot/db/auth.config.js"
-const User = db.user;
-const Role = db.role;
+import config from './../../bot/db/auth.config.js'
 
-const Op = db.Sequelize.Op;
+const User = db.user
+const Role = db.role
 
- export const signup = (req, res) => {
+const Op = db.Sequelize.Op
+
+export const signup = (req, res) => {
   // Save User to Database
-   console.log("req 2", req.body)
   User.create({
     username: req.body.username,
     email: req.body.email,
@@ -25,24 +24,23 @@ const Op = db.Sequelize.Op;
             }
           }
         }).then(roles => {
-          console.log('roles', roles)
           user.setRoles(roles).then(() => {
-            res.send({ message: "User registered successfully!" });
-          });
-        });
+            res.send({ message: 'User registered successfully!' })
+          })
+        })
       } else {
         // user role = 1
         user.setRoles([1]).then(() => {
-          res.send({ message: "User registered successfully!" });
-        });
+          res.send({ message: 'User registered successfully!' })
+        })
       }
     })
     .catch(err => {
-      res.status(500).send({ message: err.message });
-    });
-};
+      res.status(500).send({ message: err.message })
+    })
+}
 
- export const signin = (req, res) => {
+export const signin = (req, res) => {
   User.findOne({
     where: {
       username: req.body.username
@@ -50,33 +48,34 @@ const Op = db.Sequelize.Op;
   })
     .then(user => {
       if (!user) {
-        return res.status(404).send({ message: "User Not found." });
+        return res.status(404).send({ message: 'User Not found.' })
       }
 
-      var passwordIsValid = bcrypt.compare(
+      var passwordIsValid = bcrypt.compareSync(
         req.body.password,
-        user.password
-      );
+        user.password,
+      )
+
 
       if (!passwordIsValid) {
         return res.status(401).send({
           accessToken: null,
-          message: "Invalid Password!"
-        });
+          message: 'Invalid Password!'
+        })
       }
 
       const token = jwt.sign({ id: user.id },
-                              config.secret,
-                              {
-                                algorithm: 'HS256',
-                                allowInsecureKeySizes: true,
-                                expiresIn: 86400, // 24 hours
-                              });
+        config.secret,
+        {
+          algorithm: 'HS256',
+          allowInsecureKeySizes: true,
+          expiresIn: 86400 // 24 hours
+        })
 
-      var authorities = [];
+      var authorities = []
       user.getRoles().then(roles => {
         for (let i = 0; i < roles.length; i++) {
-          authorities.push("ROLE_" + roles[i].name.toUpperCase());
+          authorities.push('ROLE_' + roles[i].name.toUpperCase())
         }
         res.status(200).send({
           id: user.id,
@@ -84,13 +83,13 @@ const Op = db.Sequelize.Op;
           email: user.email,
           roles: authorities,
           accessToken: token
-        });
-      });
+        })
+      })
     })
     .catch(err => {
-      res.status(500).send({ message: err.message });
-    });
-};
+      res.status(500).send({ message: err.message })
+    })
+}
 
 export default {
   signup: signup,

@@ -10,11 +10,12 @@ export default function(app) {
     next();
   });
 
+  // email: string, username: string, password: string, roles: array of strings
   app.post(
     "/api/auth/signup",
     [
       verifySignUp.checkDuplicateUsernameOrEmail,
-      // verifySignUp.checkRolesExisted
+      verifySignUp.checkRolesExisted
     ],
     signup
   );

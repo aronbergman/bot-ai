@@ -40,41 +40,43 @@ listSudoers(bot, sudoUser)
 onMessageText(bot, sudoUser)
 // onMessageVoice(bot);
 
-const app = express();
+const app = express()
 
 var corsOptions = {
   origin: `http://localhost:${REACT_ADMIN_PORT}`
-};
+}
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  next()
+})
+app.options('*', cors())
 
-api(app);
-api0(app);
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+api(app)
+api0(app)
 
 // initial()
 function initial() {
   db.role.create({
     id: 1,
-    name: "user"
-  });
+    name: 'user'
+  })
 
   db.role.create({
     id: 2,
-    name: "moderator"
-  });
+    name: 'moderator'
+  })
 
   db.role.create({
     id: 3,
-    name: "admin"
-  });
+    name: 'admin'
+  })
 }
-
-app.post('/auth/login', (req, res) => {
-  console.log('> req', req)
-  // db.user.findOne({})
-})
 
 app.listen(NODE_REST_PORT, () => console.log(`🟡 REST API is listening on port ${NODE_REST_PORT}`))
