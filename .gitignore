@@ -1,4 +1,5 @@
 node_modules
+admin/node_modules
 public
 .env
 *.log
