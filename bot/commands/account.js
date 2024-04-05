@@ -12,7 +12,7 @@ export const getInfo = bot => {
     }
     msg['ctx'] = INITIAL_SESSION
     try {
-      db.user.findOne({
+      db.subscriber.findOne({
         where: {
           chat_id: chatId
         }

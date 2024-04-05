@@ -15,7 +15,7 @@ export const onMessageText = (bot, sudoUser) => {
       reply_to_message_id: msgId
     }
     try {
-      db.user.findOne({
+      db.subscriber.findOne({
         where: {
           chat_id: chatID
         }

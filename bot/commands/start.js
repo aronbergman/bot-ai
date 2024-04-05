@@ -11,6 +11,8 @@ export const startBot = bot => {
     }
     msg['ctx'] = INITIAL_SESSION
     try {
+
+
       await bot.sendMessage(
         chatId,
         `
