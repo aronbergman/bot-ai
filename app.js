@@ -7,18 +7,22 @@ import { startBot } from './bot/commands/start.js'
 import { addSudoer } from './bot/commands/admin/addSudoer.js'
 import { removeSudoer } from './bot/commands/admin/removeSudoer.js'
 import { listSudoers } from './bot/commands/admin/listSudoers.js'
-import { onMessageText } from './bot/commands/onMessageText.js'
-import { onMessageVoice } from './bot/commands/onMessageVoice.js'
-import { textToSpeach } from './bot/commands/textToSpeach.js'
+import { onMessageText } from './bot/commands/_refact/onMessageText.js'
+import { onMessageVoice } from './bot/commands/_refact/onMessageVoice.js'
+import { textToSpeach } from './bot/commands/_refact/textToSpeach.js'
 import { getId } from './bot/commands/admin/getId.js'
-import { changeMode } from './bot/commands/changeMode.js'
-import { getInfo } from './bot/commands/account.js'
 
 import { db } from './bot/db/index.js'
 
 import api from './api/routes/auth.routes.js'
 
 import api0 from './api/routes/user.routes.js'
+import { COMMAND_ACCOUNT, COMMAND_GPT, COMMAND_HELP, COMMAND_MIDJOURNEY } from './bot/constants/index.js'
+import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
+import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
+import { keyboardHelp } from './bot/commands/keyboard/help.js'
+import { keyboardMidjourney } from './bot/commands/keyboard/midjourney.js'
+import { onMessageTextDefault } from './bot/commands/onMessageTextDefault.js'
 
 dotenv.config()
 
@@ -27,18 +31,38 @@ const sudoUser = parseInt(SUDO_USER, 10)
 
 const bot = new TelegramBot(TG_BOT_TOKEN, { polling: true })
 
+bot.on('polling_error', console.log)
+
 // Use command
 startBot(bot)
-changeMode(bot)
+
+bot.on('message', (msg, match) => {
+  switch (msg.text) {
+    case COMMAND_ACCOUNT:
+      return keyboardMyAccount(bot, msg)
+      break
+    case COMMAND_GPT:
+      return keyboardChatGPT(bot, msg)
+      break
+    case COMMAND_MIDJOURNEY:
+      return keyboardMidjourney(bot, msg)
+      break
+    case COMMAND_HELP:
+      return keyboardHelp(bot, msg)
+      break
+    default:
+      return onMessageTextDefault(bot, msg, match, sudoUser)
+  }
+})
+
+// textToSpeach(bot)
+// onMessageVoice(bot);
+
+// Use admin command
 getId(bot)
-getInfo(bot)
-textToSpeach(bot)
-// midjourneyCallbackQuery(bot);
 addSudoer(bot, sudoUser)
 removeSudoer(bot, sudoUser)
 listSudoers(bot, sudoUser)
-onMessageText(bot, sudoUser)
-// onMessageVoice(bot);
 
 const app = express()
 

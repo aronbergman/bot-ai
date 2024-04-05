@@ -1,23 +1,24 @@
 export const autoRemoveMessage = async (content, bot, chatId, options, duration = 5000) => {
-  const message = await bot.sendMessage(chatId, `🚀 \n\n${content}`, options)
+  const message = await bot.sendMessage(chatId, ` \n${content}`, options)
   const durationTemplate = '・'
 
   for (let i = 0; duration / 1000 >= i; i++) {
-    const timeout = setTimeout((bot, chatId, message, durationTemplate, duration) => {
+    const timeout = setTimeout((bot, chatId, message, durationTemplate, duration, options) => {
       bot.editMessageText(
-        `🚀 ${durationTemplate.repeat(duration / 1000 - i)}\n\n${content}`,
+        `${durationTemplate.repeat(duration / 1000 - i)}\n${content}`,
         {
           chat_id: chatId,
           message_id: message.message_id,
-          parse_mode: 'HTML'
+          parse_mode: 'HTML',
+          ...options
         }
       )
       clearTimeout(timeout)
-    }, i * 1000, bot, chatId, message, durationTemplate, duration)
+    }, i * 1000, bot, chatId, message, durationTemplate, duration, options)
   }
 
-  const remove = setTimeout((bot, chatId, message) => {
+  const remove = setTimeout(async (bot, chatId, message) => {
     clearTimeout(remove)
-   return bot.deleteMessage(chatId, message.message_id)
+    await bot.deleteMessage(chatId, message.message_id)
   }, duration, bot, chatId, message)
 }
