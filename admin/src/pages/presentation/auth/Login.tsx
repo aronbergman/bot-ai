@@ -66,31 +66,46 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
     enableReinitialize: true,
     initialValues: {
       loginUsername: '',
-      loginPassword: ''
+      loginPassword: '',
+      signupEmail: '',
+      signupUsername: '',
+      signupPassword: ''
     },
     validate: (values) => {
-      const errors: { loginUsername?: string; loginPassword?: string } = {}
+      const errors: { loginUsername?: string; loginPassword?: string; signupEmail?: string; signupUsername?: string; signupPassword?: string; } = {}
 
-      if (!values.loginUsername) {
-        errors.loginUsername = 'Required'
-      }
+      if (singUpStatus) {
+        if (!values.signupEmail) {
+          errors.signupEmail = 'Required'
+        }
+        if (!values.signupUsername) {
+          errors.signupUsername = 'Required'
+        }
+        if (!values.signupPassword) {
+          errors.signupPassword = 'Required'
+        }
+      } else {
+        if (!values.loginUsername) {
+          errors.loginUsername = 'Required'
+        }
 
-      if (!values.loginPassword) {
-        errors.loginPassword = 'Required'
+        if (!values.loginPassword) {
+          errors.loginPassword = 'Required'
+        }
       }
 
       return errors
     },
     validateOnChange: false,
     onSubmit: (values) => {
-      axios.post(
-        `http://localhost:3012/api/auth/signin`,
-        {
-          username: values.loginUsername,
-          password: values.loginPassword
-        }
-      )
-        .then(res => {
+      if (!singUpStatus) {
+        axios.post(
+          `http://localhost:3012/api/auth/signin`,
+          {
+            username: values.loginUsername,
+            password: values.loginPassword
+          }
+        ).then(res => {
           const persons = res.data
           if (persons) {
             if (setUser) {
@@ -99,8 +114,31 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
             }
           }
         }).catch(res => {
-        formik.setFieldError('loginPassword', 'Username and password do not match.')
-      })
+          formik.setFieldError('loginPassword', 'Username and password do not match.')
+        })
+      } else {
+        axios.post(
+          `http://localhost:3012/api/auth/signup`,
+          {
+            username: values.signupUsername,
+            password: values.signupPassword,
+            email: values.signupEmail,
+            roles: ['user'],
+          }
+        ).then(res => {
+          const persons = res.data
+          if (persons) {
+            if (setUser) {
+              setUser(persons.username)
+              handleOnClick()
+            }
+          }
+        }).catch(res => {
+          // TODO: Сделать обработку ошибок при регистрации
+          // formik.setFieldError('loginPassword', 'Username and password do not match.')
+        })
+      }
+
       // if (usernameCheck(values.loginUsername)) {
       // 	if (passwordCheck(values.loginUsername, values.loginPassword)) {
       // 		if (setUser) {
@@ -209,36 +247,78 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
                     <>
                       <div className="col-12">
                         <FormGroup
-                          id="signup-email"
+                          id="signupEmail"
                           isFloating
                           label="Your email">
-                          <Input type="email" autoComplete="email" />
+                          <Input
+                            type="email"
+                            autoComplete="email"
+                            value={formik.values.signupEmail}
+                            isTouched={formik.touched.signupEmail}
+                            invalidFeedback={
+                              formik.errors.signupEmail
+                            }
+                            isValid={formik.isValid}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            onFocus={() => {
+                              formik.setErrors({})
+                            }}
+                          />
                         </FormGroup>
                       </div>
                       <div className="col-12">
                         <FormGroup
-                          id="signup-name"
+                          id="signupUsername"
                           isFloating
-                          label="Your name">
-                          <Input autoComplete="given-name" />
+                          label="Your username">
+                          <Input
+                            autoComplete="given-name"
+                            value={formik.values.signupUsername}
+                            isTouched={formik.touched.signupUsername}
+                            invalidFeedback={
+                              formik.errors.signupUsername
+                            }
+                            isValid={formik.isValid}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                          />
                         </FormGroup>
                       </div>
+                      {/*<div className="col-12">*/}
+                      {/*  <FormGroup*/}
+                      {/*    id="signup-surname"*/}
+                      {/*    isFloating*/}
+                      {/*    label="Your surname">*/}
+                      {/*    <Input*/}
+                      {/*      autoComplete="family-name"*/}
+                      {/*      value={formik.values.sugnupSurname}*/}
+                      {/*      isTouched={formik.touched.sugnupSurname}*/}
+                      {/*      invalidFeedback={*/}
+                      {/*        formik.errors.sugnupSurname*/}
+                      {/*      }*/}
+                      {/*      isValid={formik.isValid}*/}
+                      {/*      onChange={formik.handleChange}*/}
+                      {/*      onBlur={formik.handleBlur}*/}
+                      {/*    />*/}
+                      {/*  </FormGroup>*/}
+                      {/*</div>*/}
                       <div className="col-12">
                         <FormGroup
-                          id="signup-surname"
-                          isFloating
-                          label="Your surname">
-                          <Input autoComplete="family-name" />
-                        </FormGroup>
-                      </div>
-                      <div className="col-12">
-                        <FormGroup
-                          id="signup-password"
+                          id="signupPassword"
                           isFloating
                           label="Password">
                           <Input
                             type="password"
                             autoComplete="password"
+                            value={formik.values.signupPassword}
+                            isTouched={formik.touched.signupPassword}
+                            invalidFeedback={
+                              formik.errors.signupPassword
+                            }
+                            isValid={formik.isValid}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
                           />
                         </FormGroup>
                       </div>
@@ -246,7 +326,11 @@ const Login: FC<ILoginProps> = ({ isSignUp }) => {
                         <Button
                           color="info"
                           className="w-100 py-3"
-                          onClick={handleOnClick}>
+                          isDisable={!formik.values.signupPassword}
+                          onClick={formik.handleSubmit}>
+                          {isLoading && (
+                            <Spinner isSmall inButton isGrow />
+                          )}
                           Sign Up
                         </Button>
                       </div>
