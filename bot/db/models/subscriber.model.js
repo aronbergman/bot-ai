@@ -17,6 +17,9 @@ export default (sequelize, DataTypes) => {
       },
       premium: {
         type: BOOLEAN
+      },
+      user_id_referral_program: {
+        type: DataTypes.DOUBLE,
       }
     }
   )

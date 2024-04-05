@@ -2,6 +2,7 @@ import { DataTypes, Sequelize } from 'sequelize'
 import MidjourneySchema from './models/midjourney.model.js'
 import UserSchema from './models/user.model.js'
 import SubscriberSchema from './models/subscriber.model.js'
+import PaymentSchema from './models/payment.model.js'
 import RoleSchema from './models/role.model.js'
 import UserRolesSchema from './models/user_roles.model.js'
 import SudoUserSchema from './models/sudoer.model.js'
@@ -39,6 +40,7 @@ db.midjourney = MidjourneySchema(sequelize, DataTypes)
 db.subscriber = SubscriberSchema(sequelize, DataTypes)
 db.userRoles = UserRolesSchema(sequelize, DataTypes)
 db.sudouser = SudoUserSchema(sequelize, DataTypes)
+db.payment = PaymentSchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
