@@ -1,4 +1,4 @@
-import { INITIAL_SESSION } from '../../constants/index.js'
+import { INITIAL_SESSION, TARIFS } from '../../constants/index.js'
 import { db } from '../../db/index.js'
 import * as events from 'events'
 
@@ -55,13 +55,13 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '📆 1 день за 79,00 ₽', callback_data: 'DAYS_1_79' }],
-            [{ text: '📆 7 дней за 299,00 ₽', callback_data: 'DAYS_7_299' }],
-            [{ text: '📆 30 дней за 699,00 ₽', callback_data: 'DAYS_30_699' }],
-            [{ text: '📆 90 дней за 1699,00 ₽', callback_data: 'DAYS_90_1699' }],
-            [{ text: '📆 20 запросов за 99,00 ₽', callback_data: 'REQUESTS_20_99' }],
-            [{ text: '📆 50 запросов за 189,00 ₽', callback_data: 'REQUESTS_50_189' }],
-            [{ text: '📆 100 запросов за 349,00 ₽', callback_data: 'REQUESTS_100_349' }],
+            [{ text: TARIFS[0].text, callback_data: TARIFS[0].callback_data }],
+            [{ text: TARIFS[1].text, callback_data: TARIFS[1].callback_data }],
+            [{ text: TARIFS[2].text, callback_data: TARIFS[2].callback_data }],
+            [{ text: TARIFS[3].text, callback_data: TARIFS[3].callback_data }],
+            [{ text: TARIFS[4].text, callback_data: TARIFS[4].callback_data }],
+            [{ text: TARIFS[5].text, callback_data: TARIFS[5].callback_data }],
+            [{ text: TARIFS[6].text, callback_data: TARIFS[6].callback_data }],
             [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
           ]
         }
@@ -135,6 +135,13 @@ export const keyboardMyAccount = async (bot, msg) => {
         }
       )
     })
+
+    for (let i = 0; i < TARIFS.length; i++) {
+      eventEmitter.on(TARIFS[i].callback_data, function() {
+        // TODO: Добавить ссылки на открытие оплаты
+        console.log('💚 ', TARIFS[i].text)
+      })
+    }
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data)

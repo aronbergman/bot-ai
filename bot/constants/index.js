@@ -7,10 +7,10 @@ export const TYPE_RESPONSE_MJ = {
   DOCUMENT: 'DOCUMENT'
 }
 
-export const COMMAND_GPT = "Новый диалог GPT";
-export const COMMAND_MIDJOURNEY = "Midjourney";
-export const COMMAND_ACCOUNT = "My account";
-export const COMMAND_HELP = "I need help";
+export const COMMAND_GPT = 'Новый диалог GPT'
+export const COMMAND_MIDJOURNEY = 'Midjourney'
+export const COMMAND_ACCOUNT = 'My account'
+export const COMMAND_HELP = 'I need help'
 export const COMMAND_START = `
 Привет! Твой идеальный чат-бот GPT готов к работе!
 
@@ -39,3 +39,13 @@ PDF🔛WORD (смена форматов файла)
 
 Более подробную информацию по использованию <b>ChatGPT</b>, <b>Midjourney</b> и остальных функций ты найдешь в разделе «<b>My account</b>»! 👻
 `
+
+export const TARIFS = [
+  { text: '📆 1 день за 79,00 ₽', callback_data: 'DAYS_1_79' },
+  { text: '📆 7 дней за 299,00 ₽', callback_data: 'DAYS_7_299' },
+  { text: '📆 30 дней за 699,00 ₽', callback_data: 'DAYS_30_699' },
+  { text: '📆 90 дней за 1699,00 ₽', callback_data: 'DAYS_90_1699' },
+  { text: '📆 20 запросов за 99,00 ₽', callback_data: 'REQUESTS_20_99' },
+  { text: '📆 50 запросов за 189,00 ₽', callback_data: 'REQUESTS_50_189' },
+  { text: '📆 100 запросов за 349,00 ₽', callback_data: 'REQUESTS_100_349' },
+]
