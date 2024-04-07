@@ -1,4 +1,4 @@
-import { INITIAL_SESSION, TARIFS } from '../../constants/index.js'
+import { INITIAL_SESSION, MY_ACCOUNT, TARIFS } from '../../constants/index.js'
 import { db } from '../../db/index.js'
 import * as events from 'events'
 
@@ -16,28 +16,7 @@ export const keyboardMyAccount = async (bot, msg) => {
     }
     // TODO: рефакторинг в отдельный файл
     const firstLevel = {
-      message: `
-💬 Доступно запросов для ChatGPT: 2
-🌅 Доступных запросов для Midjourney: 0
-
-Зачем нужны запросы?
-
-Генерируя изображения с помощью искусственного интеллекта Midjourney вы тратите по 1 запросу на 1 изображение.
-
-
-Зачем запросы ChatGPT?
-
-Задавая вопросы - ты тратишь 1 запрос. Бесплатно можно тратить 5 запросов каждый день. Запросы восстанавливаются каждый день в 06:00
-
-Не хватает запросов ChatGPT и Midjourney?
-
-- Вы можете купить подписку для ChatGPT или запросы для Midjourney и не париться о лимитах.
-- Пригласи человека и получи за него 3 запроса ChatGPT и 1 запрос на генерацию изображения.
-
-Как правильно общаться с ChatGPT – https://telegra.ph/Gajd-Kak-sostavit-horoshij-zapros-v-ChatGPT-s-primerami-04-08-2
-
-🔴 Создай своего ChatGPT и Midjourney бота и заработай на этом - @FatherAiRobot
-`,
+      message: MY_ACCOUNT,
       options: {
         ...generalOptions,
         reply_markup: {
@@ -167,12 +146,25 @@ export const keyboardMyAccount = async (bot, msg) => {
         default:
           mode = '.'
       }
-      // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
+
       accountMessage = await bot.sendMessage(
         chatId,
-        firstLevel.message,
-        firstLevel.options
+        '🔐',
+        generalOptions
       )
+
+      const timeout = setTimeout(() => {
+        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
+        accountMessage = bot.editMessageText(
+          firstLevel.message,
+          {
+            message_id: accountMessage.message_id,
+            chat_id: chatId,
+            ...firstLevel.options
+          }
+        )
+        clearTimeout(timeout)
+      }, 1000)
     })
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)

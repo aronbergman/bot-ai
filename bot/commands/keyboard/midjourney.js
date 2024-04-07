@@ -2,8 +2,19 @@ import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
 import { db } from '../../db/index.js'
 
 export const keyboardMidjourney = async (bot, msg) => {
-  const sendMidjourney = (bot, chatId, options) => {
-    return autoRemoveMessage(`🏞 Выбран <b>Midjourney</b>`, bot, chatId, options, 5000)
+  const sendMidjourney = async (bot, chatId, options) => {
+    let accountMessage = await bot.sendMessage(
+      chatId,
+      '✏️',
+      options
+    )
+
+    const timeout = setTimeout((chatId, message_id) => {
+      console.log('message_id', message_id)
+      bot.deleteMessage(chatId, message_id)
+      clearTimeout(timeout)
+      return autoRemoveMessage(`🏞 Выбран <b>Midjourney</b>`, bot, chatId, options, 5000)
+    }, 1000, chatId, accountMessage.message_id)
   }
 
   const { id: chatId } = msg.chat

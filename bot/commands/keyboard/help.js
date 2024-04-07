@@ -1,4 +1,5 @@
 export const keyboardHelp = async (bot, msg) => {
+  let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
   const options = {
@@ -7,11 +8,24 @@ export const keyboardHelp = async (bot, msg) => {
   }
 
   try {
-    return bot.sendMessage(
-      chatId,
-      `Help ...`,
-      options
-    )
+          accountMessage = await bot.sendMessage(
+        chatId,
+        '🔍',
+        options
+      )
+
+      const timeout = setTimeout(() => {
+        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
+        accountMessage = bot.editMessageText(
+          "Text for help",
+          {
+            message_id: accountMessage.message_id,
+            chat_id: chatId,
+            ...options
+          }
+        )
+        clearTimeout(timeout)
+      }, 1000)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, options)
   }

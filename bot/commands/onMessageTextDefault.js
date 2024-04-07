@@ -44,8 +44,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
     }
 
     bot.on('message', async () => {
-        eventEmitter.removeAllListeners() // исправление бага с отработкой слушателя прежних сообщений
         if (firstMessage) {
+          eventEmitter.removeAllListeners() // исправление бага с отработкой слушателя прежних сообщений
           await removeQueryFromPrevMessage(bot, chatID, firstMessage)
         }
       }

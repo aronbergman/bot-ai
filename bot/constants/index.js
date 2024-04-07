@@ -10,7 +10,7 @@ export const TYPE_RESPONSE_MJ = {
 export const COMMAND_GPT = '✏️ Новый диалог GPT'
 export const COMMAND_MIDJOURNEY = '🏞 Midjourney'
 export const COMMAND_ACCOUNT = '🔐 My account'
-export const COMMAND_HELP = 'I need help'
+export const COMMAND_HELP = '🔍 I need help'
 export const COMMAND_START = `
 Привет! Твой идеальный чат-бот GPT готов к работе!
 
@@ -58,14 +58,32 @@ export const START_MIDJOURNEY = `
 
 ✍️Ждем вашего запроса`
 
+export const MY_ACCOUNT = `
+Текущий режим: 🤌🏻Lite version
+
+Вам доступно:
+😄10 запросов в день для GPT-3.5 (далее очередь в живом порядке)
+😄2 запроса в день для Midjourney 
+😄3 конвертирования файла в день
+
+📎PaperClip PRO📎 350р/мес
+
+😎100 запросов  GPT-4 
+😎40 запросов Midjourney
+😎20 запросов Dalle - 3
+😎Конвертирование файла
+😎Сжатие файла 
+😎Голос в текст
+`
+
 export const TARIFS = [
-  { text: '📆 1 день за 79,00 ₽', callback_data: 'DAYS_1_79' },
+  { text: '📆 1 день за 89,00 ₽', callback_data: 'DAYS_1_89' },
   { text: '📆 7 дней за 299,00 ₽', callback_data: 'DAYS_7_299' },
-  { text: '📆 30 дней за 699,00 ₽', callback_data: 'DAYS_30_699' },
-  { text: '📆 90 дней за 1699,00 ₽', callback_data: 'DAYS_90_1699' },
+  { text: '📆 30 дней за 350,00 ₽', callback_data: 'DAYS_30_350' },
+  { text: '📆 90 дней за 1499,00 ₽', callback_data: 'DAYS_90_1499' },
   { text: '📆 20 запросов за 99,00 ₽', callback_data: 'REQUESTS_20_99' },
-  { text: '📆 50 запросов за 189,00 ₽', callback_data: 'REQUESTS_50_189' },
-  { text: '📆 100 запросов за 349,00 ₽', callback_data: 'REQUESTS_100_349' },
+  { text: '📆 50 запросов за 179,00 ₽', callback_data: 'REQUESTS_50_179' },
+  { text: '📆 100 запросов за 350,00 ₽', callback_data: 'REQUESTS_100_350' },
 ]
 
 export const MODS_CHAT = [
