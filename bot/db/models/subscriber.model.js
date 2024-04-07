@@ -15,6 +15,10 @@ export default (sequelize, DataTypes) => {
       mode: {
         type: DataTypes.STRING
       },
+      modeGPT: {
+        type: DataTypes.STRING,
+        defaultValue: "MODE_CHATGPT"
+      },
       premium: {
         type: BOOLEAN
       },

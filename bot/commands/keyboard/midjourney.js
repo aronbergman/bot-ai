@@ -3,7 +3,7 @@ import { db } from '../../db/index.js'
 
 export const keyboardMidjourney = async (bot, msg) => {
   const sendMidjourney = (bot, chatId, options) => {
-    return autoRemoveMessage(`✏️ Выбран <b>Midjourney</b>`, bot, chatId, options, 5000)
+    return autoRemoveMessage(`🏞 Выбран <b>Midjourney</b>`, bot, chatId, options, 5000)
   }
 
   const { id: chatId } = msg.chat

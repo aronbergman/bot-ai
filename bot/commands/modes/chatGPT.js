@@ -3,14 +3,16 @@ import { OpenAI } from '../../utils/openAi.js'
 import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
 import { errorMessage } from '../hoc/errorMessage.js'
 
-export const modeChatGPT = async (bot, msg) => {
+export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
+  let message;
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
   const options = {
     parse_mode: 'HTML',
-    reply_to_message_id: msgId
+    reply_to_message_id: msgId,
+    ...qweryOptions
   }
 
   try {
@@ -38,11 +40,16 @@ export const modeChatGPT = async (bot, msg) => {
 
     await spinnerOff(bot, chatID, res)
 
-    await bot.sendMessage(
+    message = await bot.sendMessage(
       chatID,
       response.content,
       options
     )
+
+    return {
+      text: response.content,
+      message_id: message.message_id
+    }
 
   } catch (error) {
     if (error instanceof Error) {
