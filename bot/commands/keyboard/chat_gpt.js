@@ -31,23 +31,23 @@ export const keyboardChatGPT = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
-      if (res?.mode.match(/\/gpt/))
+      if (res?.mode.match(/\GPT/))
         return sendChatGPT(bot, chatId, options)
       else if (res?.mode) {
         db.subscriber.update(
-          { mode: '/gpt' },
+          { mode: 'GPT' },
           { where: { chat_id: chatId } }
         ).then(res => {
-          bot.select_mode = '/gpt'
+          bot.select_mode = 'GPT'
           return sendChatGPT(bot, chatId, options)
         })
       } else {
         db.subscriber.create({
           chat_id: chatId,
           user_id: msg.from.id,
-          mode: '/gpt'
+          mode: 'GPT'
         }).then(res => {
-          bot.select_mode = '/gpt'
+          bot.select_mode = 'GPT'
           return sendChatGPT(bot, chatId, options)
         })
       }

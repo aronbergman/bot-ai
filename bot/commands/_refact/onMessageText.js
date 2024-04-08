@@ -29,7 +29,7 @@ export const onMessageText = (bot, sudoUser) => {
           await modeChatGPT(bot, msg)
         } else if (mode.match(/\/midjourney|\/image/)) {
           console.log('IMAGE')
-          await modeMidjourney(bot, sudoUser, msg, match)
+
         }
       })
     } catch (error) {

@@ -1,3 +1,12 @@
+export const managingBotSWorkMenu = {
+	managingBotSWork: {
+		id: 'managingBotSWork',
+		text: 'Managing Bot',
+		path: 'managing-bot-s-work',
+		icon: 'Book',
+	}
+}
+
 export const summaryPageTopMenu = {
 	intro: { id: 'intro', text: 'Intro', path: '#intro', icon: 'Vrpano', subMenu: null },
 	bootstrap: {

@@ -8,9 +8,9 @@ import {
 	componentPagesMenu,
 	dashboardPagesMenu,
 	demoPagesMenu,
-	gettingStartedPagesMenu,
-	pageLayoutTypesPagesMenu,
-} from '../../../menu';
+	gettingStartedPagesMenu, managingBotSWorkMenu,
+	pageLayoutTypesPagesMenu
+} from '../../../menu'
 import ThemeContext from '../../../contexts/themeContext';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Hand from '../../../assets/img/hand.png';
@@ -37,6 +37,8 @@ const DefaultAside = () => {
 				<Brand asideStatus={asideStatus} setAsideStatus={setAsideStatus} />
 			</AsideHead>
 			<AsideBody>
+						<Navigation menu={managingBotSWorkMenu} id='aside-docMenu' />
+						<NavigationLine />
 				{!doc && (
 					<>
 						<Navigation menu={dashboardPagesMenu} id='aside-dashboard' />

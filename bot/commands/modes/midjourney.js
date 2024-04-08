@@ -2,9 +2,11 @@ import { Midjourney } from 'freezer-midjourney-api'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { db } from '../../db/index.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
-import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
+import { spinnerOn } from '../../utils/spinner.js'
 import dotenv from 'dotenv'
 import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
+import events from 'events'
+import { loaderOn } from '../../utils/loader.js'
 
 dotenv.config()
 
@@ -20,6 +22,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   const { id: userId, username, first_name: firstname } = msg.from
   const { id: chatID } = msg.chat
   const options = {
+    parse_mode: 'HTML',
     reply_to_message_id: userMessageId
   }
   if (
@@ -37,14 +40,9 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   if (prompt.length === 0) {
     return bot.sendMessage(chatID, 'Prompt can\'t be empty', options)
   }
-  const waiting = await bot.sendMessage(
-    chatID,
-    `✏️ Midjourney: ${prompt}`,
-    options
-  )
 
-  let spinner
-  spinner = await spinnerOn(bot, chatID)
+  let spinner = await spinnerOn(bot, chatID)
+  let waiting = await loaderOn(3, bot, chatID)
 
   try {
     const { SERVER_ID, CHANNEL_ID, SALAI_TOKEN } = process.env
@@ -59,30 +57,25 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
 
     Imagine = await client.Imagine(prompt, async (uri, progress) => {
       console.log(`Loading: ${uri}, progress: ${progress}`)
-      await bot.editMessageText(
-        `✏️ Midjourney: ${prompt} 🚀 ${progress}`,
-        {
-          message_id: waiting.message_id,
-          chat_id: chatID
-        }
-      )
+      await loaderOn(progress, bot, chatID, waiting?.message_id)
     })
 
     const options = {
       reply_markup: JSON.stringify({
         inline_keyboard: [
           [
-            { text: 'U1', callback_data: 'U1' },
-            { text: 'U2', callback_data: 'U2' },
-            { text: 'U3', callback_data: 'U3' },
-            { text: 'U4', callback_data: 'U4' }
+            { text: '📸 1', callback_data: 'U1' },
+            { text: '📸 2', callback_data: 'U2' },
+            { text: '📸 3', callback_data: 'U3' },
+            { text: '📸 4', callback_data: 'U4' }
           ],
           [
-            { text: 'V1', callback_data: 'V1' },
-            { text: 'V2', callback_data: 'V2' },
-            { text: 'V3', callback_data: 'V3' },
-            { text: 'V4', callback_data: 'V4' }
-          ]
+            { text: '♻️ 1', callback_data: 'V1' },
+            { text: '♻️ 2', callback_data: 'V2' },
+            { text: '♻️ 3', callback_data: 'V3' },
+            { text: '♻️ 4', callback_data: 'V4' }
+          ],
+          [{ text: '🔁 Regenerate', callback_data: 'V1' }]
         ]
       })
     }
@@ -90,155 +83,145 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const imgDir = './Imagines'
     const filePath = `${imgDir}/${userMessageId}.png`
 
-    await spinnerOff(bot, chatID, spinner)
-      .then(() => bot.deleteMessage(chatID, waiting.message_id))
-    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options)
+    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
+      waiting)
   } catch (error) {
     await bot.sendMessage(chatID, `${error}`)
   }
 
-  bot.on('callback_query', async query => {
+  var eventEmitter = new events.EventEmitter()
+
+  const forU = async (query) => {
+    const { id: chat_id, title: chat_name } = query.message.chat
+    const { message_id } = query.message
+    const selectedLabel = query.data
+    let waiting
+    let spinner
+    try {
+      spinner = await spinnerOn(bot, chatID)
+      waiting = await loaderOn(3, bot, chat_id)
+      const UCustomID = Imagine.options?.find(
+        o => o.label === selectedLabel
+      )?.custom
+      const Upscale = await client.Custom({
+        msgId: Imagine.id,
+        flags: Imagine.flags,
+        customId: UCustomID,
+        loading: async (uri, progress) => {
+          console.log(`Loading: ${uri}, progress: ${progress}`)
+          await loaderOn(progress, bot, chatID, waiting?.message_id)
+        }
+      })
+
+      const imgUrl = Upscale.uri
+      const imgDir = './Upscales'
+      const filePath = `${imgDir}/${message_id}.png`
+      const options = {
+        reply_to_message_id: userMessageId
+      }
+      await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options, TYPE_RESPONSE_MJ.DOCUMENT, spinner,
+        waiting)
+    } catch (error) {
+      await bot.sendMessage(chat_id, error, { reply_to_message_id: userMessageId })
+    }
+  }
+
+  const forV = async (query) => {
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data
     let loadingMessage
+      let spinner
+      let waiting
     try {
-      if (selectedLabel.includes('U')) {
-        loadingMessage = await bot.sendMessage(chat_id, `Upscaling Image ${selectedLabel}`)
-        const UCustomID = Imagine.options?.find(
-          o => o.label === selectedLabel
-        )?.custom
-        const Upscale = await client.Custom({
-          msgId: Imagine.id,
-          flags: Imagine.flags,
-          customId: UCustomID,
-          loading: (uri, progress) => {
-            console.log(`Loading: ${uri}, progress: ${progress}`)
-            bot.editMessageText(
-              `Upscaling Image ${selectedLabel}: 🚀 ${progress}`,
-              {
-                message_id: loadingMessage.message_id,
-                chat_id
-              }
-            )
-          }
-        })
+      spinner = await spinnerOn(bot, chatID)
+      waiting = await loaderOn(3, bot, chat_id)
+      const VCustomID = Imagine.options?.find(
+        o => o.label === selectedLabel
+      )?.custom
 
-        const imgUrl = Upscale.uri
-        const imgDir = './Upscales'
-        const filePath = `${imgDir}/${message_id}.png`
-        const options = {
-          reply_to_message_id: userMessageId
+      Variation = await client.Custom({
+        msgId: Imagine.id,
+        flags: Imagine.flags,
+        customId: VCustomID,
+        content: prompt,
+        loading: async (uri, progress) => {
+          console.log(`Loading: ${uri}, progress: ${progress}`)
+          await loaderOn(progress, bot, chatID, waiting?.message_id)
         }
-        await bot.deleteMessage(chat_id, loadingMessage.message_id)
-        await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options, TYPE_RESPONSE_MJ.DOCUMENT)
-      }
-      else if (selectedLabel.includes('V')) {
-        // await bot.deleteMessage(chat_id, message_id)
-        loadingMessage = await bot.sendMessage(chat_id, `Generating Variants of ${selectedLabel}.`)
-        const VCustomID = Imagine.options?.find(
-          o => o.label === selectedLabel
-        )?.custom
+      })
 
-        Variation = await client.Custom({
-          msgId: Imagine.id,
-          flags: Imagine.flags,
-          customId: VCustomID,
-          content: prompt,
-          loading: (uri, progress) => {
-            console.log(`Loading: ${uri}, progress: ${progress}`)
-            bot.editMessageText(
-              `Generating Variants of ${selectedLabel}: 🚀 ${progress}`,
-              {
-                message_id: loadingMessage.message_id,
-                chat_id
-              }
-            )
-          }
-        })
-
-        const options = {
-          reply_markup: JSON.stringify({
-            inline_keyboard: [
-          [
-            { text: 'U1', callback_data: 'U1' },
-            { text: 'U2', callback_data: 'U2' },
-            { text: 'U3', callback_data: 'U3' },
-            { text: 'U4', callback_data: 'U4' }
-          ],
-          [
-            { text: 'V1', callback_data: 'V1' },
-            { text: 'V2', callback_data: 'V2' },
-            { text: 'V3', callback_data: 'V3' },
-            { text: 'V4', callback_data: 'V4' }
+      const options = {
+        reply_markup: JSON.stringify({
+          inline_keyboard: [
+            [
+              { text: '📸 1', callback_data: 'U1' },
+              { text: '📸 2', callback_data: 'U2' },
+              { text: '📸 3', callback_data: 'U3' },
+              { text: '📸 4', callback_data: 'U4' }
+            ],
+            [
+              { text: '♻️ 1', callback_data: 'V1' },
+              { text: '♻️ 2', callback_data: 'V2' },
+              { text: '♻️ 3', callback_data: 'V3' },
+              { text: '♻️ 4', callback_data: 'V4' }
+            ],
+          [{ text: '🔁 Regenerate', callback_data: 'V1' }]
           ]
-        ]
-          })
-        }
-
-        const { id: user_id, username } = query.from
-        db.midjourney.create({
-          query_id: query.id,
-          message_id,
-          chat_instance: query.chat_instance,
-          chat_id,
-          chat_name,
-          user_id,
-          username,
-          prompt,
-          data: selectedLabel
-        }).then(res => {
-          console.log('🔵 sequelize.midjourney.create ')
-        })
-
-
-        const imgUrl = Variation.uri
-        const imgDir = './Variations'
-        const filePath = `${imgDir}/${message_id}.png`
-
-        await bot.deleteMessage(chat_id, loadingMessage.message_id)
-        await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options)
-
-        bot.on('callback_query', async query_up => {
-          const imgLabel = query_up.data
-
-          loadingMessage = await bot.sendMessage(chat_id, `Upscaling Image from Variants ${imgLabel}`)
-
-          const upscaleCustomID = Variation.options?.find(
-            o => o.label === imgLabel
-          )?.custom
-
-          const variationUpscale = await client.Custom({
-            msgId: Variation.id,
-            flags: Variation.flags,
-            customId: upscaleCustomID,
-            loading: (uri, progress) => {
-              console.log(`Loading: ${uri}, progress: ${progress}`)
-              bot.sendMessage(
-                `Upscaling Image from Variants ${imgLabel}: ${progress}`,
-                {
-                  message_id: loadingMessage.message_id,
-                  chat_id
-                }
-              )
-            }
-          })
-
-          console.log(variationUpscale)
-
-          const imgUrl = variationUpscale.uri
-          const imgDir = './VariationsUpscales'
-          const filePath = `${imgDir}/${message_id}.png`
-          const options = {
-            reply_to_message_id: userMessageId
-          }
-
-          await bot.deleteMessage(chat_id, loadingMessage.message_id)
-          await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options, TYPE_RESPONSE_MJ.DOCUMENT)
         })
       }
+
+      const { id: user_id, username } = query.from
+      db.midjourney.create({
+        query_id: query.id,
+        message_id,
+        chat_instance: query.chat_instance,
+        chat_id,
+        chat_name,
+        user_id,
+        username,
+        prompt,
+        data: selectedLabel
+      }).then(res => {
+        console.log('🔵 sequelize.midjourney.create ')
+      })
+
+      const imgUrl = Variation.uri
+      const imgDir = './Variations'
+      const filePath = `${imgDir}/${message_id}.png`
+
+      await saveAndSendPhoto(
+        imgUrl,
+        imgDir,
+        filePath,
+        chat_id,
+        bot,
+        options,
+        TYPE_RESPONSE_MJ.PHOTO,
+        spinner,
+        waiting
+      )
+
     } catch (error) {
       await bot.sendMessage(chat_id, error, { reply_to_message_id: userMessageId })
     }
+  }
+
+  for (let i = 1; i < 5; i++) {
+    eventEmitter.on(`U${i}`, function(query) {
+      forU(query)
+    })
+  }
+
+  for (let i = 1; i < 5; i++) {
+    eventEmitter.on(`V${i}`, function(query) {
+      forV(query)
+    })
+  }
+
+  bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+    eventEmitter.emit(callbackQuery.data, callbackQuery)
+    eventEmitter.removeAllListeners()
+    bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
   })
 }

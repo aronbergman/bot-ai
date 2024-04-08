@@ -7,7 +7,6 @@ import { startBot } from './bot/commands/start.js'
 import { addSudoer } from './bot/commands/admin/addSudoer.js'
 import { removeSudoer } from './bot/commands/admin/removeSudoer.js'
 import { listSudoers } from './bot/commands/admin/listSudoers.js'
-import { onMessageText } from './bot/commands/_refact/onMessageText.js'
 import { onMessageVoice } from './bot/commands/_refact/onMessageVoice.js'
 import { textToSpeach } from './bot/commands/_refact/textToSpeach.js'
 import { getId } from './bot/commands/admin/getId.js'
@@ -22,7 +21,7 @@ import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
 import { keyboardHelp } from './bot/commands/keyboard/help.js'
 import { keyboardMidjourney } from './bot/commands/keyboard/midjourney.js'
-import { onMessageTextDefault } from './bot/commands/onMessageTextDefault.js'
+import { isModeMidjourney } from './bot/utils/getMode.js'
 
 dotenv.config()
 
@@ -38,6 +37,7 @@ startBot(bot)
 
 bot.on('message', (msg, match) => {
   console.log('msg.text', msg.text)
+
   switch (msg.text) {
     case COMMAND_ACCOUNT:
       return keyboardMyAccount(bot, msg)
@@ -52,7 +52,7 @@ bot.on('message', (msg, match) => {
       return keyboardHelp(bot, msg)
       break
     default:
-      return onMessageTextDefault(bot, msg, match, sudoUser)
+      return isModeMidjourney(bot, msg, match, sudoUser)
   }
 })
 

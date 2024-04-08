@@ -4,10 +4,14 @@ import {
 	componentPagesMenu,
 	dashboardPagesMenu,
 	demoPagesMenu,
-	gettingStartedPagesMenu,
-	pageLayoutTypesPagesMenu,
-} from '../menu';
+	gettingStartedPagesMenu, managingBotSWorkMenu,
+	pageLayoutTypesPagesMenu
+} from '../menu'
 import Login from '../pages/presentation/auth/Login';
+
+const MANAGING = {
+	TRANSLATE: lazy(() => import('../pages/managing/TranslatePage'))
+};
 
 const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/presentation/dashboard/DashboardPage')),
@@ -190,6 +194,10 @@ const EXTRA = {
 };
 
 const presentation: RouteProps[] = [
+	{
+		path: managingBotSWorkMenu.managingBotSWork.path,
+		element: <MANAGING.TRANSLATE />,
+	},
 	/**
 	 * Landing
 	 */
@@ -811,6 +819,7 @@ const documentation: RouteProps[] = [
 		element: <EXTRA.HOOKS />,
 	},
 ];
+
 const contents = [...presentation, ...documentation];
 
 export default contents;

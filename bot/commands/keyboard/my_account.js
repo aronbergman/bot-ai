@@ -3,17 +3,17 @@ import { db } from '../../db/index.js'
 import * as events from 'events'
 
 export const keyboardMyAccount = async (bot, msg) => {
-  try {
-    let accountMessage
+  let accountMessage
     const { id: chatId } = msg.chat
     const msgId = msg.message_id
     const { id } = msg.from
-    // TODO: рефакторинг в отдельный файл
+      // TODO: рефакторинг в отдельный файл
     const generalOptions = {
       parse_mode: 'HTML',
       reply_to_message_id: msgId,
       disable_web_page_preview: true
     }
+  try {
     // TODO: рефакторинг в отдельный файл
     const firstLevel = {
       message: MY_ACCOUNT,
@@ -127,7 +127,6 @@ export const keyboardMyAccount = async (bot, msg) => {
       bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
     })
 
-
     db.subscriber.findOne({
       where: {
         chat_id: chatId
@@ -137,10 +136,10 @@ export const keyboardMyAccount = async (bot, msg) => {
         return
       let mode
       switch (res?.dataValues.mode) {
-        case '/midjourney':
+        case 'MIDJOURNEY':
           mode = 'MidJourney'
           break
-        case '/gpt':
+        case 'GPT':
           mode = 'ChatGPT'
           break
         default:
@@ -155,7 +154,8 @@ export const keyboardMyAccount = async (bot, msg) => {
 
       const timeout = setTimeout(() => {
         // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
-        accountMessage = bot.editMessageText(
+        clearTimeout(timeout)
+        bot.editMessageText(
           firstLevel.message,
           {
             message_id: accountMessage.message_id,
@@ -163,9 +163,10 @@ export const keyboardMyAccount = async (bot, msg) => {
             ...firstLevel.options
           }
         )
-        clearTimeout(timeout)
+              console.log("2 accountMessage", accountMessage.message_id)
       }, 1000)
     })
+          console.log("3 accountMessage", accountMessage.message_id)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)
   }

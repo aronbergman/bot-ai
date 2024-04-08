@@ -6,6 +6,17 @@ export const spinnerOn = async (bot, chat_id) => {
     chat_id,
     emojis[Math.floor(Math.random() * emojis.length)]
   )
+  const timeout = setInterval(() => {
+    bot.editMessageText(
+      emojis[Math.floor(Math.random() * emojis.length)],
+      {
+        message_id: message.message_id,
+        chat_id
+      }
+    ).catch(() => {
+      // clearInterval(timeout)
+    })
+  }, 5000)
   return message.message_id
 }
 
