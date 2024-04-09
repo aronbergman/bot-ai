@@ -23,6 +23,7 @@ import { keyboardHelp } from './bot/commands/keyboard/help.js'
 import { keyboardMidjourney } from './bot/commands/keyboard/midjourney.js'
 import { isModeMidjourney } from './bot/utils/getMode.js'
 import { keyboardQuiz } from './bot/commands/keyboard/quiz.js'
+import { sendMessage } from './bot/commands/admin/sendMessage.js'
 
 dotenv.config()
 
@@ -65,6 +66,7 @@ bot.on('message', (msg, match) => {
 
 // Use admin command
 getId(bot)
+sendMessage(bot)
 addSudoer(bot, sudoUser)
 removeSudoer(bot, sudoUser)
 listSudoers(bot, sudoUser)
