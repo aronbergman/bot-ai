@@ -28,7 +28,7 @@ dotenv.config()
 const { TELEGRAM_API_KEY, DEV_TG_BOT_TOKEN, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
 
-const bot = new TelegramBot(TELEGRAM_API_KEY, { polling: true })
+const bot = new TelegramBot(DEV_TG_BOT_TOKEN, { polling: true })
 
 bot.on('polling_error', console.log)
 

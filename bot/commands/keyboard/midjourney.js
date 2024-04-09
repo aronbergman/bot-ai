@@ -1,6 +1,7 @@
 import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
 import { db } from '../../db/index.js'
-import { START_MIDJOURNEY } from '../../constants/index.js'
+import { COMMAND_GPT, START_MIDJOURNEY } from '../../constants/index.js'
+import events from 'events'
 
 /*
 
@@ -42,12 +43,24 @@ export const keyboardMidjourney = async (bot, msg) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: '🏞 Купить подписку', callback_data: 'B' }],
-            [{ text: 'Выйти', callback_data: 'C' }]
+            [{ text: 'Выйти', callback_data: COMMAND_GPT }]
           ]
         }
       })
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage.message_id, START_MIDJOURNEY)
+
+      var eventEmitter = new events.EventEmitter()
+
+    eventEmitter.on(COMMAND_GPT, function(query) {
+
+    })
+
+  bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+    eventEmitter.emit(callbackQuery.data, callbackQuery)
+    // eventEmitter.removeAllListeners()
+    bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
+  })
   }
 
   const { id: chatId } = msg.chat
@@ -63,7 +76,7 @@ export const keyboardMidjourney = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
-      if (res?.mode.match(/\MIDJOURNEYy/))
+      if (res?.mode.match(/\MIDJOURNEY/))
         return sendMidjourney(bot, chatId, options)
       else if (res?.mode) {
         db.subscriber.update(

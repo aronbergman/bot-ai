@@ -7,7 +7,9 @@ import dotenv from 'dotenv'
 import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import events from 'events'
 import { loaderOn } from '../../utils/loader.js'
-
+// таблица пользователей.
+//   кол-во пользователей , как часто он заходит (сколько было запросов по каждой AIб история запросов, история начисления баллов),
+// таблица где видна история покупок
 dotenv.config()
 
 export const modeMidjourney = async (bot, sudoUser, msg, match) => {
@@ -75,7 +77,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
             { text: '♻️ 3', callback_data: 'V3' },
             { text: '♻️ 4', callback_data: 'V4' }
           ],
-          [{ text: '🔁 Regenerate', callback_data: 'V1' }]
+          [{ text: '🔁 Regenerate', callback_data: 'R' }]
         ]
       })
     }
@@ -131,8 +133,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const { message_id } = query.message
     const selectedLabel = query.data
     let loadingMessage
-      let spinner
-      let waiting
+    let spinner
+    let waiting
     try {
       spinner = await spinnerOn(bot, chatID)
       waiting = await loaderOn(3, bot, chat_id)
@@ -166,7 +168,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
               { text: '♻️ 3', callback_data: 'V3' },
               { text: '♻️ 4', callback_data: 'V4' }
             ],
-          [{ text: '🔁 Regenerate', callback_data: 'V1' }]
+            [{ text: '🔁 Regenerate', callback_data: 'V1' }]
           ]
         })
       }
@@ -221,7 +223,9 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
 
   bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     eventEmitter.emit(callbackQuery.data, callbackQuery)
-    eventEmitter.removeAllListeners()
+    // eventEmitter.removeAllListeners()
     bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
   })
 }
+
+// 20 апреля 135/200
