@@ -1,20 +1,10 @@
 import { modeChatGPT } from './modes/chatGPT.js'
-import { infoMessageWithChatGPT } from './hoc/infoWithChatGPT.js'
 import events from 'events'
 import { MODS_CHAT } from '../constants/index.js'
 import { db } from '../db/index.js'
+import { removeQueryFromPrevMessage } from './hoc/removeQueryFromPrevMsg.js'
 
 // TODO: BUG: Невозможно повторно отправить запрос на смену характера из одного сообщения пользователя
-
-const removeQueryFromPrevMessage = async (bot, chatID, firstMessage) => {
-  return await bot.editMessageText(
-    firstMessage.text,
-    {
-      message_id: firstMessage.message_id,
-      chat_id: chatID
-    }
-  ).catch(err => console.log(err))
-}
 
 export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
   const { id: chatID } = msg.chat

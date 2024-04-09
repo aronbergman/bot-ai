@@ -11,7 +11,6 @@ export const keyboardChatGPT = async (bot, msg) => {
     )
 
     const timeout = setTimeout((chatId, message_id) => {
-      console.log("message_id", message_id)
       bot.deleteMessage(chatId, message_id)
       clearTimeout(timeout)
       return autoRemoveMessage(`🤖 Выбран <b>ChatGPT</b> 3.5`, bot, chatId, options, 5000)
@@ -35,7 +34,14 @@ export const keyboardChatGPT = async (bot, msg) => {
         return sendChatGPT(bot, chatId, options)
       else if (res?.mode) {
         db.subscriber.update(
-          { mode: 'GPT' },
+          {
+            mode: 'GPT',
+            user_id: msg.from.id,
+            first_name: msg.from.first_name,
+            last_name: msg.from.last_name,
+            username: msg.from.username,
+            language_code: msg.from.language_code
+          },
           { where: { chat_id: chatId } }
         ).then(res => {
           bot.select_mode = 'GPT'
@@ -45,6 +51,10 @@ export const keyboardChatGPT = async (bot, msg) => {
         db.subscriber.create({
           chat_id: chatId,
           user_id: msg.from.id,
+          first_name: msg.from.first_name,
+          last_name: msg.from.last_name,
+          username: msg.from.username,
+          language_code: msg.from.language_code,
           mode: 'GPT'
         }).then(res => {
           bot.select_mode = 'GPT'

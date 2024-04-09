@@ -50,17 +50,17 @@ export const keyboardMidjourney = async (bot, msg) => {
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage.message_id, START_MIDJOURNEY)
 
-      var eventEmitter = new events.EventEmitter()
+    var eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(COMMAND_GPT, function(query) {
 
     })
 
-  bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-    eventEmitter.emit(callbackQuery.data, callbackQuery)
-    // eventEmitter.removeAllListeners()
-    bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
-  })
+    bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+      eventEmitter.emit(callbackQuery.data, callbackQuery)
+      // eventEmitter.removeAllListeners()
+      bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
+    })
   }
 
   const { id: chatId } = msg.chat
@@ -80,7 +80,13 @@ export const keyboardMidjourney = async (bot, msg) => {
         return sendMidjourney(bot, chatId, options)
       else if (res?.mode) {
         db.subscriber.update(
-          { mode: 'MIDJOURNEY' },
+          {
+            mode: 'MIDJOURNEY',
+            first_name: msg.from.first_name,
+            last_name: msg.from.last_name,
+            username: msg.from.username,
+            language_code: msg.from.language_code
+          },
           { where: { chat_id: chatId } }
         ).then(res => {
           bot.select_mode = 'MIDJOURNEY'
@@ -90,6 +96,10 @@ export const keyboardMidjourney = async (bot, msg) => {
         db.subscriber.create({
           chat_id: chatId,
           user_id: msg.from.id,
+          first_name: msg.from.first_name,
+          last_name: msg.from.last_name,
+          username: msg.from.username,
+          language_code: msg.from.language_code,
           mode: 'MIDJOURNEY'
         }).then(res => {
           bot.select_mode = 'MIDJOURNEY'

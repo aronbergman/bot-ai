@@ -16,12 +16,13 @@ import { db } from './bot/db/index.js'
 import api from './api/routes/auth.routes.js'
 
 import api0 from './api/routes/user.routes.js'
-import { COMMAND_ACCOUNT, COMMAND_GPT, COMMAND_HELP, COMMAND_MIDJOURNEY } from './bot/constants/index.js'
+import { COMMAND_ACCOUNT, COMMAND_GPT, COMMAND_HELP, COMMAND_MIDJOURNEY, COMMAND_QUIZ } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
 import { keyboardHelp } from './bot/commands/keyboard/help.js'
 import { keyboardMidjourney } from './bot/commands/keyboard/midjourney.js'
 import { isModeMidjourney } from './bot/utils/getMode.js'
+import { keyboardQuiz } from './bot/commands/keyboard/quiz.js'
 
 dotenv.config()
 
@@ -50,6 +51,9 @@ bot.on('message', (msg, match) => {
       break
     case COMMAND_HELP:
       return keyboardHelp(bot, msg)
+      break
+    case COMMAND_QUIZ:
+      return keyboardQuiz(bot, msg)
       break
     default:
       return isModeMidjourney(bot, msg, match, sudoUser)
