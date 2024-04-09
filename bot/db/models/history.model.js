@@ -6,11 +6,14 @@ export default (sequelize, DataTypes) => {
         required: true,
         unique: true
       },
-      user_id: {
+      message_id: {
         type: DataTypes.DOUBLE,
         required: true
       },
       nickname: {
+        type: DataTypes.STRING
+      },
+      fullname: {
         type: DataTypes.STRING
       },
       request: {

@@ -2,7 +2,7 @@ import { INITIAL_SESSION } from '../../constants/index.js'
 // TODO: сделать цикл и возможность отправки сообщений группам пользователей
 export const sendMessage = bot => {
   bot.onText(/^\/msg+/ig, async msg => {
-    const text = msg.text.split('//')
+    const text = msg.text.split('&&')
     console.log("text", text)
     const { id: chatId } = msg.chat
     const options = {

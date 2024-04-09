@@ -1,5 +1,4 @@
-const miniGames = ['🎲', '🎯', '🏀', '⚽', '🎳', '🎰']
-const emojis = ['🐾', '🤖', '💡', '🚀', '⌛️']
+const emojis = ['🐾', '🤖', '💡', '🚀', '⌛️', '👾', '👻', '👽', '🦊']
 
 export const spinnerOn = async (bot, chat_id) => {
   const message = await bot.sendMessage(
@@ -14,16 +13,11 @@ export const spinnerOn = async (bot, chat_id) => {
         chat_id
       }
     ).catch(() => {
-      // clearInterval(timeout)
+      // TODO: clearInterval(timeout)
     })
   }, 5000)
   return message.message_id
 }
-
-// TODO: Разработка функционала игры для приобретения бонусов (Максим разработает план игры)
-export const diceOn = (bot, chat_id) => bot.sendDice(chat_id, {
-  emoji: miniGames[Math.floor(Math.random() * miniGames.length)]
-})
 
 export const spinnerOff = async (bot, chat_id, message_id) => {
   console.log('message', message_id)

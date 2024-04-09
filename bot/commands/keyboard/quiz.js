@@ -79,7 +79,7 @@ export const keyboardQuiz = async (bot, msg) => {
               ...options,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: 'Твоя статистика', callback_data: 'HISTORY_QUIZ' }]
+                  [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
                 ]
               }
             }
@@ -151,7 +151,7 @@ export const keyboardQuiz = async (bot, msg) => {
               ...options,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: 'Твоя статистика', callback_data: 'HISTORY_QUIZ' }]
+                  [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
                 ]
               }
             }
@@ -203,8 +203,8 @@ export const keyboardQuiz = async (bot, msg) => {
 
       // res.dataValues.quiz_available
 
-      if (res?.dataValues.quiz_available == 0) {
-        keyboard.push({ text: 'У тебя больше нет попыток...', callback_data: `EXIT` })
+      if (res?.dataValues?.quiz_available == 0) {
+        keyboard.push({ text: '⌛️ Новая игра через неделю', callback_data: `EXIT` })
       } else if (res?.dataValues.quiz_type_available === 'SUBSCRIBE') {
         keyboard.push({
           text: `Выиграй подписку 🥳 (${res.dataValues.quiz_available})`,
@@ -233,7 +233,7 @@ export const keyboardQuiz = async (bot, msg) => {
             reply_markup: {
               inline_keyboard: [
                 keyboard,
-                [{ text: 'Твой опыт', callback_data: 'HISTORY_QUIZ' }]
+                [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
               ]
             }
           }

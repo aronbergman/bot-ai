@@ -10,7 +10,7 @@ export const TYPE_RESPONSE_MJ = {
 export const COMMAND_GPT = '✏️ Новый диалог GPT'
 export const COMMAND_MIDJOURNEY = '🏞 Midjourney'
 export const COMMAND_ACCOUNT = '🔐 My account'
-export const COMMAND_QUIZ = '🎰 Викторина'
+export const COMMAND_QUIZ = 'Точка бифуркации'
 export const COMMAND_HELP = '🔍 I need help'
 export const COMMAND_START = `
 Привет! Твой идеальный чат-бот GPT готов к работе!

@@ -26,7 +26,8 @@ export default (sequelize, DataTypes) => {
         defaultValue: 'en'
       },
       mode: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        defaultValue: "GPT"
       },
       modeGPT: {
         type: DataTypes.STRING,
@@ -44,6 +45,28 @@ export default (sequelize, DataTypes) => {
       quiz_available: {
         type: DataTypes.DOUBLE,
         defaultValue: 3
+      },
+      quiz_count: {
+        type: DataTypes.DOUBLE,
+        defaultValue: 0
+      },
+      MI_count: {
+        type: DataTypes.DOUBLE,
+        defaultValue: 0
+      },
+      GPT_count: {
+        type: DataTypes.DOUBLE,
+        defaultValue: 0
+      },
+      FILES_count: {
+        type: DataTypes.DOUBLE,
+        defaultValue: 0
+      },
+      comment: {
+        type: DataTypes.STRING,
+      },
+      tags: {
+        type: DataTypes.STRING,
       }
     }
   )

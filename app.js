@@ -13,9 +13,9 @@ import { getId } from './bot/commands/admin/getId.js'
 
 import { db } from './bot/db/index.js'
 
-import api from './api/routes/auth.routes.js'
-
-import api0 from './api/routes/user.routes.js'
+import authRoutes from './api/routes/auth.routes.js'
+import userRoutes from './api/routes/user.routes.js'
+import subsRoutes from './api/routes/subs.routes.js'
 import { COMMAND_ACCOUNT, COMMAND_GPT, COMMAND_HELP, COMMAND_MIDJOURNEY, COMMAND_QUIZ } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
@@ -89,8 +89,9 @@ app.options('*', cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-api(app)
-api0(app)
+authRoutes(app)
+userRoutes(app)
+subsRoutes(app)
 
 // initial()
 function initial() {

@@ -7,6 +7,7 @@ import RoleSchema from './models/role.model.js'
 import UserRolesSchema from './models/user_roles.model.js'
 import SudoUserSchema from './models/sudoer.model.js'
 import QuizSchema from './models/quiz.model.js'
+import HistorySchema from './models/history.model.js'
 import { dbConfig } from './db.config.js'
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -43,6 +44,7 @@ db.userRoles = UserRolesSchema(sequelize, DataTypes)
 db.sudouser = SudoUserSchema(sequelize, DataTypes)
 db.payment = PaymentSchema(sequelize, DataTypes)
 db.quiz = QuizSchema(sequelize, DataTypes)
+db.history = HistorySchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
