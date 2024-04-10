@@ -27,7 +27,7 @@ import { sendMessage } from './bot/commands/admin/sendMessage.js'
 
 dotenv.config()
 
-const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT } = process.env
+const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
 
 const bot = new TelegramBot(TELEGRAM_API_KEY, { polling: true })
@@ -74,7 +74,7 @@ listSudoers(bot, sudoUser)
 const app = express()
 
 var corsOptions = {
-  origin: `http://localhost:${REACT_ADMIN_PORT}`
+  origin: `${PROTOCOL}://${CORS_HOST}:${REACT_ADMIN_PORT}`
 }
 
 app.use(cors(corsOptions))

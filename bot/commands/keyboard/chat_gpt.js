@@ -30,9 +30,9 @@ export const keyboardChatGPT = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
-      if (res?.mode.match(/\GPT/))
+      if (res?.dataValues.mode?.match(/\GPT/))
         return sendChatGPT(bot, chatId, options)
-      else if (res?.mode) {
+      else if (res?.dataValues.mode) {
         db.subscriber.update(
           {
             mode: 'GPT',

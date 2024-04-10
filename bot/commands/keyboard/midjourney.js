@@ -76,9 +76,10 @@ export const keyboardMidjourney = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
-      if (res?.mode.match(/\MIDJOURNEY/))
+      console.log("res", res)
+      if (res?.dataValues.mode?.match(/\MIDJOURNEY/))
         return sendMidjourney(bot, chatId, options)
-      else if (res?.mode) {
+      else if (res?.dataValues.mode) {
         db.subscriber.update(
           {
             mode: 'MIDJOURNEY',
