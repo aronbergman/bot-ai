@@ -8,12 +8,19 @@ import UserRolesSchema from './models/user_roles.model.js'
 import SudoUserSchema from './models/sudoer.model.js'
 import QuizSchema from './models/quiz.model.js'
 import HistorySchema from './models/history.model.js'
+import TranslateSchema from './models/translait.model.js'
 import { dbConfig } from './db.config.js'
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   port: dbConfig.port,
+  define: {
+    charset: 'utf8',
+    collate: 'utf8_general_ci',
+    timestamps: true
+  },
+  logging:false,
   operatorsAliases: false,
   pool: {
     max: dbConfig.pool.max,
@@ -45,6 +52,7 @@ db.sudouser = SudoUserSchema(sequelize, DataTypes)
 db.payment = PaymentSchema(sequelize, DataTypes)
 db.quiz = QuizSchema(sequelize, DataTypes)
 db.history = HistorySchema(sequelize, DataTypes)
+db.translate = TranslateSchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
