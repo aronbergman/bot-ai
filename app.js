@@ -38,8 +38,13 @@ bot.on('polling_error', console.log)
 startBot(bot)
 
 bot.on('message', (msg, match) => {
-  console.log('msg.text', msg.text)
-
+    db.history.create({
+      chat_id: msg.chat.id,
+      message_id: msg.message_id,
+      nickname: msg.chat.username,
+      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+      request: msg.text
+    })
   switch (msg.text) {
     case COMMAND_ACCOUNT:
       return keyboardMyAccount(bot, msg)

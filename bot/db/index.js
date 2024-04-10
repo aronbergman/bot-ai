@@ -16,8 +16,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   port: dbConfig.port,
   define: {
-    charset: 'utf8',
-    collate: 'utf8_general_ci',
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_unicode_ci',
     timestamps: true
   },
   logging:false,

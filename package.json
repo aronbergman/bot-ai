@@ -13,8 +13,10 @@
     "jsonwebtoken": "^9.0.2",
     "midjourney": "^4.3.11",
     "mysql2": "^3.9.3",
+    "nanoid": "^5.0.7",
     "node-telegram-bot-api": "^0.61.0",
     "openai": "3.2.1",
+    "payok": "^2.0.0",
     "sequelize": "^6.37.1",
     "sqlite3": "^5.1.7"
   },

@@ -1,18 +1,23 @@
 import { INITIAL_SESSION, MY_ACCOUNT, TARIFS } from '../../constants/index.js'
 import { db } from '../../db/index.js'
 import * as events from 'events'
+import { PAYOK } from 'payok'
+import { nanoid } from 'nanoid'
+import dotenv from 'dotenv'
+
+dotenv.config({ path: '../.env' })
 
 export const keyboardMyAccount = async (bot, msg) => {
   let accountMessage
-    const { id: chatId } = msg.chat
-    const msgId = msg.message_id
-    const { id } = msg.from
-      // TODO: рефакторинг в отдельный файл
-    const generalOptions = {
-      parse_mode: 'HTML',
-      reply_to_message_id: msgId,
-      disable_web_page_preview: true
-    }
+  const { id: chatId } = msg.chat
+  const msgId = msg.message_id
+  const { id } = msg.from
+  // TODO: рефакторинг в отдельный файл
+  const generalOptions = {
+    parse_mode: 'HTML',
+    reply_to_message_id: msgId,
+    disable_web_page_preview: true
+  }
   try {
     // TODO: рефакторинг в отдельный файл
     const firstLevel = {
@@ -104,7 +109,6 @@ export const keyboardMyAccount = async (bot, msg) => {
     })
 
     eventEmitter.on('get_first_level', function() {
-      console.log('buy_subscription', accountMessage.message_id)
       bot.editMessageText(
         firstLevel.message,
         {
@@ -117,8 +121,74 @@ export const keyboardMyAccount = async (bot, msg) => {
 
     for (let i = 0; i < TARIFS.length; i++) {
       eventEmitter.on(TARIFS[i].callback_data, function() {
-        // TODO: Добавить ссылки на открытие оплаты
-        console.log('💚 ', TARIFS[i].text)
+        const tarif = TARIFS[i].callback_data.split('_')
+
+        const payok = new PAYOK({
+          apiId: process.env.PAYOK_APIID,
+          apiKey: process.env.PAYOK_APIKEY,
+          secretKey: process.env.PAYOK_SECRETKEY,
+          shop: process.env.PAYOK_SHOP
+        })
+
+        db.payment.create({
+          payment_id: nanoid(7),
+          type_of_tariff: tarif[0],
+          duration: tarif[1],
+          price: tarif[2],
+          currency: 'RUB',
+          user_id: chatId,
+          payment_method: 'PAYOK'
+        }).then((invoice) => {
+
+          const link =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cd',
+          })
+
+          const linkSBP =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'sbp',
+          })
+
+          const linkCR =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cru',
+          })
+
+          const linkCW =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cwo',
+          })
+
+          bot.sendMessage(chatId,
+            `🔗 Счет сформирован, осталось только оплатить
+
+Подписка ${invoice.dataValues.type_of_tariff} ${invoice.dataValues.duration} 
+Сумма: ${invoice.dataValues.price} ${invoice.dataValues.currency}
+Номер платежа: ${invoice.dataValues.payment_id}
+
+Payok - оплачивайте следующими способами:
+   └ VISA, Mastercard, MIR, QIWI, YooMoney, Crypto
+`, {
+              ...generalOptions,
+              reply_markup: {
+                inline_keyboard: [
+                  [{text: '| Оплатить через Payok |', url: link.payUrl }],
+                  [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
+                  [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
+                  [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                ]
+              }
+            })
+        })
       })
     }
 
@@ -127,46 +197,24 @@ export const keyboardMyAccount = async (bot, msg) => {
       bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
     })
 
-    db.subscriber.findOne({
-      where: {
-        chat_id: chatId
-      }
-    }).then(async (res) => {
-      if (!res)
-        return
-      let mode
-      switch (res?.dataValues.mode) {
-        case 'MIDJOURNEY':
-          mode = 'MidJourney'
-          break
-        case 'GPT':
-          mode = 'ChatGPT'
-          break
-        default:
-          mode = '.'
-      }
+    accountMessage = await bot.sendMessage(
+      chatId,
+      '🔐',
+      generalOptions
+    )
 
-      accountMessage = await bot.sendMessage(
-        chatId,
-        '🔐',
-        generalOptions
+    const timeout = setTimeout((accountMessage) => {
+      // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
+      clearTimeout(timeout)
+      bot.editMessageText(
+        firstLevel.message,
+        {
+          message_id: accountMessage.message_id,
+          chat_id: chatId,
+          ...firstLevel.options
+        }
       )
-
-      const timeout = setTimeout(() => {
-        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
-        clearTimeout(timeout)
-        bot.editMessageText(
-          firstLevel.message,
-          {
-            message_id: accountMessage.message_id,
-            chat_id: chatId,
-            ...firstLevel.options
-          }
-        )
-              console.log("2 accountMessage", accountMessage.message_id)
-      }, 1000)
-    })
-          console.log("3 accountMessage", accountMessage.message_id)
+    }, 1000, accountMessage)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)
   }

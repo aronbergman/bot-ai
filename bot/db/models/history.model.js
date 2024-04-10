@@ -4,7 +4,6 @@ export default (sequelize, DataTypes) => {
       chat_id: {
         type: DataTypes.DOUBLE,
         required: true,
-        unique: true
       },
       message_id: {
         type: DataTypes.DOUBLE,
@@ -17,10 +16,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING
       },
       request: {
-        type: DataTypes.STRING
+        type: DataTypes.CHAR(255)
       },
       response: {
-        type: DataTypes.STRING
+        type: DataTypes.CHAR(255)
       }
     }
   )

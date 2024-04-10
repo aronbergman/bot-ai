@@ -7,7 +7,7 @@ export default (sequelize, DataTypes) => {
     {
       payment_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: DataTypes.UUIDV1(10),
         allowNull: false,
         primaryKey: true
       },
@@ -23,7 +23,7 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         allowNull: false,
       },
-      subs_end_date: {
+      subs_end_date: { // TODO: Добавить подсчет после подтверждения оплаты
         type: DataTypes.DATE,
         allowNull: true,
       },
