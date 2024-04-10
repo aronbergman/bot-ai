@@ -1,7 +1,12 @@
 import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
 import { db } from '../../db/index.js'
-import { COMMAND_GPT, START_MIDJOURNEY } from '../../constants/index.js'
+import { COMMAND_GPT, START_MIDJOURNEY, TARIFS } from '../../constants/index.js'
 import events from 'events'
+import { PAYOK } from 'payok'
+import { nanoid } from 'nanoid'
+import dotenv from 'dotenv'
+
+dotenv.config({ path: '../.env' })
 
 /*
 
@@ -36,25 +41,144 @@ export const keyboardMidjourney = async (bot, msg) => {
       options
     )
 
-    const timeout = setTimeout((chatId, message_id, START_MIDJOURNEY) => {
-      bot.deleteMessage(chatId, message_id)
-      bot.sendMessage(chatId, START_MIDJOURNEY, {
+    const firstLevel = {
+      message: START_MIDJOURNEY,
+      options: {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🏞 Купить подписку', callback_data: 'B' }],
+            [{ text: '🏞 Купить подписку', callback_data: 'buy_subscription' }],
             [{ text: 'Выйти', callback_data: COMMAND_GPT }]
           ]
         }
+      }
+    }
+
+    const buyLevel = {
+      message: 'Выберите тарифный план, который хотите приобрести.',
+      options: {
+        ...options,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: TARIFS[0].text, callback_data: TARIFS[0].callback_data }],
+            [{ text: TARIFS[1].text, callback_data: TARIFS[1].callback_data }],
+            [{ text: TARIFS[2].text, callback_data: TARIFS[2].callback_data }],
+            [{ text: TARIFS[3].text, callback_data: TARIFS[3].callback_data }],
+            [{ text: TARIFS[4].text, callback_data: TARIFS[4].callback_data }],
+            [{ text: TARIFS[5].text, callback_data: TARIFS[5].callback_data }],
+            [{ text: TARIFS[6].text, callback_data: TARIFS[6].callback_data }],
+            [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
+          ]
+        }
+      }
+    }
+
+    const timeout = setTimeout((chatId, message_id, firstLevel, messageStart) => {
+      bot.editMessageText(firstLevel.message, {
+        chat_id: chatId,
+        message_id: message_id,
+        ...firstLevel.options
       })
       clearTimeout(timeout)
-    }, 1000, chatId, accountMessage.message_id, START_MIDJOURNEY)
+    }, 1000, chatId, accountMessage.message_id, firstLevel, )
 
     var eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on(COMMAND_GPT, function(query) {
-
+    eventEmitter.on('buy_subscription', async function() {
+      await bot.editMessageText(
+        buyLevel.message,
+        {
+          message_id: accountMessage.message_id,
+          chat_id: chatId,
+          ...buyLevel.options
+        }
+      )
     })
+
+    eventEmitter.on('get_first_level', function() {
+      bot.editMessageText(
+        firstLevel.message,
+        {
+          message_id: accountMessage.message_id,
+          chat_id: chatId,
+          ...firstLevel.options
+        }
+      )
+    })
+
+        for (let i = 0; i < TARIFS.length; i++) {
+      eventEmitter.on(TARIFS[i].callback_data, function() {
+        const tarif = TARIFS[i].callback_data.split('_')
+
+        const payok = new PAYOK({
+          apiId: process.env.PAYOK_APIID,
+          apiKey: process.env.PAYOK_APIKEY,
+          secretKey: process.env.PAYOK_SECRETKEY,
+          shop: process.env.PAYOK_SHOP
+        })
+
+        db.payment.create({
+          payment_id: nanoid(7),
+          type_of_tariff: tarif[0],
+          duration: tarif[1],
+          price: tarif[2],
+          currency: 'RUB',
+          user_id: chatId,
+          payment_method: 'PAYOK'
+        }).then((invoice) => {
+
+          const link =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cd',
+          })
+
+          const linkSBP =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'sbp',
+          })
+
+          const linkCR =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cru',
+          })
+
+          const linkCW =  payok.getPaymentLink({
+            amount: invoice.dataValues.price,
+            payment: invoice.dataValues.payment_id,
+            desc: TARIFS[i].text,
+            method: 'cwo',
+          })
+
+          bot.sendMessage(chatId,
+            `🔗 Счет сформирован, осталось только оплатить
+
+Подписка ${invoice.dataValues.type_of_tariff} ${invoice.dataValues.duration} 
+Сумма: ${invoice.dataValues.price} ${invoice.dataValues.currency}
+Номер платежа: ${invoice.dataValues.payment_id}
+
+Payok - оплачивайте следующими способами:
+   └ VISA, Mastercard, MIR, QIWI, YooMoney, Crypto
+`, {
+              ...options,
+              reply_markup: {
+                inline_keyboard: [
+                  [{text: '| Оплатить через Payok |', url: link.payUrl }],
+                  [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
+                  [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
+                  [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                ]
+              }
+            })
+        })
+      })
+    }
+
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
@@ -76,7 +200,6 @@ export const keyboardMidjourney = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
-      console.log("res", res)
       if (res?.dataValues.mode?.match(/\MIDJOURNEY/))
         return sendMidjourney(bot, chatId, options)
       else if (res?.dataValues.mode) {

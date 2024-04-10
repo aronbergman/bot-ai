@@ -26,8 +26,8 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Купить подписку', callback_data: 'buy_subscription' }],
-            [{ text: 'Получить бонус', callback_data: 'referral_program' }]
+            [{ text: '🔐 Купить подписку', callback_data: 'buy_subscription' }],
+            [{ text: 'Реферальная программа', callback_data: 'referral_program' }]
           ]
         }
       }
@@ -86,7 +86,6 @@ export const keyboardMyAccount = async (bot, msg) => {
     })
 
     eventEmitter.on('buy_subscription', async function() {
-      console.log('buy_subscription')
       await bot.editMessageText(
         buyLevel.message,
         {
