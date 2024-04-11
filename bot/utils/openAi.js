@@ -1,8 +1,6 @@
 import { createReadStream } from 'fs'
-import {
-  Configuration,
-  OpenAIApi
-} from 'openai'
+import * as parse from '@fortaine/fetch-event-source/parse'
+import { OpenAI as OpenAIApi } from 'openai'
 import dotenv from 'dotenv'
 
 dotenv.config({ path: '../.env' })
@@ -19,24 +17,31 @@ export class OpenAI {
 //  openai: OpenAIApi
 
   constructor(filepath) {
-    const configuration = new Configuration({
+    this.openai = new OpenAIApi({
       apiKey: process.env.OPENAI_API_KEY
     })
-
-    this.openai = new OpenAIApi(configuration)
     this.filepath = filepath
   }
 
-  async chat(messages) {
-    const response = await this.openai.createChatCompletion({
+  async chat(messages, bot, editId) {
+    const response = await this.openai.chat.completions.create({
       model: this.chatGPTVersion,
-      messages
+      messages,
+      stream: true
     })
-
-    return response.data.choices[0].message
+let answer = ''
+  for await (const chunk of response) {
+    answer += chunk.choices[0]?.delta?.content || ''
+    console.log('chunk.choices[0]?.delta?.content', chunk.choices[0]?.delta?.content)
+    bot.sendMessage(6221051172, chunk.choices[0]?.delta?.content).catch((err) => {console.log(err)})
   }
 
-   async transcription() {
+
+
+    // return new Promise(res => res(answer))
+  }
+
+  async transcription() {
     if (!this.filepath) {
       throw new Error('Something went wrong please try again.')
     }

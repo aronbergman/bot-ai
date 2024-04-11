@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "1.1.0",
+    "@fortaine/fetch-event-source": "^3.0.6",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -15,7 +16,7 @@
     "mysql2": "^3.9.3",
     "nanoid": "^5.0.7",
     "node-telegram-bot-api": "^0.61.0",
-    "openai": "3.2.1",
+    "openai": "4.33.0",
     "payok": "^2.0.0",
     "sequelize": "^6.37.1",
     "sqlite3": "^5.1.7"

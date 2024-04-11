@@ -18,7 +18,9 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   try {
     msg.ctx ??= INITIAL_SESSION
 
-    res = await spinnerOn(bot, chatID)
+    let messa = bot.sendMessage(chatID, 'Ghbdtn')
+
+    // res = await spinnerOn(bot, chatID)
 
     const openAi = new OpenAI()
 
@@ -27,29 +29,30 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       content: msg.text
     })
 
-    const response = await openAi.chat(msg?.ctx.messages)
+    const response = null
+   await openAi.chat(msg?.ctx.messages, bot, messa.message_id)
 
-    if (!response) {
-      throw new Error('Something went wrong please try again.')
-    }
+    // if (!response) {
+    //   throw new Error('Something went wrong please try again.')
+    // }
 
-    msg?.ctx.messages.push({
-      role: openAi.roles.Assistant,
-      content: response.content
-    })
+    // msg?.ctx.messages.push({
+    //   role: openAi.roles.Assistant,
+    //   content: response
+    // })
 
-    await spinnerOff(bot, chatID, res)
-
-    message = await bot.sendMessage(
-      chatID,
-      response.content,
-      options
-    )
-
-    return {
-      text: response.content,
-      message_id: message.message_id
-    }
+    // await spinnerOff(bot, chatID, res)
+    //
+    // message = await bot.sendMessage(
+    //   chatID,
+    //   response,
+    //   options
+    // )
+    //
+    // return {
+    //   text: response,
+    //   message_id: message.message_id
+    // }
 
   } catch (error) {
     if (error instanceof Error) {
