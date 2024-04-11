@@ -5,6 +5,7 @@ import events from 'events'
 import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
+import { keyboardChatGPT } from './chat_gpt.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -39,7 +40,7 @@ export const keyboardMidjourney = async (bot, msg) => {
       chatId,
       '✏️',
       options
-    )
+    ).catch(err => console.log(err))
 
     const firstLevel = {
       message: START_MIDJOURNEY,
@@ -47,8 +48,8 @@ export const keyboardMidjourney = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🏞 Купить подписку', callback_data: 'buy_subscription' }],
-            [{ text: 'Выйти', callback_data: COMMAND_GPT }]
+            [{ text: '🏞 Купить подписку', callback_data: `buy_subscription_M` }],
+            [{ text: 'Выйти', callback_data: `${COMMAND_GPT}_M` }]
           ]
         }
       }
@@ -60,14 +61,14 @@ export const keyboardMidjourney = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: TARIFS[0].text, callback_data: TARIFS[0].callback_data }],
-            [{ text: TARIFS[1].text, callback_data: TARIFS[1].callback_data }],
-            [{ text: TARIFS[2].text, callback_data: TARIFS[2].callback_data }],
-            [{ text: TARIFS[3].text, callback_data: TARIFS[3].callback_data }],
-            [{ text: TARIFS[4].text, callback_data: TARIFS[4].callback_data }],
-            [{ text: TARIFS[5].text, callback_data: TARIFS[5].callback_data }],
-            [{ text: TARIFS[6].text, callback_data: TARIFS[6].callback_data }],
-            [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
+            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_M`  }],
+            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_M` }],
+            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_M`  }],
+            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_M` }],
+            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_M`  }],
+            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_M` }],
+            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_M`  }],
+            [{ text: 'Вернуться в меню', callback_data: `get_first_level_M` }]
           ]
         }
       }
@@ -78,13 +79,13 @@ export const keyboardMidjourney = async (bot, msg) => {
         chat_id: chatId,
         message_id: message_id,
         ...firstLevel.options
-      })
+      }).catch(err => console.log(err))
       clearTimeout(timeout)
-    }, 1000, chatId, accountMessage.message_id, firstLevel, )
+    }, 1000, chatId, accountMessage.message_id, firstLevel)
 
     var eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on('buy_subscription', async function() {
+    eventEmitter.on(`buy_subscription_M`, async function() {
       await bot.editMessageText(
         buyLevel.message,
         {
@@ -92,10 +93,10 @@ export const keyboardMidjourney = async (bot, msg) => {
           chat_id: chatId,
           ...buyLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     })
 
-    eventEmitter.on('get_first_level', function() {
+    eventEmitter.on(`get_first_level_M`, function() {
       bot.editMessageText(
         firstLevel.message,
         {
@@ -103,11 +104,15 @@ export const keyboardMidjourney = async (bot, msg) => {
           chat_id: chatId,
           ...firstLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     })
 
-        for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(TARIFS[i].callback_data, function() {
+    eventEmitter.on(`${COMMAND_GPT}_M`, function() {
+      return keyboardChatGPT(bot, msg)
+    })
+
+    for (let i = 0; i < TARIFS.length; i++) {
+      eventEmitter.on(`${TARIFS[i].callback_data}_M`, function() {
         const tarif = TARIFS[i].callback_data.split('_')
 
         const payok = new PAYOK({
@@ -127,32 +132,32 @@ export const keyboardMidjourney = async (bot, msg) => {
           payment_method: 'PAYOK'
         }).then((invoice) => {
 
-          const link =  payok.getPaymentLink({
+          const link = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cd',
+            method: 'cd'
           })
 
-          const linkSBP =  payok.getPaymentLink({
+          const linkSBP = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'sbp',
+            method: 'sbp'
           })
 
-          const linkCR =  payok.getPaymentLink({
+          const linkCR = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cru',
+            method: 'cru'
           })
 
-          const linkCW =  payok.getPaymentLink({
+          const linkCW = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cwo',
+            method: 'cwo'
           })
 
           bot.sendMessage(chatId,
@@ -168,22 +173,21 @@ Payok - оплачивайте следующими способами:
               ...options,
               reply_markup: {
                 inline_keyboard: [
-                  [{text: '| Оплатить через Payok |', url: link.payUrl }],
-                  [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
-                  [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
-                  [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                  [{ text: '| Оплатить через Payok |', url: link.payUrl }],
+                  [{ text: '| Российская карта | Payok |', url: linkCR.payUrl }],
+                  [{ text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
+                  [{ text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                   // [{ text: 'Вернуться в меню', callback_data: `get_first_level_M` }]
                 ]
               }
-            })
+            }).catch(err => console.log(err))
         })
       })
     }
 
-
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
-      // eventEmitter.removeAllListeners()
-      bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
+      bot.answerCallbackQuery(callbackQuery.id, '...', false)
     })
   }
 
@@ -235,6 +239,6 @@ Payok - оплачивайте следующими способами:
     })
   } catch
     (error) {
-    await bot.sendMessage(chatId, `${error.message}`, options)
+    await bot.sendMessage(chatId, `${error.message}`, options).catch(err => console.log(err))
   }
 }

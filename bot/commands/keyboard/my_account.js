@@ -82,7 +82,7 @@ export const keyboardMyAccount = async (bot, msg) => {
           message_id: accountMessage.message_id,
           chat_id: chatId
         }
-      )
+      ).catch(err => console.log(err))
     })
 
     eventEmitter.on('buy_subscription', async function() {
@@ -93,7 +93,7 @@ export const keyboardMyAccount = async (bot, msg) => {
           chat_id: chatId,
           ...buyLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     })
 
     eventEmitter.on('referral_program', async function() {
@@ -104,7 +104,7 @@ export const keyboardMyAccount = async (bot, msg) => {
           chat_id: chatId,
           ...referralLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     })
 
     eventEmitter.on('get_first_level', function() {
@@ -115,7 +115,7 @@ export const keyboardMyAccount = async (bot, msg) => {
           chat_id: chatId,
           ...firstLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     })
 
     for (let i = 0; i < TARIFS.length; i++) {
@@ -184,23 +184,24 @@ Payok - оплачивайте следующими способами:
                   [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
                   [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
                   [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                  // [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
                 ]
               }
-            })
+            }).catch(err => console.log(err))
         })
       })
     }
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data)
-      bot.answerCallbackQuery(callbackQuery.id, 'I\'m cold and I want to eat', false)
+      bot.answerCallbackQuery(callbackQuery.id, '...', false)
     })
 
     accountMessage = await bot.sendMessage(
       chatId,
       '🔐',
       generalOptions
-    )
+    ).catch(err => console.log(err))
 
     const timeout = setTimeout((accountMessage) => {
       // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
@@ -212,7 +213,7 @@ Payok - оплачивайте следующими способами:
           chat_id: chatId,
           ...firstLevel.options
         }
-      )
+      ).catch(err => console.log(err))
     }, 1000, accountMessage)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)

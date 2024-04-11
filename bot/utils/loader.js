@@ -20,7 +20,7 @@ function createProgress(progress) {
   }
 
   const lineArray = createLine(roundMe(progress) / 10)
-  return `${lineArray.join('')} ${progress}`
+  return `${lineArray.join('')} ${progress}%`
 }
 
 export const loaderOn = (progress, bot, chat_id, message_id) => {
