@@ -9,14 +9,13 @@ const miniGames = ['🎲', '🎯', '🏀', '⚽', '🎳']
 
 const getStringOrDist = (emoji, name) => {
   const miniGames = [
+    { emoji: '🎰', name: 'MACHINE' },
     { emoji: '🎲', name: 'CUBE' },
     { emoji: '🎯', name: 'DARTS' },
     { emoji: '🏀', name: 'BASKET' },
     { emoji: '⚽', name: 'FOOT' },
     { emoji: '🎳', name: 'BOWLING' }
   ]
-
-  // { emoji: '🎰', name: 'MACHINE' }
 
   return miniGames.map((i) => {
     if (emoji)
@@ -27,7 +26,6 @@ const getStringOrDist = (emoji, name) => {
 }
 
 export const keyboardQuiz = async (bot, msg) => {
-  let quiz
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -40,7 +38,7 @@ export const keyboardQuiz = async (bot, msg) => {
 
   eventEmitter.on(`WIN_REQ_${chatId}`, async function(qwery) {
     console.log(`GO_GO${chatId}`, qwery)
-    eventEmitter.removeAllListeners(`WIN_REQ_${chatId}`)
+    eventEmitter.removeAllListeners()
     await removeQueryFromPrevMessage(bot, chatId, accountMessage)
     await db.subscriber.findOne({
       where: {
@@ -69,7 +67,7 @@ export const keyboardQuiz = async (bot, msg) => {
           const { emoji, value } = quiz.dice
           const createStringValue = getStringOrDist(emoji)
 
-          const quizRes = value > 1 ? Math.round(value / 2) : 0
+          const quizRes = value
           const text = quizRes ? QUIZS[0].fin(emoji, quizRes) : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => bot.sendMessage(
@@ -77,11 +75,11 @@ export const keyboardQuiz = async (bot, msg) => {
             text,
             {
               ...options,
-              reply_markup: {
-                inline_keyboard: [
-                  [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
-                ]
-              }
+              // reply_markup: {
+              //   inline_keyboard: [
+              //     [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
+              //   ]
+              // }
             }
           ), 3000, emoji, value, chatId)
 
@@ -94,7 +92,7 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = res.dataValues.quiz_available - 1;
+          const available = res.dataValues.quiz_available - 1
 
           await db.subscriber.update(
             {
@@ -111,7 +109,7 @@ export const keyboardQuiz = async (bot, msg) => {
   })
   eventEmitter.on(`WIN_SUBS_${chatId}`, async function(qwery) {
     console.log(`WIN_SUBS_${chatId}`, qwery)
-    eventEmitter.removeAllListeners(`WIN_SUBS_${chatId}`)
+    eventEmitter.removeAllListeners()
     await removeQueryFromPrevMessage(bot, chatId, accountMessage)
     await db.subscriber.findOne({
       where: {
@@ -141,17 +139,18 @@ export const keyboardQuiz = async (bot, msg) => {
           const createStringValue = getStringOrDist(emoji)
 
           const quizRes = value // TODO: установить значение для выйгрыша
+          const text = quizRes > 55 ? QUIZS[0].finSub(emoji) : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => bot.sendMessage(
             chatId,
-            QUIZS[0].fin(emoji, quizRes),
+            text,
             {
               ...options,
-              reply_markup: {
-                inline_keyboard: [
-                  [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
-                ]
-              }
+              // reply_markup: {
+              //   inline_keyboard: [
+              //     [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
+              //   ]
+              // }
             }
           ), 3000, emoji, value, chatId)
 
@@ -164,7 +163,7 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = res.dataValues.quiz_available - 1;
+          const available = res.dataValues.quiz_available - 1
 
           await db.subscriber.update(
             {
@@ -192,7 +191,10 @@ export const keyboardQuiz = async (bot, msg) => {
 
       for (let i = 0; i < res.length; i++) {
         let someDate = new Date(res[i].dataValues.createdAt).toLocaleString('ru')
-        text.push(`${res[i].dataValues.quiz_res ? '🎁' : '⬜️'}  <b>${res[i].dataValues.quiz_res}</b>   ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
+        if (res[i].dataValues.name === 'MACHINE')
+          text.push(`${res[i].dataValues.quiz_res > 55 ? '🎁' : '⬜️'}       ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
+        else
+          text.push(`${res[i].dataValues.quiz_res ? '🎁' : '⬜️'}  <b>${res[i].dataValues.quiz_res}</b>   ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
       }
       await bot.sendMessage(chatId, text.join(''), options)
       eventEmitter.removeAllListeners()
