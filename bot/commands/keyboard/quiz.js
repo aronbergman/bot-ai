@@ -139,7 +139,7 @@ export const keyboardQuiz = async (bot, msg) => {
           const createStringValue = getStringOrDist(emoji)
 
           const quizRes = value // TODO: установить значение для выйгрыша
-          const text = quizRes > 55 ? QUIZS[0].finSub(emoji) : QUIZS[0].finNeg(emoji)
+          const text = QUIZS[0].finTest(quizRes)
 
           setTimeout((emoji, value, chatId) => bot.sendMessage(
             chatId,

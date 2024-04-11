@@ -119,6 +119,7 @@ export const QUIZS = [
     fin: (emoji, count) => `${emoji}\nОтличный рузультат! 🎁 <b>${count}</b>`,
     finSub: (emoji) => `${emoji}\nВыйграл подписку! 🎁 `,
     finNeg: (emoji) => `${emoji}🙄\nПечалька, повезёт в следуюзий раз!`,
+    finTest: (count) => `${count}`,
   },
   { emoji: '🎯' },
   { emoji: '🏀' },

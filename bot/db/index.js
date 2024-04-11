@@ -10,6 +10,7 @@ import QuizSchema from './models/quiz.model.js'
 import HistorySchema from './models/history.model.js'
 import TranslateSchema from './models/translait.model.js'
 import { dbConfig } from './db.config.js'
+import HelperModel from './models/helper.model.js'
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -53,6 +54,7 @@ db.payment = PaymentSchema(sequelize, DataTypes)
 db.quiz = QuizSchema(sequelize, DataTypes)
 db.history = HistorySchema(sequelize, DataTypes)
 db.translate = TranslateSchema(sequelize, DataTypes)
+db.helper = HelperModel(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",

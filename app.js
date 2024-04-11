@@ -39,6 +39,14 @@ bot.on('polling_error', console.log)
 startBot(bot)
 
 bot.on('message', (msg, match) => {
+
+  if (msg.reply_to_message) {
+    return db.helper.create({
+      count: msg.reply_to_message.text,
+      comment: msg.text,
+    })
+  }
+
   if (msg.from.username !== 'aronbergman')
     bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, {parse_mode: 'HTML'})
 
