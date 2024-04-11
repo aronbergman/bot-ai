@@ -7,7 +7,7 @@ import { db } from '../../db/index.js'
 
 const miniGames = ['🎲', '🎯', '🏀', '⚽', '🎳']
 
-const getStringOrDist = (emoji) => {
+const getStringOrDist = (emoji, name) => {
   const miniGames = [
     { emoji: '🎲', name: 'CUBE' },
     { emoji: '🎯', name: 'DARTS' },
@@ -19,7 +19,10 @@ const getStringOrDist = (emoji) => {
   // { emoji: '🎰', name: 'MACHINE' }
 
   return miniGames.map((i) => {
-    if (i.emoji === emoji) return i.name
+    if (emoji)
+      if (i.emoji === emoji) return i.name
+    if (name)
+      if (i.name === name) return i.emoji
   }).join('')
 }
 
@@ -56,10 +59,6 @@ export const keyboardQuiz = async (bot, msg) => {
         quizAvailable = res?.dataValues?.quiz_available
       }
 
-      console.log('accountMessage.chat.id', accountMessage.chat.id)
-      console.log('chatID', chatId)
-      console.log('msgId', msgId)
-
       if (quizAvailable > 0) {
         bot.sendDice(accountMessage.chat.id, {
           emoji: miniGames[Math.floor(Math.random() * miniGames.length)],
@@ -70,16 +69,17 @@ export const keyboardQuiz = async (bot, msg) => {
           const { emoji, value } = quiz.dice
           const createStringValue = getStringOrDist(emoji)
 
-          const quizRes = Math.round(value / 2)
+          const quizRes = value > 2 ? Math.round(value / 2) : 0
+          const text = quizRes ? QUIZS[0].fin(emoji, quizRes) : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => bot.sendMessage(
             chatId,
-            QUIZS[0].fin(emoji, quizRes),
+            text,
             {
               ...options,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
+                  [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
                 ]
               }
             }
@@ -94,10 +94,12 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
+          const available = res.dataValues.quiz_available - 1;
+
           await db.subscriber.update(
             {
-              quiz_available: res.dataValues.quiz_available - 1,
-              quiz_type_available: 'REQUESTS'
+              quiz_available: available,
+              quiz_type_available: available ? 'REQUESTS' : null
             },
             { where: { chat_id: chatId } }
           )
@@ -128,10 +130,6 @@ export const keyboardQuiz = async (bot, msg) => {
         quizAvailable = res?.dataValues?.quiz_available
       }
 
-      console.log('accountMessage.chat.id', accountMessage.chat.id)
-      console.log('chatID', chatId)
-      console.log('msgId', msgId)
-
       if (quizAvailable > 0) {
         bot.sendDice(accountMessage.chat.id, {
           emoji: '🎰',
@@ -151,7 +149,7 @@ export const keyboardQuiz = async (bot, msg) => {
               ...options,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
+                  [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
                 ]
               }
             }
@@ -166,10 +164,12 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
+          const available = res.dataValues.quiz_available - 1;
+
           await db.subscriber.update(
             {
-              quiz_available: res.dataValues.quiz_available - 1,
-              quiz_type_available: 'SUBSCRIBE'
+              quiz_available: available,
+              quiz_type_available: available ? 'SUBSCRIBE' : null
             },
             { where: { chat_id: chatId } }
           )
@@ -177,13 +177,31 @@ export const keyboardQuiz = async (bot, msg) => {
       }
     })
   })
-  eventEmitter.on(`HISTORY_QUIZ_${chatId}`, async function() {
 
+  eventEmitter.on(`HISTORY_QUIZ_${chatId}`, async function() {
+    await db.quiz.findAll({
+      where: {
+        chat_id: chatId
+      },
+      limit: 15,
+      subQuery: false,
+      order: [['createdAt', 'DESC']]
+    }).then(async res => {
+
+      let text = ['Итак, победитель 🤴🏻\nвот твоя статистика...\n\n']
+
+
+      for (let i = 0; i < res.length; i++) {
+        let someDate = new Date(res[i].dataValues.createdAt).toLocaleString('ru')
+        text.push(`${res[i].dataValues.quiz_res ? '🎁' : '⬜️'}  <b>${res[i].dataValues.quiz_res}</b>   ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
+      }
+      await bot.sendMessage(chatId, text.join(''), options)
+    })
   })
 
   bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     eventEmitter.emit(callbackQuery.data)
-    bot.answerCallbackQuery(callbackQuery.id, `${chatId}`, false)
+    bot.answerCallbackQuery(callbackQuery.id, 'quiz', false)
   })
 
   try {
@@ -233,7 +251,7 @@ export const keyboardQuiz = async (bot, msg) => {
             reply_markup: {
               inline_keyboard: [
                 keyboard,
-                [{ text: '👾 Статистика игр', callback_data: 'HISTORY_QUIZ' }]
+                [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
               ]
             }
           }

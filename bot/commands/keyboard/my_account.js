@@ -26,8 +26,8 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔐 Купить подписку', callback_data: 'buy_subscription' }],
-            [{ text: 'Реферальная программа', callback_data: 'referral_program' }]
+            [{ text: '🔐 Купить подписку', callback_data: `buy_subscription_A_${chatId}` }],
+            [{ text: 'Реферальная программа', callback_data: `referral_program_A_${chatId}` }]
           ]
         }
       }
@@ -39,14 +39,14 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: TARIFS[0].text, callback_data: TARIFS[0].callback_data }],
-            [{ text: TARIFS[1].text, callback_data: TARIFS[1].callback_data }],
-            [{ text: TARIFS[2].text, callback_data: TARIFS[2].callback_data }],
-            [{ text: TARIFS[3].text, callback_data: TARIFS[3].callback_data }],
-            [{ text: TARIFS[4].text, callback_data: TARIFS[4].callback_data }],
-            [{ text: TARIFS[5].text, callback_data: TARIFS[5].callback_data }],
-            [{ text: TARIFS[6].text, callback_data: TARIFS[6].callback_data }],
-            [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
+            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_A_${chatId}` }],
+            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_A_${chatId}` }],
+            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
           ]
         }
       }
@@ -64,7 +64,7 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
+            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
           ]
         }
       }
@@ -74,7 +74,7 @@ export const keyboardMyAccount = async (bot, msg) => {
 
     var eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on('referral_program', async function() {
+    eventEmitter.on(`referral_program_A_${chatId}`, async function() {
       console.log('referral_program')
       await bot.editMessageText(
         'text',
@@ -85,7 +85,7 @@ export const keyboardMyAccount = async (bot, msg) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on('buy_subscription', async function() {
+    eventEmitter.on(`buy_subscription_A_${chatId}`, async function() {
       await bot.editMessageText(
         buyLevel.message,
         {
@@ -96,7 +96,7 @@ export const keyboardMyAccount = async (bot, msg) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on('referral_program', async function() {
+    eventEmitter.on(`referral_program_A_${chatId}`, async function() {
       await bot.editMessageText(
         referralLevel.message,
         {
@@ -107,7 +107,7 @@ export const keyboardMyAccount = async (bot, msg) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on('get_first_level', function() {
+    eventEmitter.on(`get_first_level_A_${chatId}`, function() {
       bot.editMessageText(
         firstLevel.message,
         {
@@ -119,7 +119,7 @@ export const keyboardMyAccount = async (bot, msg) => {
     })
 
     for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(TARIFS[i].callback_data, function() {
+      eventEmitter.on(`${TARIFS[i].callback_data}_A_${chatId}`, function() {
         const tarif = TARIFS[i].callback_data.split('_')
 
         const payok = new PAYOK({
@@ -136,6 +136,7 @@ export const keyboardMyAccount = async (bot, msg) => {
           price: tarif[2],
           currency: 'RUB',
           user_id: chatId,
+          username: msg.from.username,
           payment_method: 'PAYOK'
         }).then((invoice) => {
 
@@ -167,8 +168,8 @@ export const keyboardMyAccount = async (bot, msg) => {
             method: 'cwo',
           })
 
-          bot.sendMessage(chatId,
-            `🔗 Счет сформирован, осталось только оплатить
+          bot.editMessageText(
+            `🔗 Осталось только оплатить
 
 Подписка ${invoice.dataValues.type_of_tariff} ${invoice.dataValues.duration} 
 Сумма: ${invoice.dataValues.price} ${invoice.dataValues.currency}
@@ -178,13 +179,15 @@ Payok - оплачивайте следующими способами:
    └ VISA, Mastercard, MIR, QIWI, YooMoney, Crypto
 `, {
               ...generalOptions,
+              message_id: accountMessage.message_id,
+              chat_id: chatId,
               reply_markup: {
                 inline_keyboard: [
                   [{text: '| Оплатить через Payok |', url: link.payUrl }],
                   [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
                   [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
                   [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
-                  // [{ text: 'Вернуться в меню', callback_data: 'get_first_level' }]
+                  [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
                 ]
               }
             }).catch(err => console.log(err))
@@ -194,7 +197,7 @@ Payok - оплачивайте следующими способами:
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data)
-      bot.answerCallbackQuery(callbackQuery.id, '...', false)
+      bot.answerCallbackQuery(callbackQuery.id, 'my_account', false)
     })
 
     accountMessage = await bot.sendMessage(

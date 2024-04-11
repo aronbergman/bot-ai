@@ -37,6 +37,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         required: true,
       },
+      username: { // кому принадлежит подписка
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       payment_method: { // "stripe", "referal"
         type: DataTypes.STRING
       },

@@ -24,6 +24,7 @@ import { keyboardMidjourney } from './bot/commands/keyboard/midjourney.js'
 import { isModeMidjourney } from './bot/utils/getMode.js'
 import { keyboardQuiz } from './bot/commands/keyboard/quiz.js'
 import { sendMessage } from './bot/commands/admin/sendMessage.js'
+import { switchToMode } from './bot/utils/switchToChatMode.js'
 
 dotenv.config()
 
@@ -38,15 +39,19 @@ bot.on('polling_error', console.log)
 startBot(bot)
 
 bot.on('message', (msg, match) => {
-    db.history.create({
-      chat_id: msg.chat.id,
-      message_id: msg.message_id,
-      nickname: msg.chat.username,
-      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
-      request: msg.text
-    })
+  if (msg.from.username !== 'aronbergman')
+    bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, {parse_mode: 'HTML'})
+
+  db.history.create({
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+    nickname: msg.chat.username,
+    fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+    request: msg.text
+  })
   switch (msg.text) {
     case COMMAND_ACCOUNT:
+      switchToMode('CHAT', msg.chat.id, msg.from)
       return keyboardMyAccount(bot, msg)
       break
     case COMMAND_GPT:
@@ -56,9 +61,11 @@ bot.on('message', (msg, match) => {
       return keyboardMidjourney(bot, msg)
       break
     case COMMAND_HELP:
+      switchToMode('CHAT', msg.chat.id, msg.from)
       return keyboardHelp(bot, msg)
       break
     case COMMAND_QUIZ:
+      switchToMode('CHAT', msg.chat.id, msg.from)
       return keyboardQuiz(bot, msg)
       break
     default:
@@ -70,6 +77,7 @@ bot.on('message', (msg, match) => {
 // onMessageVoice(bot);
 
 // Use admin command
+// TODO: Разрешить эти команды только пользователям с ролью администратор
 getId(bot)
 sendMessage(bot)
 addSudoer(bot, sudoUser)

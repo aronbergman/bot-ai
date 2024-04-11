@@ -93,7 +93,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data)
-      bot.answerCallbackQuery(callbackQuery.id, '⭕️: callback_query', false)
+      bot.answerCallbackQuery(callbackQuery.id, 'on_message_text_default', false)
     })
 
     // TODO: Показывать сообщение только один раз, когда человек вводит первое сообщение при выбранном моде chat

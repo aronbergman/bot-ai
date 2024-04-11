@@ -224,7 +224,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     eventEmitter.emit(callbackQuery.data, callbackQuery)
     // eventEmitter.removeAllListeners()
-    bot.answerCallbackQuery(callbackQuery.id, '...', false)
+    bot.answerCallbackQuery(callbackQuery.id, 'modes/midjourney', false)
   })
 }
 

@@ -25,6 +25,7 @@ export const startBot = bot => {
             { text: COMMAND_MIDJOURNEY }
           ],
           [
+            {text: COMMAND_QUIZ},
             { text: COMMAND_ACCOUNT },
             { text: COMMAND_HELP }
           ]

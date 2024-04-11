@@ -48,8 +48,8 @@ export const keyboardMidjourney = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🏞 Купить подписку', callback_data: `buy_subscription_M` }],
-            [{ text: 'Выйти', callback_data: `${COMMAND_GPT}_M` }]
+            [{ text: '🏞 Купить подписку', callback_data: `buy_subscription_M_${chatId}` }],
+            [{ text: 'Выйти', callback_data: `${COMMAND_GPT}_M_${chatId}` }]
           ]
         }
       }
@@ -61,14 +61,14 @@ export const keyboardMidjourney = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_M`  }],
-            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_M` }],
-            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_M`  }],
-            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_M` }],
-            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_M`  }],
-            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_M` }],
-            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_M`  }],
-            [{ text: 'Вернуться в меню', callback_data: `get_first_level_M` }]
+            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_M_${chatId}` }],
+            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_M_${chatId}` }],
+            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_M_${chatId}` }],
+            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_M_${chatId}`  }],
+            [{ text: 'Вернуться в меню', callback_data: `get_first_level_M_${chatId}` }]
           ]
         }
       }
@@ -85,7 +85,7 @@ export const keyboardMidjourney = async (bot, msg) => {
 
     var eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on(`buy_subscription_M`, async function() {
+    eventEmitter.on(`buy_subscription_M_${chatId}`, async function() {
       await bot.editMessageText(
         buyLevel.message,
         {
@@ -96,7 +96,7 @@ export const keyboardMidjourney = async (bot, msg) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`get_first_level_M`, function() {
+    eventEmitter.on(`get_first_level_M_${chatId}`, function() {
       bot.editMessageText(
         firstLevel.message,
         {
@@ -107,12 +107,12 @@ export const keyboardMidjourney = async (bot, msg) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`${COMMAND_GPT}_M`, function() {
+    eventEmitter.on(`${COMMAND_GPT}_M_${chatId}`, function() {
       return keyboardChatGPT(bot, msg)
     })
 
     for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(`${TARIFS[i].callback_data}_M`, function() {
+      eventEmitter.on(`${TARIFS[i].callback_data}_M_${chatId}`, function() {
         const tarif = TARIFS[i].callback_data.split('_')
 
         const payok = new PAYOK({
@@ -129,6 +129,7 @@ export const keyboardMidjourney = async (bot, msg) => {
           price: tarif[2],
           currency: 'RUB',
           user_id: chatId,
+          username: msg.from.username,
           payment_method: 'PAYOK'
         }).then((invoice) => {
 
@@ -160,8 +161,8 @@ export const keyboardMidjourney = async (bot, msg) => {
             method: 'cwo'
           })
 
-          bot.sendMessage(chatId,
-            `🔗 Счет сформирован, осталось только оплатить
+          bot.editMessageText(
+            `🔗 Осталось только оплатить
 
 Подписка ${invoice.dataValues.type_of_tariff} ${invoice.dataValues.duration} 
 Сумма: ${invoice.dataValues.price} ${invoice.dataValues.currency}
@@ -171,13 +172,15 @@ Payok - оплачивайте следующими способами:
    └ VISA, Mastercard, MIR, QIWI, YooMoney, Crypto
 `, {
               ...options,
+              message_id: accountMessage.message_id,
+              chat_id: chatId,
               reply_markup: {
                 inline_keyboard: [
                   [{ text: '| Оплатить через Payok |', url: link.payUrl }],
                   [{ text: '| Российская карта | Payok |', url: linkCR.payUrl }],
                   [{ text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
                   [{ text: '| СБП | Payok |', url: linkSBP.payUrl }],
-                   // [{ text: 'Вернуться в меню', callback_data: `get_first_level_M` }]
+                   [{ text: 'Вернуться в меню', callback_data: `get_first_level_M_${chatId}` }]
                 ]
               }
             }).catch(err => console.log(err))
@@ -187,7 +190,7 @@ Payok - оплачивайте следующими способами:
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
-      bot.answerCallbackQuery(callbackQuery.id, '...', false)
+      bot.answerCallbackQuery(callbackQuery.id, 'keyboard/midjourney', false)
     })
   }
 
