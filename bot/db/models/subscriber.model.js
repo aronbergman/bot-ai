@@ -31,7 +31,7 @@ export default (sequelize, DataTypes) => {
       },
       modeGPT: {
         type: DataTypes.STRING,
-        defaultValue: 'MODE_CHATGPT'
+        defaultValue: 'assistant'
       },
       premium: {
         type: BOOLEAN

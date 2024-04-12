@@ -101,13 +101,6 @@ export const TARIFS = [
   { text: '📆 100 запросов за 350,00 ₽', callback_data: 'REQUESTS_100_350' }
 ]
 
-export const MODS_CHAT = [
-  { text: 'Chat GPT', callback_data: 'MODE_CHATGPT' },
-  { text: 'Программист', callback_data: 'MODE_DEVELOPER' },
-  { text: 'Психолог', callback_data: 'MODE_PSYCHOLOGIST' },
-  { text: 'Мотиватор', callback_data: 'MODE_MOTIVATOR' },
-  { text: 'Гопник', callback_data: 'MODE_MASTER' }
-]
 export const QUIZ_RULES = `
 Выиграй подписку в нашей эмодзи-викторине🔥
 

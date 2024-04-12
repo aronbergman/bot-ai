@@ -2,10 +2,12 @@ import { INITIAL_SESSION } from '../../constants/index.js'
 import { OpenAI } from '../../utils/openAi.js'
 import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
 import { errorMessage } from '../hoc/errorMessage.js'
+import { modesChatGPT } from '../../constants/modes.js'
+import { db } from '../../db/index.js'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
-  let message
+  let modeGPT
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -16,55 +18,68 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   }
 
   try {
-    msg.ctx ??= INITIAL_SESSION
-
-    res = await spinnerOn(bot, chatID, "CHAT")
-    let message = await bot.sendMessage(chatID, '...').catch(() => {
-      console.log('!!!')
-      return true
-    })
-
-    const openAi = new OpenAI()
-
-    await msg?.ctx.messages.push({
-      role: openAi.roles.User,
-      content: msg.text
-    })
-
-    const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID)
-
-    if (!response) {
-      throw new Error('Something went wrong please try again.')
-    }
-
-    msg?.ctx.messages.push({
-      role: openAi.roles.Assistant,
-      content: response
-    })
-
-    await spinnerOff(bot, chatID, res)
-
-    await bot.editMessageText(
-      response,
-      {
-        message_id: message.message_id,
+    db.subscriber.findOne({
+      where: {
         chat_id: chatID,
-        ...options
+        user_id: msg.from.id
       }
-    ).catch(() => {
-      console.log('!!!!')
-      return true
+    }).then(async response => {
+      modeGPT = response.dataValues.modeGPT
     })
 
-    return {
-      text: response,
-      message_id: message.message_id
-    }
+      msg.ctx ??= INITIAL_SESSION
 
+      res = await spinnerOn(bot, chatID, 'CHAT')
+      let message = await bot.sendMessage(chatID, '...').catch(() => {
+        console.log('!!!')
+        return true
+      })
+
+      const openAi = new OpenAI()
+
+      let x = modesChatGPT.find(mode => mode.code === modeGPT)
+
+      let newMessage = x?.prompt_start
+      newMessage = newMessage + '\n\n' + msg.text
+
+      await msg?.ctx.messages.push({
+        role: openAi.roles.User,
+        content: newMessage
+      })
+
+      const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID)
+
+      if (!response) {
+        throw new Error('Something went wrong please try again.')
+      }
+
+      msg?.ctx.messages.push({
+        role: openAi.roles.Assistant,
+        content: response
+      })
+
+      await spinnerOff(bot, chatID, res)
+
+      await bot.editMessageText(
+        response,
+        {
+          message_id: message.message_id,
+          chat_id: chatID,
+          ...options
+        }
+      ).catch(() => {
+        console.log('!!!!')
+        return true
+      })
+
+      return {
+        text: response,
+        message_id: message.message_id
+      }
   } catch (error) {
     if (error instanceof Error) {
       await spinnerOff(bot, chatID, res)
-      return errorMessage(bot, error, chatID, options)
+      return errorMessage(bot, error, chatID)
     }
   }
 }

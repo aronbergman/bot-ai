@@ -5,7 +5,7 @@ import { autoRemoveMessage } from './autoRemoveMessage.js'
 //  Запустить таску на очередь
 
 export const errorMessage = async (bot, error, chatID, options) => {
-  const message = `⚡️\n${error.message}\nc${chatID}u${bot?.context?.from.id}m${bot?.context?.message_id}`
+  const message = `⚡️\n${error.message}`
 
   await autoRemoveMessage(message, bot, chatID, options, 10000)
 }

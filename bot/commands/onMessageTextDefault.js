@@ -1,10 +1,8 @@
 import { modeChatGPT } from './modes/chatGPT.js'
 import events from 'events'
-import { MODS_CHAT } from '../constants/index.js'
 import { db } from '../db/index.js'
 import { removeQueryFromPrevMessage } from './hoc/removeQueryFromPrevMsg.js'
-
-// TODO: BUG: Невозможно повторно отправить запрос на смену характера из одного сообщения пользователя
+import { modesChatGPT } from '../constants/modes.js'
 
 export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
   const { id: chatID } = msg.chat
@@ -45,20 +43,14 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
     var eventEmitter = new events.EventEmitter()
 
     eventEmitter.on('change_chat_mode', async function() {
+      console.log("firstMessage", firstMessage)
       await bot.editMessageText(
         firstMessage.text,
         {
           message_id: firstMessage.message_id,
           chat_id: chatID,
           reply_markup: {
-            inline_keyboard: [
-              [{ text: MODS_CHAT[0].text, callback_data: MODS_CHAT[0].callback_data },
-                { text: MODS_CHAT[1].text, callback_data: MODS_CHAT[1].callback_data }],
-              [{ text: MODS_CHAT[2].text, callback_data: MODS_CHAT[2].callback_data },
-                { text: MODS_CHAT[3].text, callback_data: MODS_CHAT[3].callback_data }],
-              [{ text: MODS_CHAT[4].text, callback_data: MODS_CHAT[4].callback_data },
-                { text: '⬅️ Назад', callback_data: 'first_step' }]
-            ]
+            inline_keyboard: modesChatGPT.map((mode) => [{ text: mode.name, callback_data: mode.code }])
           }
         }
       ).catch(() => {
@@ -81,13 +73,13 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
       })
     })
 
-    for (let i = 0; i < MODS_CHAT.length; i++) {
-      eventEmitter.on(MODS_CHAT[i].callback_data, async function() {
+    for (let i = 0; i < modesChatGPT.length; i++) {
+      eventEmitter.on(modesChatGPT[i].code, async function() {
         await db.subscriber.update(
-          { modeGPT: MODS_CHAT[i].callback_data },
+          { modeGPT: modesChatGPT[i].code },
           { where: { chat_id: chatID } }
         ).then(res => {
-          console.log(MODS_CHAT[i].text)
+          // console.log(MODS_CHAT[i].text)
           bot.deleteMessage(chatID, firstMessage.message_id).catch(err => console.error(err))
           firstMessage = modeChatGPT(bot, msg, {
             message_id: firstMessage.message_id,
