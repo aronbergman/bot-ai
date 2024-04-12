@@ -16,7 +16,14 @@ import { db } from './bot/db/index.js'
 import authRoutes from './api/routes/auth.routes.js'
 import userRoutes from './api/routes/user.routes.js'
 import subsRoutes from './api/routes/subs.routes.js'
-import { COMMAND_ACCOUNT, COMMAND_GPT, COMMAND_HELP, COMMAND_MIDJOURNEY, COMMAND_QUIZ } from './bot/constants/index.js'
+import {
+  COMMAND_ACCOUNT,
+  COMMAND_DALL_E,
+  COMMAND_GPT,
+  COMMAND_HELP,
+  COMMAND_MIDJOURNEY,
+  COMMAND_QUIZ
+} from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
 import { keyboardHelp } from './bot/commands/keyboard/help.js'
@@ -25,6 +32,7 @@ import { isModeMidjourney } from './bot/utils/getMode.js'
 import { keyboardQuiz } from './bot/commands/keyboard/quiz.js'
 import { sendMessage } from './bot/commands/admin/sendMessage.js'
 import { switchToMode } from './bot/utils/switchToChatMode.js'
+import { keyboardDalle } from './bot/commands/keyboard/dalle.js'
 
 dotenv.config()
 
@@ -67,6 +75,9 @@ bot.on('message', (msg, match) => {
       break
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
+      break
+    case COMMAND_DALL_E:
+      return keyboardDalle(bot, msg)
       break
     case COMMAND_HELP:
       switchToMode('CHAT', msg.chat.id, msg.from)

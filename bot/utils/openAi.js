@@ -58,6 +58,16 @@ export class OpenAI {
     return new Promise(res => res(answer))
   }
 
+  async image(prompt) {
+    let response = await this.openai.images.generate({
+      prompt,
+      n: 4,
+      size: '512x512',
+      quality: 'hd'
+    })
+    return response.data[0].url
+  }
+
   async transcription() {
     if (!this.filepath) {
       throw new Error('Something went wrong please try again.')

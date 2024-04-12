@@ -1,8 +1,10 @@
 import {
   COMMAND_ACCOUNT,
+  COMMAND_DALL_E,
   COMMAND_GPT,
   COMMAND_HELP,
-  COMMAND_MIDJOURNEY, COMMAND_QUIZ,
+  COMMAND_MIDJOURNEY,
+  COMMAND_QUIZ,
   COMMAND_START,
   INITIAL_SESSION
 } from '../constants/index.js'
@@ -22,10 +24,11 @@ export const startBot = bot => {
         keyboard: [
           [
             { text: COMMAND_GPT },
+            { text: COMMAND_DALL_E },
             { text: COMMAND_MIDJOURNEY }
           ],
           [
-            {text: COMMAND_QUIZ},
+            { text: COMMAND_QUIZ },
             { text: COMMAND_ACCOUNT },
             { text: COMMAND_HELP }
           ]
@@ -40,8 +43,8 @@ export const startBot = bot => {
         options
       )
 
-    // TODO:  Вынести в отдельную функцию
-     await db.subscriber.findOne({
+      // TODO:  Вынести в отдельную функцию
+      await db.subscriber.findOne({
         where: {
           chat_id: chatId,
           user_id: msg.from.id
@@ -65,7 +68,7 @@ export const startBot = bot => {
             first_name: msg.from.first_name,
             last_name: msg.from.last_name,
             username: msg.from.username,
-            language_code: msg.from.language_code,
+            language_code: msg.from.language_code
           })
         }
       })

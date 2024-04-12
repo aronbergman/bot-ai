@@ -1,5 +1,5 @@
 const emojis = ['🐾', '🤖', '💡', '🚀', '⌛️', '👾', '👻', '👽', '🦊']
-const emojiChat = ['🤖', '👽', '🦊', '🐯', '🦁', '🐧']
+const emojiChat = ['🤖', '👽']
 
 export const spinnerOn = async (bot, chat_id, type) => {
   const coll = type === "CHAT" ? emojiChat : emojis;
