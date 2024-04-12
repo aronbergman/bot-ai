@@ -19,7 +19,10 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     msg.ctx ??= INITIAL_SESSION
 
     res = await spinnerOn(bot, chatID, "CHAT")
-    let message = await bot.sendMessage(chatID, '...').catch(() => console.log('!!!'))
+    let message = await bot.sendMessage(chatID, '...').catch(() => {
+      console.log('!!!')
+      return true
+    })
 
     const openAi = new OpenAI()
 
@@ -28,7 +31,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       content: msg.text
     })
 
-    const response = await openAi.chat(msg?.ctx.messages, bot, message.message_id, chatID)
+    const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID)
 
     if (!response) {
       throw new Error('Something went wrong please try again.')
@@ -48,7 +51,10 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
         chat_id: chatID,
         ...options
       }
-    ).catch(() => console.log('!!!!'))
+    ).catch(() => {
+      console.log('!!!!')
+      return true
+    })
 
     return {
       text: response,

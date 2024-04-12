@@ -61,7 +61,10 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
             ]
           }
         }
-      ).catch(() => console.log('!!'))
+      ).catch(() => {
+        console.log('!!')
+        return true
+      })
     })
 
     eventEmitter.on('first_step', async function() {
@@ -72,7 +75,10 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
           chat_id: chatID,
           ...qweryOptions
         }
-      ).catch(() => console.log('!'))
+      ).catch(() => {
+        console.log('!')
+        return true
+      })
     })
 
     for (let i = 0; i < MODS_CHAT.length; i++) {

@@ -18,7 +18,7 @@ export const spinnerOn = async (bot, chat_id, type) => {
       clearInterval(timeout)
     }).catch(() => {
       clearInterval(timeout)
-      console.log('!*')
+      return true
     })
   }, 5000)
   return message.message_id

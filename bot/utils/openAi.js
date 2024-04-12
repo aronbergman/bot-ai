@@ -20,20 +20,40 @@ export class OpenAI {
     this.filepath = filepath
   }
 
-  async chat(messages, bot, editId, chatId) {
+  async chat(messages, bot, editMessage, chatId) {
     const response = await this.openai.chat.completions.create({
       model: this.chatGPTVersion,
       messages,
       stream: true
     })
     let answer = ''
+    let prevAnswer = ''
     for await (const chunk of response) {
       answer += chunk.choices[0]?.delta?.content || ''
-
-      await bot.editMessageText(answer, {
-        message_id: editId, chat_id: chatId
-      }).catch((err) => {console.log('.')})
+      process.stdout.write(`${answer.length % process.env.CHAT_GPT_SPEED}`)
+      process.stdout.write(`${answer.length === prevAnswer.length ? '🔺' : ''}`)
+      if (
+        answer.length
+        && answer.length !== prevAnswer.length
+        && answer.length % process.env.CHAT_GPT_SPEED === 0
+      ) {
+        process.stdout.write('🟩')
+        await bot.editMessageText(answer, {
+          message_id: editMessage.message_id, chat_id: chatId
+        }).then(() => {
+          prevAnswer = answer
+        }).catch((err) => {
+          console.log('💀 openai.chat', err.message)
+          return true
+        })
+      }
     }
+
+    await bot.editMessageText(answer, {
+      message_id: editMessage.message_id, chat_id: chatId
+    }).catch((err) => {
+      console.log('💀 openai.chat', err.message)
+    })
 
     return new Promise(res => res(answer))
   }
