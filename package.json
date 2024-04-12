@@ -2,7 +2,6 @@
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "1.1.0",
-    "@fortaine/fetch-event-source": "^3.0.6",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

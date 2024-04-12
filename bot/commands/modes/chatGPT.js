@@ -5,7 +5,7 @@ import { errorMessage } from '../hoc/errorMessage.js'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
-  let message;
+  let message
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -18,9 +18,8 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   try {
     msg.ctx ??= INITIAL_SESSION
 
-    let messa = bot.sendMessage(chatID, 'Ghbdtn')
-
-    // res = await spinnerOn(bot, chatID)
+    res = await spinnerOn(bot, chatID, "CHAT")
+    let message = await bot.sendMessage(chatID, '...').catch(() => console.log('!!!'))
 
     const openAi = new OpenAI()
 
@@ -29,30 +28,32 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       content: msg.text
     })
 
-    const response = null
-   await openAi.chat(msg?.ctx.messages, bot, messa.message_id)
+    const response = await openAi.chat(msg?.ctx.messages, bot, message.message_id, chatID)
 
-    // if (!response) {
-    //   throw new Error('Something went wrong please try again.')
-    // }
+    if (!response) {
+      throw new Error('Something went wrong please try again.')
+    }
 
-    // msg?.ctx.messages.push({
-    //   role: openAi.roles.Assistant,
-    //   content: response
-    // })
+    msg?.ctx.messages.push({
+      role: openAi.roles.Assistant,
+      content: response
+    })
 
-    // await spinnerOff(bot, chatID, res)
-    //
-    // message = await bot.sendMessage(
-    //   chatID,
-    //   response,
-    //   options
-    // )
-    //
-    // return {
-    //   text: response,
-    //   message_id: message.message_id
-    // }
+    await spinnerOff(bot, chatID, res)
+
+    await bot.editMessageText(
+      response,
+      {
+        message_id: message.message_id,
+        chat_id: chatID,
+        ...options
+      }
+    ).catch(() => console.log('!!!!'))
+
+    return {
+      text: response,
+      message_id: message.message_id
+    }
 
   } catch (error) {
     if (error instanceof Error) {

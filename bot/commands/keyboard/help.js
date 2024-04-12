@@ -23,7 +23,7 @@ export const keyboardHelp = async (bot, msg) => {
             chat_id: chatId,
             ...options
           }
-        )
+        ).catch(() => console.log('!'))
         clearTimeout(timeout)
       }, 1000)
   } catch (error) {

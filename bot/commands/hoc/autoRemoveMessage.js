@@ -12,13 +12,13 @@ export const autoRemoveMessage = async (content, bot, chatId, options, duration 
           parse_mode: 'HTML',
           ...options
         }
-      ).catch(() => {})
+      ).catch(() => console.log('!'))
       clearTimeout(timeout)
     }, i * 1000, bot, chatId, message, durationTemplate, duration, options)
   }
 
   const remove = setTimeout(async (bot, chatId, message) => {
     clearTimeout(remove)
-    await bot.deleteMessage(chatId, message.message_id).catch(() => {})
+    await bot.deleteMessage(chatId, message.message_id).catch(() => console.log('!'))
   }, duration, bot, chatId, message)
 }

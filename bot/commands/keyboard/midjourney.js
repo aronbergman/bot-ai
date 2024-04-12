@@ -79,7 +79,7 @@ export const keyboardMidjourney = async (bot, msg) => {
         chat_id: chatId,
         message_id: message_id,
         ...firstLevel.options
-      }).catch(err => console.log(err))
+      }).catch(() => console.log('!'))
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage.message_id, firstLevel)
 

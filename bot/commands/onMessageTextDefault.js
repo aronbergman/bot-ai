@@ -61,7 +61,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
             ]
           }
         }
-      ).catch(err => console.error(err))
+      ).catch(() => console.log('!!'))
     })
 
     eventEmitter.on('first_step', async function() {
@@ -72,7 +72,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
           chat_id: chatID,
           ...qweryOptions
         }
-      )
+      ).catch(() => console.log('!'))
     })
 
     for (let i = 0; i < MODS_CHAT.length; i++) {
@@ -99,7 +99,6 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
     // TODO: Показывать сообщение только один раз, когда человек вводит первое сообщение при выбранном моде chat
     // await infoMessageWithChatGPT(bot, chatID)
     firstMessage = await modeChatGPT(bot, msg, qweryOptions).catch(err => console.error(err))
-    console.log('firstMessage', firstMessage)
   } catch
     (error) {
     if (error instanceof Error) {
