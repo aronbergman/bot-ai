@@ -1,8 +1,11 @@
 import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
 import { db } from '../../db/index.js'
+import { modesChatGPT } from '../../constants/modes.js'
 
 export const keyboardChatGPT = async (bot, msg) => {
-  const sendChatGPT = async (bot, chatId, options) => {
+  const sendChatGPT = async (bot, chatId, options, modeGPT) => {
+
+    const character = modesChatGPT.find(mode => mode.code === modeGPT)
 
     let accountMessage = await bot.sendMessage(
       chatId,
@@ -13,7 +16,7 @@ export const keyboardChatGPT = async (bot, msg) => {
     const timeout = setTimeout((chatId, message_id) => {
       bot.deleteMessage(chatId, message_id)
       clearTimeout(timeout)
-      return autoRemoveMessage(`🤖 Выбран <b>ChatGPT</b> 3.5`, bot, chatId, options, 5000)
+      return autoRemoveMessage(`🤖 Выбран <b>ChatGPT</b> 3.5 \n Характер: ${character.name}`, bot, chatId, options, 5000)
     }, 1000, chatId, accountMessage.message_id)
   }
 
@@ -30,8 +33,9 @@ export const keyboardChatGPT = async (bot, msg) => {
         user_id: msg.from.id
       }
     }).then(res => {
+
       if (res?.dataValues.mode?.match(/\GPT/))
-        return sendChatGPT(bot, chatId, options)
+        return sendChatGPT(bot, chatId, options, res.dataValues.modeGPT)
       else if (res?.dataValues.mode) {
         db.subscriber.update(
           {
@@ -58,7 +62,7 @@ export const keyboardChatGPT = async (bot, msg) => {
           mode: 'GPT'
         }).then(res => {
           bot.select_mode = 'GPT'
-          return sendChatGPT(bot, chatId, options)
+          return sendChatGPT(bot, chatId, options, res.dataValues.modeGPT)
         })
       }
     })

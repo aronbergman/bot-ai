@@ -9,7 +9,6 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
   const msgId = msg.message_id
 
   const optionsGeneral = {
-    parse_mode: 'HTML',
     reply_to_message_id: msgId
   }
 

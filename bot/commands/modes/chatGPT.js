@@ -12,8 +12,8 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
   const options = {
-    parse_mode: 'HTML',
     reply_to_message_id: msgId,
+    parse_mode: 'HTML',
     ...qweryOptions
   }
 
@@ -65,6 +65,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
         {
           message_id: message.message_id,
           chat_id: chatID,
+          parse_mode: x["parse_mode"],
           ...options
         }
       ).catch(() => {
