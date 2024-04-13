@@ -1,11 +1,11 @@
 import {
   COMMAND_ACCOUNT,
-  COMMAND_DALL_E,
+  COMMAND_DALL_E, COMMAND_FILE_CONVERTOR,
   COMMAND_GPT,
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ,
-  COMMAND_START,
+  COMMAND_QUIZ, COMMAND_SPEECH_TO_TEXT,
+  COMMAND_START, COMMAND_TEXT_TO_SPEECH,
   INITIAL_SESSION
 } from '../constants/index.js'
 import { db } from '../db/index.js'
@@ -26,6 +26,11 @@ export const startBot = bot => {
             { text: COMMAND_GPT },
             { text: COMMAND_DALL_E },
             { text: COMMAND_MIDJOURNEY }
+          ],
+          [
+            { text: COMMAND_TEXT_TO_SPEECH },
+            { text: COMMAND_SPEECH_TO_TEXT },
+            { text: COMMAND_FILE_CONVERTOR }
           ],
           [
             { text: COMMAND_QUIZ },
