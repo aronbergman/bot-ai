@@ -36,6 +36,8 @@ import { keyboardDalle } from './bot/commands/keyboard/dalle.js'
 
 dotenv.config()
 
+import Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
 
@@ -64,6 +66,14 @@ bot.on('message', (msg, match) => {
     nickname: msg.chat.username,
     fullname: `${msg.from.first_name} ${msg.from.last_name}`,
     request: msg.text
+  }).catch(() => {
+    db.history.create({
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+    nickname: msg.chat.username,
+    fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+    request: "Сообщение слишком длинное"
+  })
   })
   switch (msg.text) {
     case COMMAND_ACCOUNT:
@@ -105,6 +115,24 @@ listSudoers(bot, sudoUser)
 
 const app = express()
 
+Sentry.init({
+  dsn: "https://cd16320a573f069cdc9afe19e324c2cb@o392602.ingest.us.sentry.io/4507084187893760",
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Sentry.Integrations.Express({ app }),
+    nodeProfilingIntegration(),
+  ],
+  // Performance Monitoring
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
 var corsOptions = {
   origin: `${PROTOCOL}://${CORS_HOST}:${REACT_ADMIN_PORT}`
 }
@@ -142,5 +170,14 @@ function initial() {
     name: 'admin'
   })
 }
+
+app.use(Sentry.Handlers.errorHandler());
+// Optional fallthrough error handler
+app.use(function onError(err, req, res, next) {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  res.statusCode = 500;
+  res.end(res.sentry + "\n");
+});
 
 app.listen(NODE_REST_PORT, () => console.log(`🟡 REST API is listening on port ${NODE_REST_PORT}`))

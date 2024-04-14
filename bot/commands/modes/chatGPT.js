@@ -8,7 +8,7 @@ import { db } from '../../db/index.js'
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
   let modeGPT
-    let newMessage
+  let newMessage
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -68,6 +68,22 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
 
     await spinnerOff(bot, chatID, res)
 
+    db.history.create({
+      chat_id: msg.chat.id,
+      message_id: msg.message_id,
+      nickname: msg.chat.username,
+      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+      response: msg.text
+    }).catch(() => {
+      db.history.create({
+        chat_id: msg.chat.id,
+        message_id: msg.message_id,
+        nickname: msg.chat.username,
+        fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+        response: 'Ответ слишком длинный'
+      })
+    })
+
     await bot.editMessageText(
       response,
       {
@@ -85,7 +101,8 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       text: response,
       message_id: message.message_id
     }
-  } catch (error) {
+  } catch
+    (error) {
     if (error instanceof Error) {
       await spinnerOff(bot, chatID, res)
       return errorMessage(bot, error, chatID)

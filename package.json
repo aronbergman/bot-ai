@@ -2,6 +2,8 @@
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "1.1.0",
+    "@sentry/node": "^7.110.0",
+    "@sentry/profiling-node": "^7.110.0",
     "axios": "^1.6.8",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
