@@ -41,13 +41,14 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
 
     let x = modesChatGPT.find(mode => mode.code === modeGPT)
 
-
     if (modeGPT === 'assistant') {
-      newMessage = msg.text
+      newMessage = msg.text ?? msg.sticker.emoji
       msg.ctx = INITIAL_SESSION
-    } else {
+    } else if (msg.text) {
       newMessage = x?.prompt_start
       newMessage = newMessage + '\n\n' + msg.text
+    } else {
+      newMessage = msg.sticker.emoji
     }
 
     await msg?.ctx.messages.push({

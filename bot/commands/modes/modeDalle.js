@@ -13,7 +13,7 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
   let prompt
 
   userMessageId = msg.message_id
-  prompt = msg.text.replace(match[0], '').trim()
+  prompt = msg.text ? msg.text.replace(match[0], '').trim() : msg.sticker.emoji
   const { id: userId, username, first_name: firstname } = msg.from
   const { id: chatID } = msg.chat
   const options = {

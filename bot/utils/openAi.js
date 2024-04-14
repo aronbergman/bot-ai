@@ -37,7 +37,7 @@ export class OpenAI {
         && answer.length !== prevAnswer.length
         && answer.length % process.env.CHAT_GPT_SPEED === 0
       ) {
-        process.stdout.write('🟩')
+        // process.stdout.write('🟩')
         await bot.editMessageText(answer, {
           message_id: editMessage.message_id, chat_id: chatId
         }).then(() => {

@@ -4,7 +4,7 @@ import { db } from '../../db/index.js'
 
 export const onMessageText = (bot, sudoUser) => {
   bot.on('text', async (msg, match) => {
-    if (msg.text.match(/^\/+/ig))
+    if (msg.text?.match(/^\/+/ig))
       return
     // TODO: Рефакторинг для минимизации обращения к бд.
     const { id: userId } = msg.from

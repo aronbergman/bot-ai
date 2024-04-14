@@ -6,6 +6,6 @@ import { autoRemoveMessage } from './autoRemoveMessage.js'
 
 export const errorMessage = async (bot, error, chatID, options) => {
   const message = `⚡️\n${error.message}`
-
+  console.log("error", error)
   await autoRemoveMessage(message, bot, chatID, options, 10000)
 }

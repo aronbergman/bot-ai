@@ -14,7 +14,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
 
   try {
     let firstMessage
-    if (msg.text.match(/^\/+/ig))
+    if (msg.text?.match(/^\/+/ig))
       return
     // TODO: Рефакторинг для минимизации обращения к бд.
     // TODO: BUG: При удалении базы данных и начале нового диалоге не создается сообщение в бд пока не выберается тип.
