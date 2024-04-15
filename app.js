@@ -54,8 +54,11 @@ startBot(bot)
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
 
+  if (msg?.chat?.type === 'supergroup')
+    return true
+
   if (msg.text === 'X2PROMO') {
-   await usePromoModel(bot, msg.text, msg.chat.id, msg.from)
+    await usePromoModel(bot, msg.text, msg.chat.id, msg.from)
     return true
   }
 

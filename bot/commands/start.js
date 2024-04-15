@@ -54,9 +54,9 @@ export const startBot = bot => {
           chat_id: chatId,
           user_id: msg.from.id
         }
-      }).then(res => {
+      }).then(async res => {
         if (res) {
-          db.subscriber.update(
+          await db.subscriber.update(
             {
               user_id: msg.from.id,
               first_name: msg.from.first_name,
@@ -67,7 +67,7 @@ export const startBot = bot => {
             { where: { chat_id: chatId } }
           )
         } else {
-          db.subscriber.create({
+          await db.subscriber.create({
             chat_id: chatId,
             user_id: msg.from.id,
             first_name: msg.from.first_name,
@@ -76,6 +76,7 @@ export const startBot = bot => {
             language_code: msg.from.language_code
           })
         }
+        await bot.sendMessage(-1001993684575, `🐥 ${from.first_name} @${from.username}`)
       })
     } catch (error) {
       await bot.sendMessage(chatId, `${error.message}`, options)
