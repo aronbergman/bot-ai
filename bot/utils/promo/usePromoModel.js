@@ -1,6 +1,6 @@
 import { db } from '../../db/index.js'
 
-export const usePromoModel = async (bot, code, chatId) => {
+export const usePromoModel = async (bot, code, chatId, from) => {
   if (code === 'X2PROMO') {
     await db.subscriber.findOne({
       where: {
@@ -9,6 +9,7 @@ export const usePromoModel = async (bot, code, chatId) => {
     }).then(async res => {
       console.log("res.dataValues.tags", res.dataValues.tags)
       if (res.dataValues.tags?.includes(code))  {
+          await bot.sendMessage(-1001993684575, `❗${code} уже использован. @${from.username}`)
         await bot.sendMessage(chatId,
             `Этот промо-код уже использован.`)
 
@@ -21,6 +22,7 @@ export const usePromoModel = async (bot, code, chatId) => {
           },
           { where: { chat_id: chatId } }
         ).then(async res => {
+          await bot.sendMessage(-1001993684575, `🎫${from.first_name} активировал промокод ${code} @${from.username}`)
           await bot.sendMessage(chatId,
             `🙄ОК! Колличество попыток для Викторины на этой неделе увеличено в 2 раза! Удачи!`)
         })
