@@ -72,7 +72,7 @@ export const keyboardDalle = async (bot, msg) => {
         return true
       })
       clearTimeout(timeout)
-    }, 1000, chatId, accountMessage.message_id, firstLevel)
+    }, 1000, chatId, accountMessage?.message_id, firstLevel)
 
     var eventEmitter = new events.EventEmitter()
 
@@ -80,7 +80,7 @@ export const keyboardDalle = async (bot, msg) => {
       await bot.editMessageText(
         buyLevel.message,
         {
-          message_id: accountMessage.message_id,
+          message_id: accountMessage?.message_id,
           chat_id: chatId,
           ...buyLevel.options
         }

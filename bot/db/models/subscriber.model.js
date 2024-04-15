@@ -1,5 +1,3 @@
-import { BOOLEAN } from 'sequelize/lib/data-types'
-
 export default (sequelize, DataTypes) => {
   const SubscriberSchema = sequelize.define('subscriber',
     {
@@ -33,8 +31,11 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: 'assistant'
       },
-      premium: {
-        type: BOOLEAN
+      tokens: {
+        type: DataTypes.DOUBLE
+      },
+      paid_days: {
+        type: DataTypes.DOUBLE
       },
       user_id_referral_program: {
         type: DataTypes.DOUBLE

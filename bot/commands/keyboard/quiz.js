@@ -4,26 +4,12 @@ import {
 import events from 'events'
 import { removeQueryFromPrevMessage } from '../hoc/removeQueryFromPrevMsg.js'
 import { db } from '../../db/index.js'
+import { calculatingAttempts } from '../../utils/quiz/calculatingAttempts.js'
+import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
+import { calculationOfWonTokens } from '../../utils/quiz/calculationOfWonTokens.js'
+import { nanoid } from 'nanoid'
 
-const miniGames = ['🎲', '🎯', '🏀', '⚽', '🎳']
-
-const getStringOrDist = (emoji, name) => {
-  const miniGames = [
-    { emoji: '🎰', name: 'MACHINE' },
-    { emoji: '🎲', name: 'CUBE' },
-    { emoji: '🎯', name: 'DARTS' },
-    { emoji: '🏀', name: 'BASKET' },
-    { emoji: '⚽', name: 'FOOT' },
-    { emoji: '🎳', name: 'BOWLING' }
-  ]
-
-  return miniGames.map((i) => {
-    if (emoji)
-      if (i.emoji === emoji) return i.name
-    if (name)
-      if (i.name === name) return i.emoji
-  }).join('')
-}
+const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
 
 export const keyboardQuiz = async (bot, msg) => {
   let accountMessage
@@ -37,7 +23,6 @@ export const keyboardQuiz = async (bot, msg) => {
   var eventEmitter = new events.EventEmitter()
 
   eventEmitter.on(`WIN_REQ_${chatId}`, async function(qwery) {
-    console.log(`GO_GO${chatId}`, qwery)
     eventEmitter.removeAllListeners()
     await removeQueryFromPrevMessage(bot, chatId, accountMessage)
     await db.subscriber.findOne({
@@ -45,17 +30,7 @@ export const keyboardQuiz = async (bot, msg) => {
         chat_id: chatId
       }
     }).then(async res => {
-      let quizAvailable
-      if (!res) {
-        db.subscriber.create({
-          chat_id: chatId,
-          user_id: msg.from.id,
-          mode: 'GPT'
-        })
-        quizAvailable = 5
-      } else {
-        quizAvailable = res?.dataValues?.quiz_available
-      }
+      let quizAvailable = calculatingAttempts(res?.dataValues, 'REQUESTS')
 
       if (quizAvailable > 0) {
         bot.sendDice(accountMessage.chat.id, {
@@ -66,22 +41,26 @@ export const keyboardQuiz = async (bot, msg) => {
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
           const createStringValue = getStringOrDist(emoji)
-
-          const quizRes = value
+          console.log(emoji, value, msg.from.username)
+          const quizRes = calculationOfWonTokens(emoji, value)
+          await bot.sendMessage(-1001993684575, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes}\n@${msg.from.username}`)
           const text = quizRes ? QUIZS[0].fin(emoji, quizRes) : QUIZS[0].finNeg(emoji)
 
-          setTimeout((emoji, value, chatId) => bot.sendMessage(
-            chatId,
-            text,
-            {
-              ...options,
-              // reply_markup: {
-              //   inline_keyboard: [
-              //     [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
-              //   ]
-              // }
-            }
-          ), 3000, emoji, value, chatId)
+          setTimeout((emoji, value, chatId) => {
+            bot.sendMessage(
+              chatId,
+              text,
+              options
+            )
+            db.subscriber.findOne(
+              { where: { chat_id: chatId } }
+            ).then(res => {
+              db.subscriber.update(
+                { tokens: res.dataValues.tokens + quizRes },
+                { where: { chat_id: chatId } }
+              )
+            })
+          }, 5000, emoji, value, chatId)
 
           await db.quiz.create(
             {
@@ -92,12 +71,12 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = res.dataValues.quiz_available - 1
+          const available = quizAvailable - 1
 
           await db.subscriber.update(
             {
               quiz_available: available,
-              quiz_type_available: available ? 'REQUESTS' : null
+              quiz_type_available: available ? 'REQUESTS' : 'NO_ATTEMPTS'
             },
             { where: { chat_id: chatId } }
           )
@@ -107,8 +86,8 @@ export const keyboardQuiz = async (bot, msg) => {
 
     })
   })
+
   eventEmitter.on(`WIN_SUBS_${chatId}`, async function(qwery) {
-    console.log(`WIN_SUBS_${chatId}`, qwery)
     eventEmitter.removeAllListeners()
     await removeQueryFromPrevMessage(bot, chatId, accountMessage)
     await db.subscriber.findOne({
@@ -116,17 +95,7 @@ export const keyboardQuiz = async (bot, msg) => {
         chat_id: chatId
       }
     }).then(async res => {
-      let quizAvailable
-      if (!res) {
-        db.subscriber.create({
-          chat_id: chatId,
-          user_id: msg.from.id,
-          mode: 'GPT'
-        })
-        quizAvailable = 5
-      } else {
-        quizAvailable = res?.dataValues?.quiz_available
-      }
+      let quizAvailable = calculatingAttempts(res?.dataValues, 'SUBSCRIBE')
 
       if (quizAvailable > 0) {
         bot.sendDice(accountMessage.chat.id, {
@@ -136,23 +105,35 @@ export const keyboardQuiz = async (bot, msg) => {
           protect_content: true
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
-          const createStringValue = getStringOrDist(emoji)
 
-          const quizRes = value // TODO: установить значение для выйгрыша
-          const text = QUIZS[0].finTest(quizRes)
+          console.log(emoji, value, msg.from.username)
+          const quizRes = calculationOfWonTokens(emoji, value)
+          await bot.sendMessage(-1001993684575, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes}\n@${msg.from.username}`)
+          const text = quizRes ? QUIZS[0].finSub(emoji) : QUIZS[0].finNeg(emoji)
 
-          setTimeout((emoji, value, chatId) => bot.sendMessage(
-            chatId,
-            text,
-            {
-              ...options,
-              // reply_markup: {
-              //   inline_keyboard: [
-              //     [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
-              //   ]
-              // }
-            }
-          ), 3000, emoji, value, chatId)
+          setTimeout((emoji, value, chatId) => {
+            bot.sendMessage(
+              chatId,
+              text,
+              options
+            )
+          }, 5000, emoji, value, chatId)
+
+          if (quizRes) {
+            await db.payment.create({
+              payment_id: nanoid(7),
+              type_of_tariff: 'DAYS',
+              duration: 30,
+              user_id: chatId,
+              username: msg.from.username,
+              payment_method: 'QUIZ',
+              payment_confirmed: new Date()
+            })
+            await db.subscriber.update({
+              paid_days: 30
+            }, { where: { chat_id: chatId } })
+            await bot.sendMessage(-1001993684575, `🎰 @${msg.from.username} Выйграл подписку на месяц`)
+          }
 
           await db.quiz.create(
             {
@@ -163,12 +144,12 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = res.dataValues.quiz_available - 1
+          const available = quizAvailable - 1
 
           await db.subscriber.update(
             {
               quiz_available: available,
-              quiz_type_available: available ? 'SUBSCRIBE' : null
+              quiz_type_available: available ? 'SUBSCRIBE' : 'NO_ATTEMPTS'
             },
             { where: { chat_id: chatId } }
           )
@@ -220,11 +201,12 @@ export const keyboardQuiz = async (bot, msg) => {
     }).then(res => {
 
       let keyboard = []
+      let keyboard2 = []
 
       // res.dataValues.quiz_available
 
-      if (res?.dataValues?.quiz_available == 0) {
-        keyboard.push({ text: '⌛️ Новая игра через неделю', callback_data: `EXIT` })
+      if (res?.dataValues?.quiz_type_available === 'NO_ATTEMPTS') {
+        keyboard.push({ text: '⌛️ Новая игра через неделю', callback_data: `NO_ATTEMPTS` })
       } else if (res?.dataValues.quiz_type_available === 'SUBSCRIBE') {
         keyboard.push({
           text: `Выиграй подписку 🥳 (${res.dataValues.quiz_available})`,
@@ -237,7 +219,7 @@ export const keyboardQuiz = async (bot, msg) => {
         })
       } else {
         keyboard.push({ text: 'Выиграй запросы 🤓', callback_data: `WIN_REQ_${chatId}` })
-        keyboard.push({ text: 'Выиграй подписку 🥳', callback_data: `WIN_SUBS_${chatId}` })
+        keyboard2.push({ text: 'Выиграй подписку 🥳', callback_data: `WIN_SUBS_${chatId}` })
       }
 
       const timeout = setTimeout(async () => {
@@ -253,6 +235,7 @@ export const keyboardQuiz = async (bot, msg) => {
             reply_markup: {
               inline_keyboard: [
                 keyboard,
+                keyboard2,
                 [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
               ]
             }

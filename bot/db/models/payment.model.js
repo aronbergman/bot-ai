@@ -7,7 +7,7 @@ export default (sequelize, DataTypes) => {
     {
       payment_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV1(10),
+        defaultValue: DataTypes.UUID,
         allowNull: false,
         primaryKey: true
       },

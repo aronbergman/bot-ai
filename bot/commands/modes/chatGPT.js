@@ -43,7 +43,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     let x = modesChatGPT.find(mode => mode.code === modeGPT)
 
     if (modeGPT === 'assistant') {
-      newMessage = msg.text ?? msg.sticker.emoji
+      newMessage = msg.text ?? msg.sticker?.emoji
       msg.ctx = INITIAL_SESSION
     } else if (msg.text) {
       newMessage = x?.prompt_start

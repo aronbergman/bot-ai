@@ -1,9 +1,10 @@
-import { INITIAL_SESSION, MY_ACCOUNT, TARIFS } from '../../constants/index.js'
+import { INITIAL_SESSION, TARIFS } from '../../constants/index.js'
 import { db } from '../../db/index.js'
 import * as events from 'events'
 import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
+import { createAccountMessage } from '../../utils/createAccountMessage.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -21,7 +22,7 @@ export const keyboardMyAccount = async (bot, msg) => {
   try {
     // TODO: рефакторинг в отдельный файл
     const firstLevel = {
-      message: MY_ACCOUNT,
+      message: null,
       options: {
         ...generalOptions,
         reply_markup: {
@@ -109,7 +110,7 @@ export const keyboardMyAccount = async (bot, msg) => {
 
     eventEmitter.on(`get_first_level_A_${chatId}`, function() {
       bot.editMessageText(
-        firstLevel.message,
+        createAccountMessage(0, 0),
         {
           message_id: accountMessage.message_id,
           chat_id: chatId,
@@ -140,32 +141,32 @@ export const keyboardMyAccount = async (bot, msg) => {
           payment_method: 'PAYOK'
         }).then((invoice) => {
 
-          const link =  payok.getPaymentLink({
+          const link = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cd',
+            method: 'cd'
           })
 
-          const linkSBP =  payok.getPaymentLink({
+          const linkSBP = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'sbp',
+            method: 'sbp'
           })
 
-          const linkCR =  payok.getPaymentLink({
+          const linkCR = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cru',
+            method: 'cru'
           })
 
-          const linkCW =  payok.getPaymentLink({
+          const linkCW = payok.getPaymentLink({
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cwo',
+            method: 'cwo'
           })
 
           bot.editMessageText(
@@ -183,10 +184,10 @@ Payok - оплачивайте следующими способами:
               chat_id: chatId,
               reply_markup: {
                 inline_keyboard: [
-                  [{text: '| Оплатить через Payok |', url: link.payUrl }],
-                  [{text: '| Российская карта | Payok |', url: linkCR.payUrl }],
-                  [{text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
-                  [{text: '| СБП | Payok |', url: linkSBP.payUrl }],
+                  [{ text: '| Оплатить через Payok |', url: link.payUrl }],
+                  [{ text: '| Российская карта | Payok |', url: linkCR.payUrl }],
+                  [{ text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
+                  [{ text: '| СБП | Payok |', url: linkSBP.payUrl }],
                   [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
                 ]
               }
@@ -206,17 +207,23 @@ Payok - оплачивайте следующими способами:
       generalOptions
     ).catch(err => console.log(err))
 
-    const timeout = setTimeout((accountMessage) => {
+    const timeout = setTimeout(async (accountMessage) => {
       // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
-      clearTimeout(timeout)
-      bot.editMessageText(
-        firstLevel.message,
-        {
-          message_id: accountMessage.message_id,
-          chat_id: chatId,
-          ...firstLevel.options
+      await db.subscriber.findOne({
+        where: {
+          chat_id: chatId
         }
-      ).catch(err => console.log(err))
+      }).then(res => {
+        clearTimeout(timeout)
+        bot.editMessageText(
+          createAccountMessage(res.dataValues.tokens, res.dataValues.paid_days),
+          {
+            message_id: accountMessage.message_id,
+            chat_id: chatId,
+            ...firstLevel.options
+          }
+        ).catch(err => console.log(err))
+      })
     }, 1000, accountMessage)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)
