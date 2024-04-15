@@ -4,6 +4,7 @@ import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
 import { errorMessage } from '../hoc/errorMessage.js'
 import { modesChatGPT } from '../../constants/modes.js'
 import { db } from '../../db/index.js'
+import { exceptionForHistoryLogging } from '../../utils/exceptionForHistoryLogging.js'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
@@ -69,21 +70,12 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
 
     await spinnerOff(bot, chatID, res)
 
-    db.history.create({
+    db.history.update({
       chat_id: msg.chat.id,
-      message_id: msg.message_id,
       nickname: msg.chat.username,
       fullname: `${msg.from.first_name} ${msg.from.last_name}`,
-      response: msg.text
-    }).catch(() => {
-      db.history.create({
-        chat_id: msg.chat.id,
-        message_id: msg.message_id,
-        nickname: msg.chat.username,
-        fullname: `${msg.from.first_name} ${msg.from.last_name}`,
-        response: 'Ответ слишком длинный'
-      })
-    })
+      response: exceptionForHistoryLogging(msg.from.id, response)
+    }, { where: { message_id: msg.message_id } }).catch()
 
     await bot.editMessageText(
       response,

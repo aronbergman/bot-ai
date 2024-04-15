@@ -36,8 +36,10 @@ import { keyboardDalle } from './bot/commands/keyboard/dalle.js'
 
 dotenv.config()
 
-import Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import Sentry from '@sentry/node'
+import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import { exceptionForHistoryLogging } from './bot/utils/exceptionForHistoryLogging.js'
+
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
 
@@ -48,32 +50,33 @@ bot.on('polling_error', console.log)
 // Use command
 startBot(bot)
 
-bot.on('message', (msg, match) => {
+bot.on('message', async (msg, match) => {
 
   if (msg.reply_to_message) {
     return db.helper.create({
       count: msg.reply_to_message.text,
-      comment: msg.text,
+      comment: msg.text
     })
   }
 
   if (msg.from.username !== 'aronbergman' && process.env.SERVER === 'DEVELOPMENT')
-    bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, { parse_mode: 'HTML' }).then(r  =>{})
+    bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, { parse_mode: 'HTML' }).then(r => {
+    })
 
-  db.history.create({
+  await db.history.create({
     chat_id: msg.chat.id,
     message_id: msg.message_id,
     nickname: msg.chat.username,
     fullname: `${msg.from.first_name} ${msg.from.last_name}`,
-    request: msg.text
-  }).catch(() => {
-    db.history.create({
-    chat_id: msg.chat.id,
-    message_id: msg.message_id,
-    nickname: msg.chat.username,
-    fullname: `${msg.from.first_name} ${msg.from.last_name}`,
-    request: "Сообщение слишком длинное"
-  })
+    request: exceptionForHistoryLogging(msg.from.id, msg.text)
+  }).catch(async () => {
+    await db.history.create({
+      chat_id: msg.chat.id,
+      message_id: msg.message_id,
+      nickname: msg.chat.username,
+      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+      request: 'VERY_LONG_MESSAGE'
+    })
   })
   switch (msg.text) {
     case COMMAND_ACCOUNT:
@@ -116,22 +119,22 @@ listSudoers(bot, sudoUser)
 const app = express()
 
 Sentry.init({
-  dsn: "https://cd16320a573f069cdc9afe19e324c2cb@o392602.ingest.us.sentry.io/4507084187893760",
+  dsn: 'https://cd16320a573f069cdc9afe19e324c2cb@o392602.ingest.us.sentry.io/4507084187893760',
   integrations: [
     // enable HTTP calls tracing
     new Sentry.Integrations.Http({ tracing: true }),
     // enable Express.js middleware tracing
     new Sentry.Integrations.Express({ app }),
-    nodeProfilingIntegration(),
+    nodeProfilingIntegration()
   ],
   // Performance Monitoring
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-});
+  profilesSampleRate: 1.0
+})
 
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.tracingHandler())
 
 var corsOptions = {
   origin: `${PROTOCOL}://${CORS_HOST}:${REACT_ADMIN_PORT}`
@@ -171,13 +174,13 @@ function initial() {
   })
 }
 
-app.use(Sentry.Handlers.errorHandler());
+app.use(Sentry.Handlers.errorHandler())
 // Optional fallthrough error handler
 app.use(function onError(err, req, res, next) {
   // The error id is attached to `res.sentry` to be returned
   // and optionally displayed to the user for support.
-  res.statusCode = 500;
-  res.end(res.sentry + "\n");
-});
+  res.statusCode = 500
+  res.end(res.sentry + '\n')
+})
 
 app.listen(NODE_REST_PORT, () => console.log(`🟡 REST API is listening on port ${NODE_REST_PORT}`))
