@@ -39,6 +39,7 @@ dotenv.config()
 import Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { exceptionForHistoryLogging } from './bot/utils/exceptionForHistoryLogging.js'
+import { usePromoModel } from './bot/utils/promo/usePromoModel.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -52,6 +53,11 @@ startBot(bot)
 
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
+
+  if (msg.text === 'X2PROMO') {
+   await usePromoModel(bot, msg.text, msg.chat.id)
+    return true
+  }
 
   if (msg.from.username !== 'aronbergman' && process.env.SERVER === 'DEVELOPMENT')
     bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, { parse_mode: 'HTML' }).then(r => {
