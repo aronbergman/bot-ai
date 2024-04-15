@@ -76,7 +76,7 @@ export const startBot = bot => {
             language_code: msg.from.language_code
           })
         }
-        await bot.sendMessage(-1001993684575, `🐥 ${from.first_name} @${from.username}`)
+        await bot.sendMessage(-1001993684575, `🐥 ${msg.from.first_name} @${msg.from.username}`)
       })
     } catch (error) {
       await bot.sendMessage(chatId, `${error.message}`, options)
