@@ -2,7 +2,7 @@ const emojis = ['🐾', '🤖', '💡', '🚀', '⌛️', '👾', '👻', '👽'
 const emojiChat = ['🤖', '👽']
 
 export const spinnerOn = async (bot, chat_id, type) => {
-  const coll = type === "CHAT" ? emojiChat : emojis;
+  const coll = type === "GPT" ? emojiChat : emojis;
   const message = await bot.sendMessage(
     chat_id,
     coll[Math.floor(Math.random() * coll.length)]

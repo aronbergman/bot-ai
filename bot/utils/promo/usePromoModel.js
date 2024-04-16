@@ -1,4 +1,6 @@
 import { db } from '../../db/index.js'
+import dotenv from "dotenv";
+dotenv.config();
 
 export const usePromoModel = async (bot, code, chatId, from) => {
   if (code === 'X2PROMO') {
@@ -9,7 +11,7 @@ export const usePromoModel = async (bot, code, chatId, from) => {
     }).then(async res => {
 if (res) {
   if (res.dataValues.tags?.includes(code)) {
-    await bot.sendMessage(-1001993684575, `❗Повторно вводит ${code} @${from.username}`)
+    await bot.sendMessage(process.env.NOTIF_GROUP, `❗Повторно вводит ${code} @${from.username}`)
     await bot.sendMessage(chatId,
       `Этот промо-код уже использован.`)
 
@@ -22,7 +24,7 @@ if (res) {
       },
       { where: { chat_id: chatId } }
     ).then(async res => {
-      await bot.sendMessage(-1001993684575, `🎫 ${from.first_name} активировал промокод ${code} @${from.username}`)
+      await bot.sendMessage(process.env.NOTIF_GROUP, `🎫 ${from.first_name} активировал промокод ${code} @${from.username}`)
       await bot.sendMessage(chatId,
         `🙄 ОК! Колличество попыток для Викторины на этой неделе увеличено в 2 раза! Удачи!`)
     })

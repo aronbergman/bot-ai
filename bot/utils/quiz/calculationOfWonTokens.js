@@ -29,8 +29,9 @@ export const calculationOfWonTokens = (emoji, value) => {
       else
         return value
     case 'MACHINE':
-      // if (winMachine.find((i) => i === value) === -1)
-      if (winMachine.find((i) => i === value) !== -1) // Для тестирования выйгрыша
+      if (winMachine.find((i) => i === value) === -1)
+      // if (winMachin
+        // e.find((i) => i === value) !== -1) // Для тестирования выйгрыша
         return 1
       else
         return 0

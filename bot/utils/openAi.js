@@ -73,11 +73,11 @@ export class OpenAI {
       throw new Error('Something went wrong please try again.')
     }
 
-    const { data } = await this.openai.createTranscription(
-      createReadStream(this.filepath),
-      'whisper-1'
-    )
+    const { text } = await this.openai.audio.transcriptions.create({
+      model: 'whisper-1',
+      file: createReadStream(this.filepath),
+    })
 
-    return data
+    return text;
   }
 }

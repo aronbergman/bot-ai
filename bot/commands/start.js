@@ -9,6 +9,8 @@ import {
   INITIAL_SESSION
 } from '../constants/index.js'
 import { db } from '../db/index.js'
+import dotenv from "dotenv";
+dotenv.config();
 
 export const startBot = bot => {
   bot.onText(/\/start|\/echo/, async msg => {
@@ -76,7 +78,7 @@ export const startBot = bot => {
             language_code: msg.from.language_code
           })
         }
-        await bot.sendMessage(-1001993684575, `🐥 ${msg.from.first_name} @${msg.from.username}`)
+        await bot.sendMessage(process.env.NOTIF_GROUP, `🐥 ${msg.from.first_name} @${msg.from.username}`)
       })
     } catch (error) {
       await bot.sendMessage(chatId, `${error.message}`, options)

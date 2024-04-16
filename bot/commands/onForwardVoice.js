@@ -1,8 +1,8 @@
-import { INITIAL_SESSION } from '../../constants/index.js'
-import { OggDownloader } from '../../utils/oggDownloader.js'
-import { OggConverter } from '../../utils/oggConverter.js'
-import { OpenAI } from '../../utils/openAi.js'
-import { spinnerOff } from '../../utils/spinner.js'
+import { INITIAL_SESSION } from '../constants/index.js'
+import { OggDownloader } from '../utils/oggDownloader.js'
+import { OggConverter } from '../utils/oggConverter.js'
+import { OpenAI } from '../utils/openAi.js'
+import { spinnerOff } from '../utils/spinner.js'
 
 export const onForwardVoice = async (bot, msg) => {
   const { id: chatID } = msg.chat
@@ -72,19 +72,25 @@ export const onCreateAnswer = async (bot, spinnerId, answerType) => {
       await spinnerOff(bot, chatID, spinnerId)
       return await bot.sendMessage(
         chatID,
-        data.text,
+        data,
         options
       )
     }
+
+      const res = await bot.sendMessage(
+        chatID,
+        '...',
+        options
+      )
 
     await oggConverter.delete()
 
     msg?.ctx.messages.push({
       role: openAi.roles.User,
-      content: data.text
+      content: data
     })
 
-    const response = await openAi.chat(msg?.ctx.messages)
+    const response = await openAi.chat(msg?.ctx.messages, bot, res, chatID)
 
     if (!response) {
       throw new Error('Something went wrong please try again.')
@@ -92,16 +98,11 @@ export const onCreateAnswer = async (bot, spinnerId, answerType) => {
 
     msg?.ctx.messages.push({
       role: openAi.roles.Assistant,
-      content: response.content
+      content: response
     })
 
     await spinnerOff(bot, chatID, spinnerId)
 
-    await bot.sendMessage(
-      chatID,
-      response.content,
-      options
-    )
   } catch (error) {
     if (error instanceof Error) {
       return await bot.sendMessage(

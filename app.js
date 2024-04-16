@@ -22,7 +22,8 @@ import {
   COMMAND_GPT,
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ
+  COMMAND_QUIZ,
+  COMMAND_SPEECH_TO_TEXT
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
@@ -40,6 +41,7 @@ import Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { exceptionForHistoryLogging } from './bot/utils/exceptionForHistoryLogging.js'
 import { usePromoModel } from './bot/utils/promo/usePromoModel.js'
+import { keyboardSpeechToText } from './bot/commands/keyboard/keyboardSpeechToText.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -54,7 +56,7 @@ startBot(bot)
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
 
-  if (msg?.chat?.type === 'supergroup')
+  if (msg?.chat?.type === 'supergroup' || msg.voice)
     return true
 
   if (msg.text === 'X2PROMO') {
@@ -84,7 +86,7 @@ bot.on('message', async (msg, match) => {
 
   switch (msg.text) {
     case COMMAND_ACCOUNT:
-      switchToMode('CHAT', msg.chat.id, msg.from)
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardMyAccount(bot, msg)
       break
     case COMMAND_GPT:
@@ -93,15 +95,18 @@ bot.on('message', async (msg, match) => {
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
       break
+    case COMMAND_SPEECH_TO_TEXT:
+      return keyboardSpeechToText(bot, msg)
+      break
     case COMMAND_DALL_E:
       return keyboardDalle(bot, msg)
       break
     case COMMAND_HELP:
-      switchToMode('CHAT', msg.chat.id, msg.from)
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardHelp(bot, msg)
       break
     case COMMAND_QUIZ:
-      switchToMode('CHAT', msg.chat.id, msg.from)
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardQuiz(bot, msg)
       break
     default:
@@ -109,8 +114,7 @@ bot.on('message', async (msg, match) => {
   }
 })
 
-// textToSpeach(bot)
-// onMessageVoice(bot);
+onMessageVoice(bot);
 
 // Use admin command
 // TODO: Разрешить эти команды только пользователям с ролью администратор

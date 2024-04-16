@@ -8,6 +8,8 @@ import { calculatingAttempts } from '../../utils/quiz/calculatingAttempts.js'
 import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
 import { calculationOfWonTokens } from '../../utils/quiz/calculationOfWonTokens.js'
 import { nanoid } from 'nanoid'
+import dotenv from "dotenv";
+dotenv.config();
 
 const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
 
@@ -43,7 +45,7 @@ export const keyboardQuiz = async (bot, msg) => {
           const createStringValue = getStringOrDist(emoji)
           console.log(emoji, value, msg.from.username)
           const quizRes = calculationOfWonTokens(emoji, value)
-          await bot.sendMessage(-1001993684575, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes}\n@${msg.from.username}`)
+          await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
           const text = quizRes ? QUIZS[0].fin(emoji, quizRes) : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => {
@@ -108,7 +110,7 @@ export const keyboardQuiz = async (bot, msg) => {
 
           console.log(emoji, value, msg.from.username)
           const quizRes = calculationOfWonTokens(emoji, value)
-          await bot.sendMessage(-1001993684575, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes}\n@${msg.from.username}`)
+          await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
           const text = quizRes ? QUIZS[0].finSub(emoji) : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => {
@@ -132,7 +134,8 @@ export const keyboardQuiz = async (bot, msg) => {
             await db.subscriber.update({
               paid_days: 30
             }, { where: { chat_id: chatId } })
-            await bot.sendMessage(-1001993684575, `🎰 @${msg.from.username} Выйграл подписку на месяц`)
+            // TODO: Ждем рефералов сделать рефералку на 3 из 5 ссылок пришли от пользователя
+            await bot.sendMessage(process.env.NOTIF_GROUP, `🎰 @${msg.from.username} выиграл подписку, ждём рефералов...`)
           }
 
           await db.quiz.create(

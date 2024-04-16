@@ -32,7 +32,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     // TODO: Запоминать контекст беседы пользователя или всегда начинать новый чат
     msg.ctx ??= INITIAL_SESSION
 
-    res = await spinnerOn(bot, chatID, 'CHAT')
+    res = await spinnerOn(bot, chatID, 'GPT')
     let message = await bot.sendMessage(chatID, '...').catch(() => {
       console.log('!!!')
       return true
