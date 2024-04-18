@@ -1,7 +1,9 @@
-function createProgress(progress) {
+function createProgress(progress, type = 0) {
   let res = []
-  const done = '🟩'
-  const empty = '⬜'
+  const typeEmoji = [
+    {done: '🟩', empty: '🟨'},
+    {done: '🔝', empty: '🔜'}
+  ];
 
   function roundMe(progress) {
     const x = 10
@@ -11,10 +13,10 @@ function createProgress(progress) {
 
   const createLine = (x) => {
     for (let i = 0; i < x; i++) {
-      res.push(done)
+      res.push(typeEmoji[type].done)
     }
     for (let i = 0; i < 10 - x; i++) {
-      res.push(empty)
+      res.push(typeEmoji[type].empty)
     }
     return res
   }
@@ -23,18 +25,18 @@ function createProgress(progress) {
   return `${lineArray.join('')} ${progress}%`
 }
 
-export const loaderOn = (progress, bot, chat_id, message_id) => {
+export const loaderOn = (progress, bot, chat_id, message_id, type) => {
   if (!message_id) {
     const msg = bot.sendMessage(
       chat_id,
-      createProgress(progress)
+      createProgress(progress, type)
     ).catch(() => {
       console.error('🔺 loaderOn sendMessage')
     })
     return msg
   } else {
     bot.editMessageText(
-      createProgress(progress.replace('%', '')),
+      createProgress(progress.replace('%', ''), type),
       {
         message_id,
         chat_id

@@ -44,7 +44,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   }
 
   let spinner = await spinnerOn(bot, chatID)
-  let waiting = await loaderOn(3, bot, chatID)
+  let waiting = await loaderOn(0, bot, chatID)
 
   try {
     const { SERVER_ID, CHANNEL_ID, SALAI_TOKEN } = process.env
@@ -101,7 +101,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     let spinner
     try {
       spinner = await spinnerOn(bot, chatID)
-      waiting = await loaderOn(3, bot, chat_id)
+      waiting = await loaderOn(0, bot, chat_id)
       const UCustomID = Imagine.options?.find(
         o => o.label === selectedLabel
       )?.custom
@@ -137,7 +137,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     let waiting
     try {
       spinner = await spinnerOn(bot, chatID)
-      waiting = await loaderOn(3, bot, chat_id)
+      waiting = await loaderOn(0, bot, chat_id)
       const VCustomID = Imagine.options?.find(
         o => o.label === selectedLabel
       )?.custom

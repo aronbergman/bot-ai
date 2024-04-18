@@ -1,5 +1,5 @@
 import {
-  QUIZ_RULES, QUIZS
+  QUIZ_RULES, QUIZS, WON_A_MONTH_SUBSCRIPTION
 } from '../../constants/index.js'
 import events from 'events'
 import { removeQueryFromPrevMessage } from '../hoc/removeQueryFromPrevMsg.js'
@@ -111,7 +111,7 @@ export const keyboardQuiz = async (bot, msg) => {
           console.log(emoji, value, msg.from.username)
           const quizRes = calculationOfWonTokens(emoji, value)
           await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
-          const text = quizRes ? QUIZS[0].finSub(emoji) : QUIZS[0].finNeg(emoji)
+          const text = quizRes ? WON_A_MONTH_SUBSCRIPTION("@PiraJoke") : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => {
             bot.sendMessage(
@@ -176,9 +176,9 @@ export const keyboardQuiz = async (bot, msg) => {
       for (let i = 0; i < res.length; i++) {
         let someDate = new Date(res[i].dataValues.createdAt).toLocaleString('ru')
         if (res[i].dataValues.name === 'MACHINE')
-          text.push(`${res[i].dataValues.quiz_res > 55 ? '🎁' : '⬜️'}       ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
+          text.push(`${res[i].dataValues.quiz_res > 55 ? '🎁' : '➖'}       ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
         else
-          text.push(`${res[i].dataValues.quiz_res ? '🎁' : '⬜️'}  <b>${res[i].dataValues.quiz_res}</b>   ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
+          text.push(`${res[i].dataValues.quiz_res ? '🎁' : '➖'}  <b>${res[i].dataValues.quiz_res}</b>   ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
       }
       await bot.sendMessage(chatId, text.join(''), options)
       eventEmitter.removeAllListeners()

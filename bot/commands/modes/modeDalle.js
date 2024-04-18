@@ -37,7 +37,7 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
   }
 
   let spinner = await spinnerOn(bot, chatID)
-  let waiting = await loaderOn(3, bot, chatID)
+  let waiting = await loaderOn(0, bot, chatID, null, 1)
 
   // var eventEmitter = new events.EventEmitter()
   //
@@ -60,7 +60,6 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
 
     const response = await openAi.image(prompt)
 
-
     const imgUrl = response
     const imgDir = './Dall-e'
     const filePath = `${imgDir}/${userMessageId}.png`
@@ -73,7 +72,7 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     //   })
     // }
 
-    await loaderOn('62%', bot, chatID, waiting?.message_id)
+    await loaderOn('42%', bot, chatID, waiting?.message_id, 1)
 
     await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
       waiting)
