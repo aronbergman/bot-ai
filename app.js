@@ -7,8 +7,7 @@ import { startBot } from './bot/commands/start.js'
 import { addSudoer } from './bot/commands/admin/addSudoer.js'
 import { removeSudoer } from './bot/commands/admin/removeSudoer.js'
 import { listSudoers } from './bot/commands/admin/listSudoers.js'
-import { onMessageVoice } from './bot/commands/_refact/onMessageVoice.js'
-import { textToSpeach } from './bot/commands/_refact/textToSpeach.js'
+import { onMessageVoice } from './bot/commands/onMessageVoice.js'
 import { getId } from './bot/commands/admin/getId.js'
 
 import { db } from './bot/db/index.js'
@@ -42,6 +41,7 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { exceptionForHistoryLogging } from './bot/utils/exceptionForHistoryLogging.js'
 import { usePromoModel } from './bot/utils/promo/usePromoModel.js'
 import { keyboardSpeechToText } from './bot/commands/keyboard/keyboardSpeechToText.js'
+import { setQuizModeForSubs } from './bot/commands/admin/setQuizModeForSubs.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -120,6 +120,7 @@ onMessageVoice(bot);
 // TODO: Разрешить эти команды только пользователям с ролью администратор
 getId(bot)
 sendMessage(bot)
+setQuizModeForSubs(bot)
 addSudoer(bot, sudoUser)
 removeSudoer(bot, sudoUser)
 listSudoers(bot, sudoUser)

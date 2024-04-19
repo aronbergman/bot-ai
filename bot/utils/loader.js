@@ -1,9 +1,14 @@
-function createProgress(progress, type = 0) {
+import axios from 'axios'
+import fs from 'fs'
+import { TYPE_RESPONSE_MJ } from '../constants/index.js'
+import { spinnerOff } from './spinner.js'
+
+export function createProgress(progress, type = 0) {
   let res = []
   const typeEmoji = [
-    {done: '🟩', empty: '🟨'},
-    {done: '🔝', empty: '🔜'}
-  ];
+    { done: '🟩', empty: '🟨' },
+    { done: '🔝', empty: '🔜' }
+  ]
 
   function roundMe(progress) {
     const x = 10
@@ -25,7 +30,7 @@ function createProgress(progress, type = 0) {
   return `${lineArray.join('')} ${progress}%`
 }
 
-export const loaderOn = (progress, bot, chat_id, message_id, type) => {
+export const loaderOn = async (progress, bot, chat_id, message_id, type) => {
   if (!message_id) {
     const msg = bot.sendMessage(
       chat_id,
@@ -42,7 +47,7 @@ export const loaderOn = (progress, bot, chat_id, message_id, type) => {
         chat_id
       }
     ).catch(() => {
-      console.error('🔺 loaderOn editMessageText', message_id, "-", chat_id)
+      console.error('🔺 loaderOn editMessageText', message_id, '-', chat_id)
     })
   }
 }

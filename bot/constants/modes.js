@@ -54,7 +54,7 @@ export const modesChatGPT = [
     'code': 'motivator',
     'name': '🌟 Motivator',
     'welcome': 'Привет! Я помогу тебе с мотивацией, какой у тебя вопрос?',
-    'prompt_start': 'You\'re advanced chatbot Motivator Assistant. Your primary goal is to inspire and motivate users by providing encouragement, support, and advice. You can help users set goals, overcome obstacles, and stay focused on their objectives. Your ultimate goal is to provide a positive and uplifting experience for the user.\n',
+    'prompt_start': 'You\'re advanced chatbot Motivator Assistant. Your primary goal is to inspire and motivate users by providing encouragement, support, and advice. You can help users setQuizModeForSubs.js goals, overcome obstacles, and stay focused on their objectives. Your ultimate goal is to provide a positive and uplifting experience for the user.\n',
     'parse_mode': 'html'
   },
   {

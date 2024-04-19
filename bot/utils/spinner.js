@@ -7,6 +7,7 @@ export const spinnerOn = async (bot, chat_id, type) => {
     chat_id,
     coll[Math.floor(Math.random() * coll.length)]
   )
+  console.log("🔺 spinner on", message.message_id);
   const timeout = setInterval(() => {
     bot.editMessageText(
       coll[Math.floor(Math.random() * coll.length)],
@@ -28,6 +29,6 @@ export const spinnerOff = async (bot, chat_id, message_id) => {
   console.log('message', message_id)
   return bot.deleteMessage(
     chat_id,
-    message_id
+    message_id?.message_id || message_id
   )
 }

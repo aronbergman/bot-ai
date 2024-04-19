@@ -1,9 +1,9 @@
-import { INITIAL_SESSION } from '../../constants/index.js'
-import { OggDownloader } from '../../utils/oggDownloader.js'
-import { OggConverter } from '../../utils/oggConverter.js'
-import { OpenAI } from '../../utils/openAi.js'
+import { INITIAL_SESSION } from '../constants/index.js'
+import { OggDownloader } from '../utils/oggDownloader.js'
+import { OggConverter } from '../utils/oggConverter.js'
+import { OpenAI } from '../utils/openAi.js'
 import { onCreateAnswer, onForwardVoice } from './onForwardVoice.js'
-import { spinnerOn } from '../../utils/spinner.js'
+import { spinnerOn } from '../utils/spinner.js'
 
 export const onMessageVoice = (bot) => {
   bot.on('voice', async (msg, match) => {
@@ -57,7 +57,7 @@ export const onMessageVoice = (bot) => {
 
       const { message_id } = res
       await bot.editMessageText(
-        `...${data.text}...`,
+        `...${data}...`,
         {
           ...options,
           message_id
@@ -68,10 +68,10 @@ export const onMessageVoice = (bot) => {
 
       msg?.ctx.messages.push({
         role: openAi.roles.User,
-        content: data.text
+        content: data
       })
 
-      const response = await openAi.chat(msg?.ctx.messages)
+      const response = await openAi.chat(msg?.ctx.messages, bot, res, chatID)
 
       if (!response) {
         throw new Error('Something went wrong please try again.')
@@ -79,14 +79,8 @@ export const onMessageVoice = (bot) => {
 
       msg?.ctx.messages.push({
         role: openAi.roles.Assistant,
-        content: response.content
+        content: response
       })
-
-      await bot.sendMessage(
-        chatID,
-        response.content,
-        options
-      )
     } catch (error) {
       if (error instanceof Error) {
         return await bot.sendMessage(
@@ -103,21 +97,23 @@ export const onMessageVoice = (bot) => {
     const { message_id } = query.message
     const selectedLabel = query.data
 
-    if (bot.context?.answer_message_id)
-      await bot.deleteMessage(
-        chat_id,
-        bot.context.answer_message_id
-      )
+    if (selectedLabel === 'translate' || selectedLabel === 'question') {
+      if (bot.context?.answer_message_id)
+        await bot.deleteMessage(
+          chat_id,
+          bot.context.answer_message_id
+        )
 
-    const spinId = await spinnerOn(bot, chat_id)
+      const spinId = await spinnerOn(bot, chat_id)
 
-    if (bot.context) {
-      if (selectedLabel.includes('translate')) {
-        await onCreateAnswer(bot, spinId, 'translate')
-      } else if (selectedLabel.includes('question')) {
-        await onCreateAnswer(bot, spinId, 'question')
+      if (bot.context) {
+        if (selectedLabel.includes('translate')) {
+          await onCreateAnswer(bot, spinId, 'translate')
+        } else if (selectedLabel.includes('question')) {
+          await onCreateAnswer(bot, spinId, 'question')
+        }
       }
+      bot.context = null
     }
-    bot.context = null
   })
 }

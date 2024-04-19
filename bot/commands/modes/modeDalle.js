@@ -36,7 +36,7 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     return bot.sendMessage(chatID, 'Prompt can\'t be empty', options)
   }
 
-  let spinner = await spinnerOn(bot, chatID)
+  // let spinner = await spinnerOn(bot, chatID)
   let waiting = await loaderOn(0, bot, chatID, null, 1)
 
   // var eventEmitter = new events.EventEmitter()
@@ -63,14 +63,6 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     const imgUrl = response
     const imgDir = './Dall-e'
     const filePath = `${imgDir}/${userMessageId}.png`
-
-    // const options = {
-    //   reply_markup: JSON.stringify({
-    //     inline_keyboard: [
-    //       [{ text: '🔁 Regenerate', callback_data: `REGENERATE_${chatID}_${msg.message_id}` }]
-    //     ]
-    //   })
-    // }
 
     await loaderOn('42%', bot, chatID, waiting?.message_id, 1)
 

@@ -1,16 +1,10 @@
 import { Midjourney } from 'freezer-midjourney-api'
-import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
-import { db } from '../../db/index.js'
+import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
+import { db } from '../../db/index.js'
 import { spinnerOn } from '../../utils/spinner.js'
-import dotenv from 'dotenv'
-import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
-import events from 'events'
 import { loaderOn } from '../../utils/loader.js'
-// таблица пользователей.
-//   кол-во пользователей , как часто он заходит (сколько было запросов по каждой AIб история запросов, история начисления баллов),
-// таблица где видна история покупок
-dotenv.config()
+import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
 
 export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   let userMessageId
@@ -24,21 +18,20 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   const { id: userId, username, first_name: firstname } = msg.from
   const { id: chatID } = msg.chat
   const options = {
-    parse_mode: 'HTML',
     reply_to_message_id: userMessageId
   }
-  if (
-    !(await sudoChecker(
-      userId,
-      username || firstname,
-      sudoUser,
-      bot,
-      chatID,
-      options
-    ))
-  ) {
-    return
-  }
+  // if (
+  //   !(await sudoChecker(
+  //     userId,
+  //     username || firstname,
+  //     sudoUser,
+  //     bot,
+  //     chatID,
+  //     options
+  //   ))
+  // ) {
+  //   return
+  // }
   if (prompt.length === 0) {
     return bot.sendMessage(chatID, 'Prompt can\'t be empty', options)
   }
@@ -52,14 +45,14 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
       ServerId: SERVER_ID,
       ChannelId: CHANNEL_ID,
       SalaiToken: SALAI_TOKEN,
-      Debug: true,
+      // Debug: true,
       Ws: true
     })
     await client.init()
 
     Imagine = await client.Imagine(prompt, async (uri, progress) => {
       console.log(`Loading: ${uri}, progress: ${progress}`)
-      await loaderOn(progress, bot, chatID, waiting?.message_id)
+      waiting = await saveAndSendPreloaderPhoto(uri, chatID, bot, waiting?.message_id, progress)
     })
 
     const options = {
@@ -85,147 +78,169 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const imgDir = './Imagines'
     const filePath = `${imgDir}/${userMessageId}.png`
 
-    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
-      waiting)
+    await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner, waiting)
   } catch (error) {
     await bot.sendMessage(chatID, `${error}`)
   }
 
-  var eventEmitter = new events.EventEmitter()
-
-  const forU = async (query) => {
+  bot.on('callback_query', async query => {
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data
-    let waiting
-    let spinner
-    try {
-      spinner = await spinnerOn(bot, chatID)
-      waiting = await loaderOn(0, bot, chat_id)
-      const UCustomID = Imagine.options?.find(
-        o => o.label === selectedLabel
-      )?.custom
-      const Upscale = await client.Custom({
-        msgId: Imagine.id,
-        flags: Imagine.flags,
-        customId: UCustomID,
-        loading: async (uri, progress) => {
-          console.log(`Loading: ${uri}, progress: ${progress}`)
-          await loaderOn(progress, bot, chatID, waiting?.message_id)
-        }
-      })
 
-      const imgUrl = Upscale.uri
-      const imgDir = './Upscales'
-      const filePath = `${imgDir}/${message_id}.png`
-      const options = {
-        reply_to_message_id: userMessageId
-      }
-      await saveAndSendPhoto(imgUrl, imgDir, filePath, chat_id, bot, options, TYPE_RESPONSE_MJ.DOCUMENT, spinner,
-        waiting)
-    } catch (error) {
-      await bot.sendMessage(chat_id, error, { reply_to_message_id: userMessageId })
+    if (selectedLabel.includes('R')) {
+      return modeMidjourney(bot, sudoUser, msg, match)
     }
-  }
 
-  const forV = async (query) => {
-    const { id: chat_id, title: chat_name } = query.message.chat
-    const { message_id } = query.message
-    const selectedLabel = query.data
-    let loadingMessage
-    let spinner
-    let waiting
     try {
-      spinner = await spinnerOn(bot, chatID)
-      waiting = await loaderOn(0, bot, chat_id)
-      const VCustomID = Imagine.options?.find(
-        o => o.label === selectedLabel
-      )?.custom
+      if (selectedLabel.includes('U')) {
+    let spinner = await spinnerOn(bot, chatID)
+    let waiting = await loaderOn(0, bot, chatID)
 
-      Variation = await client.Custom({
-        msgId: Imagine.id,
-        flags: Imagine.flags,
-        customId: VCustomID,
-        content: prompt,
-        loading: async (uri, progress) => {
-          console.log(`Loading: ${uri}, progress: ${progress}`)
-          await loaderOn(progress, bot, chatID, waiting?.message_id)
+        const UCustomID = Imagine.options?.find(
+          o => o.label === selectedLabel
+        )?.custom
+
+        const Upscale = await client.Custom({
+          msgId: Imagine.id,
+          flags: Imagine.flags,
+          customId: UCustomID,
+          loading: async (uri, progress) => {
+            console.log(`Loading: ${uri}, progress: ${progress}`)
+            waiting = await saveAndSendPreloaderPhoto(uri, chatID, bot, waiting.message_id, progress)
+          }
+        })
+
+        const imgUrl = Upscale.uri
+        const imgDir = './Upscales'
+        const filePath = `${imgDir}/${message_id}.png`
+        const options = {
+          reply_to_message_id: userMessageId
         }
-      })
 
-      const options = {
-        reply_markup: JSON.stringify({
-          inline_keyboard: [
-            [
-              { text: '📸 1', callback_data: 'U1' },
-              { text: '📸 2', callback_data: 'U2' },
-              { text: '📸 3', callback_data: 'U3' },
-              { text: '📸 4', callback_data: 'U4' }
-            ],
-            [
-              { text: '♻️ 1', callback_data: 'V1' },
-              { text: '♻️ 2', callback_data: 'V2' },
-              { text: '♻️ 3', callback_data: 'V3' },
-              { text: '♻️ 4', callback_data: 'V4' }
-            ],
-            [{ text: '🔁 Regenerate', callback_data: 'V1' }]
-          ]
+        await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.DOCUMENT, spinner, waiting)
+      } else if (selectedLabel.includes('V')) {
+
+        // await bot.deleteMessage(chat_id, message_id)
+    let spinner = await spinnerOn(bot, chatID)
+    let waiting = await loaderOn(0, bot, chatID)
+        const VCustomID = Imagine.options?.find(
+          o => o.label === selectedLabel
+        )?.custom
+
+        Variation = await client.Custom({
+          msgId: Imagine.id,
+          flags: Imagine.flags,
+          customId: VCustomID,
+          content: prompt,
+          loading: async (uri, progress) => {
+            console.log(`Loading: ${uri}, progress: ${progress}`)
+            waiting = await saveAndSendPreloaderPhoto(uri, chatID, bot, waiting?.message_id, progress)
+          }
+        })
+
+        const options = {
+          reply_markup: JSON.stringify({
+            inline_keyboard: [
+              [
+                { text: '📸 1', callback_data: 'scale1' },
+                { text: '📸 2', callback_data: 'scale2' },
+                { text: '📸 3', callback_data: 'scale3' },
+                { text: '📸 4', callback_data: 'scale4' }
+              ],
+              // [{ text: '🔁 Regenerate', callback_data: 'scaleR' }]
+            ]
+          })
+        }
+
+        const { id: user_id, username } = query.from
+        await db.midjourney.create({
+          query_id: query.id,
+          message_id,
+          chat_instance: query.chat_instance,
+          chat_id,
+          chat_name,
+          user_id,
+          username,
+          prompt,
+          data: selectedLabel
+        })
+
+        const imgUrl = Variation.uri
+        const imgDir = './Variations'
+        const filePath = `${imgDir}/${message_id}.png`
+
+        await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner, waiting)
+
+        bot.on('callback_query', async query_up => {
+          const upscaleLabel = query_up.data
+          let imgLabel
+
+          if (upscaleLabel === 'scaleR') {
+            await modeMidjourney(bot, sudoUser, msg, match)
+            return true
+          }
+
+          let spinner = await spinnerOn(bot, chatID)
+          let waiting = await loaderOn(0, bot, chatID)
+
+          switch (upscaleLabel) {
+            case 'scale1':
+              imgLabel = 'U1'
+              break
+            case 'scale2':
+              imgLabel = 'U2'
+              break
+            case 'scale3':
+              imgLabel = 'U3'
+              break
+            case 'scale4':
+              imgLabel = 'U4'
+              break
+            default:
+              bot.sendMessage(chat_id, 'Invalid selection')
+              break
+          }
+
+          const upscaleCustomID = Variation.options?.find(
+            o => o.label === imgLabel
+          )?.custom
+
+          const variationUpscale = await client.Custom({
+            msgId: Variation.id,
+            flags: Variation.flags,
+            customId: upscaleCustomID,
+            loading: async (uri, progress) => {
+              console.log(`Loading: ${uri}, progress: ${progress}`)
+              waiting = await saveAndSendPreloaderPhoto(uri, chatID, bot, waiting.message_id, progress)
+            }
+          })
+
+          console.log(variationUpscale)
+
+          const imgUrl = variationUpscale.uri
+          const imgDir = './VariationsUpscales'
+          const filePath = `${imgDir}/${message_id}.png`
+          const options = {
+            reply_to_message_id: userMessageId
+          }
+
+          await saveAndSendPhoto(
+            imgUrl,
+            imgDir,
+            filePath,
+            chat_id,
+            bot,
+            options,
+            TYPE_RESPONSE_MJ.DOCUMENT,
+            spinner,
+            waiting
+          )
+
         })
       }
-
-      const { id: user_id, username } = query.from
-      db.midjourney.create({
-        query_id: query.id,
-        message_id,
-        chat_instance: query.chat_instance,
-        chat_id,
-        chat_name,
-        user_id,
-        username,
-        prompt,
-        data: selectedLabel
-      }).then(res => {
-        console.log('🔵 sequelize.midjourney.create ')
-      })
-
-      const imgUrl = Variation.uri
-      const imgDir = './Variations'
-      const filePath = `${imgDir}/${message_id}.png`
-
-      await saveAndSendPhoto(
-        imgUrl,
-        imgDir,
-        filePath,
-        chat_id,
-        bot,
-        options,
-        TYPE_RESPONSE_MJ.PHOTO,
-        spinner,
-        waiting
-      )
-
     } catch (error) {
-      await bot.sendMessage(chat_id, error, { reply_to_message_id: userMessageId })
+      bot.sendMessage(chat_id, error, { reply_to_message_id: userMessageId })
     }
-  }
-
-  for (let i = 1; i < 5; i++) {
-    eventEmitter.on(`U${i}`, function(query) {
-      forU(query)
-    })
-  }
-
-  for (let i = 1; i < 5; i++) {
-    eventEmitter.on(`V${i}`, function(query) {
-      forV(query)
-    })
-  }
-
-  bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-    eventEmitter.emit(callbackQuery.data, callbackQuery)
-    // eventEmitter.removeAllListeners()
-    bot.answerCallbackQuery(callbackQuery.id, 'modes/midjourney', false)
   })
 }
-
-// 20 апреля 135/200

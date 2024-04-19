@@ -78,7 +78,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     }, { where: { message_id: msg.message_id } }).catch()
 
     await bot.editMessageText(
-      response,
+      response ? response : '....',
       {
         message_id: message.message_id,
         chat_id: chatID,
