@@ -14,13 +14,13 @@ import { variation } from './variation.js'
 
 export const upscale = async (Variation, client, query, bot, chatID, prevMessageId, userMessageId) => {
   const eventEmitter = new events.EventEmitter()
+  let waiting = await loaderOn(0, bot, chatID)
 
   try {
     if (prevMessageId)
       await bot.deleteMessage(chatID, prevMessageId).catch(() => {
         console.log('🔺 upscale | error remove loader ', prevMessageId)
       })
-    let waiting = await loaderOn(0, bot, chatID)
 
     const upscaleLabel = query.data
     const selectedL = upscaleLabel.split('+')[0]
@@ -38,18 +38,17 @@ export const upscale = async (Variation, client, query, bot, chatID, prevMessage
         waiting = await saveAndSendPreloaderPhoto(uri, chatID, bot, waiting.message_id, progress)
       }
     })
-
+    console.log('upscaleCustom', upscaleCustom)
     const options = {
       reply_to_message_id: userMessageId,
       reply_markup: JSON.stringify({
         inline_keyboard: [
-          [{ text: '📸 (Subtle)', callback_data: `upsample_v6_2x_subtle++${waiting.message_id}` },
-            { text: '📸 (Creative)', callback_data: `upsample_v6_2x_creative++${waiting.message_id}` }],
-          [{ text: '♻️ (Subtle)', callback_data: `low_variation++${waiting.message_id}` },
-            { text: '♻️ (Strong)', callback_data: `high_variation++${waiting.message_id}` },
-            { text: '♻️ (Region)', callback_data: `Inpaint++${waiting.message_id}` }],
-          [{ text: '🔍 2x', callback_data: `Outpaint::50++${waiting.message_id}` },
-            { text: `🔍 1.5x`, callback_data: `Outpaint::75++${waiting.message_id}` }],
+          [{ text: '📸 Subtle', callback_data: `upsample_v6_2x_subtle++${waiting.message_id}` },
+            { text: '📸 Creative', callback_data: `upsample_v6_2x_creative++${waiting.message_id}` }],
+          [{ text: '♻️ Subtle', callback_data: `low_variation++${waiting.message_id}` },
+            { text: '♻️ Strong', callback_data: `high_variation++${waiting.message_id}` }],
+          [{ text: '🔍 out 2x', callback_data: `Outpaint::50++${waiting.message_id}` },
+            { text: `🔍 out 1.5x`, callback_data: `Outpaint::75++${waiting.message_id}` }],
           [{ text: '⬅️', callback_data: `pan_left++${waiting.message_id}` },
             { text: '➡️', callback_data: `pan_right++${waiting.message_id}` },
             { text: '⬆️', callback_data: `pan_up++${waiting.message_id}` },
@@ -76,62 +75,50 @@ export const upscale = async (Variation, client, query, bot, chatID, prevMessage
     )
 
     eventEmitter.on(`upsample_v6_2x_subtle++${waiting.message_id}`, async function(query) {
-      await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
+      await upscale(upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
     })
 
     eventEmitter.on(`upsample_v6_2x_creative++${waiting.message_id}`, async function(query) {
-      await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
+      await upscale(upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
     })
 
     eventEmitter.on(`low_variation++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`high_variation++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`Inpaint++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`Outpaint::50++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`Outpaint::75++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`CustomZoom++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`pan_left++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`pan_right++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
     eventEmitter.on(`pan_up++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`pan_down++${waiting.message_id}`, async function(query) {
       await variation(null, upscaleCustom, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     eventEmitter.on(`DOWNLOAD++${waiting.message_id}`, async function(query) {
@@ -150,12 +137,14 @@ export const upscale = async (Variation, client, query, bot, chatID, prevMessage
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
       bot.answerCallbackQuery(callbackQuery.id, 'midjourney upscale', false)
+      eventEmitter.removeAllListeners()
     })
 
   } catch (error) {
-    eventEmitter.removeAllListeners()
-    await client.Reset()
-    client.Close()
+    bot.deleteMessage(chatID, waiting.message_id).then()
+    // eventEmitter.removeAllListeners()
+    // await client.Reset()
+    // client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

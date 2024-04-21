@@ -2,11 +2,10 @@
 import { Midjourney } from 'freezer-midjourney-api'
 import Converter from 'timestamp-conv'
 
-export const midjourneyInfo = async (bot, userMessageId) => {
+export const midjourneyInfo = async (bot) => {
   bot.onText(/^\/minfo+/ig, async msg => {
     const { id: chatId } = msg.chat
     const options = {
-      reply_to_message_id: userMessageId,
       parse_mode: 'HTML'
     }
 
@@ -26,7 +25,8 @@ const date = new Converter.date(+msg.subscription.split('<t:')[1].substring(0, 1
 
       const message = `
 👨🏻‍🎨 <b>Midjourney Info </b>
-Basic (Active monthly, renews next on ${date.getDay()}.${date.getMonth()}.${date.getYear()}, ${date.getHour()}:${date.getMinute()}
+Basic (Active monthly). 
+Renews next on ${date.getDay()}.${date.getMonth()}.${date.getYear()}, ${date.getHour()}:${date.getMinute()}
 ${msg.fastTimeRemaining}
 visibilityMode: ${msg.visibilityMode}
 lifetimeUsage: ${msg.lifetimeUsage}

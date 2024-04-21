@@ -8,19 +8,9 @@ export const isModeMidjourney = async (bot, msg, match, sudoUser) => {
     where: { chat_id: msg.chat.id, user_id: msg.from.id }
   }).then(res => {
     if (res.mode === 'MIDJOURNEY') {
-      db.subscriber.update(
-        { mode: 'GPT' },
-        { where: { chat_id: msg.chat.id } }
-      ).then((res) => {
-        return modeMidjourney(bot, sudoUser, msg, match)
-      })
+      return modeMidjourney(bot, sudoUser, msg, match)
     } else if (res.mode === 'DALL-E') {
-      db.subscriber.update(
-        { mode: 'GPT' },
-        { where: { chat_id: msg.chat.id } }
-      ).then((res) => {
-        return modeDalle(bot, sudoUser, msg, match)
-      })
+      return modeDalle(bot, sudoUser, msg, match)
     } else {
       return onMessageTextDefault(bot, msg, match, sudoUser)
     }

@@ -15,6 +15,7 @@ import { upscale } from './upscale.js'
 
 export const variation = async (prompt, Imagine, client, query, bot, chatID, prevMessageId, userMessageId) => {
   const eventEmitter = new events.EventEmitter()
+    let waiting = await loaderOn(0, bot, chatID)
 
   try {
     if (prevMessageId)
@@ -24,7 +25,6 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data
-    let waiting = await loaderOn(0, bot, chatID)
     const selectedL = selectedLabel.split('+')[0]
 
     const VCustomID = Imagine.options?.find(
@@ -85,29 +85,28 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
     for (let i = 1; i < 5; i++) {
       eventEmitter.on(`V${i}++${waiting.message_id}`, async function(query) {
         await variation(prompt, Variation, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-        eventEmitter.removeAllListeners()
       })
     }
     for (let i = 1; i < 5; i++) {
       eventEmitter.on(`U${i}++${waiting.message_id}`, async function(query) {
         await upscale(Variation, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-        eventEmitter.removeAllListeners()
       })
     }
     eventEmitter.on(`🔄++${waiting.message_id}`, async function(query) {
       await variation(prompt, Variation, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
       bot.answerCallbackQuery(callbackQuery.id, 'midjourney variation', false)
+      eventEmitter.removeAllListeners()
     })
 
   } catch (error) {
-    eventEmitter.removeAllListeners()
-    await client.Reset()
-    client.Close()
+    bot.deleteMessage(chatID, waiting.message_id).then()
+    // eventEmitter.removeAllListeners()
+    // await client.Reset()
+    // client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

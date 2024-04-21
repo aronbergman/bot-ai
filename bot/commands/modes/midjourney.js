@@ -5,6 +5,9 @@ import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import { upscale } from './midjourney/upscale.js'
 import events from 'events'
 import { variation } from './midjourney/variation.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const modeMidjourney = async (bot, sudoUser, msg, match) => {
   const eventEmitter = new events.EventEmitter()
@@ -44,6 +47,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
       ServerId: SERVER_ID,
       ChannelId: CHANNEL_ID,
       SalaiToken: SALAI_TOKEN,
+      // BotId: process.env.MJBot,
+      // BotId: process.env.NijiBot,
       // Debug: true,
       Ws: true
     })
@@ -82,31 +87,30 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     for (let i = 1; i < 5; i++) {
       eventEmitter.on(`V${i}++${waiting.message_id}`, async function(query) {
         await variation(prompt, Imagine, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-        eventEmitter.removeAllListeners()
       })
     }
 
     for (let i = 1; i < 5; i++) {
       eventEmitter.on(`U${i}++${waiting.message_id}`, async function(query) {
         await upscale(Imagine, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-        eventEmitter.removeAllListeners()
       })
     }
 
     eventEmitter.on(`🔄++${waiting.message_id}`, async function(query) {
       await variation(prompt, Imagine, client, query, bot, chatID, prevMessage.message_id, userMessageId)
-      eventEmitter.removeAllListeners()
     })
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
       bot.answerCallbackQuery(callbackQuery.id, 'midjourney main', false)
+      eventEmitter.removeAllListeners()
     })
 
   } catch (error) {
-    eventEmitter.removeAllListeners()
-    await client.Reset()
-    client.Close()
+    bot.deleteMessage(chatID, waiting.message_id).then()
+    // eventEmitter.removeAllListeners()
+    // await client.Reset()
+    // client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

@@ -56,13 +56,6 @@ startBot(bot)
 
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
-    await midjourneyInfo(bot, msg.message_id)
-  getId(bot)
-  sendMessage(bot)
-  setQuizModeForSubs(bot)
-  addSudoer(bot, sudoUser)
-  removeSudoer(bot, sudoUser)
-  listSudoers(bot, sudoUser)
 
   if (msg?.chat?.type === 'supergroup' || msg.voice)
     return true
@@ -122,11 +115,17 @@ bot.on('message', async (msg, match) => {
   }
 })
 
-onMessageVoice(bot)
+onMessageVoice(bot);
 
 // Use admin command
 // TODO: Разрешить эти команды только пользователям с ролью администратор
-
+getId(bot)
+sendMessage(bot)
+midjourneyInfo(bot)
+setQuizModeForSubs(bot)
+addSudoer(bot, sudoUser)
+removeSudoer(bot, sudoUser)
+listSudoers(bot, sudoUser)
 
 const app = express()
 
