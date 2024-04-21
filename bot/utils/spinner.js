@@ -1,13 +1,13 @@
 const emojis = ['🐾', '🤖', '💡', '🚀', '⌛️', '👾', '👻', '👽', '🦊']
 const emojiChat = ['🤖', '👽']
 
-export const spinnerOn = async (bot, chat_id, type) => {
+export const spinnerOn = async (bot, chat_id, type, component) => {
   const coll = type === "GPT" ? emojiChat : emojis;
   const message = await bot.sendMessage(
     chat_id,
     coll[Math.floor(Math.random() * coll.length)]
   )
-  console.log("🔺 spinner on", message.message_id);
+  console.log("🔺 spinner on", message.message_id, component);
   const timeout = setInterval(() => {
     bot.editMessageText(
       coll[Math.floor(Math.random() * coll.length)],
@@ -26,7 +26,6 @@ export const spinnerOn = async (bot, chat_id, type) => {
 }
 
 export const spinnerOff = async (bot, chat_id, message_id) => {
-  console.log('message', message_id)
   return bot.deleteMessage(
     chat_id,
     message_id?.message_id || message_id

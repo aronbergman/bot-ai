@@ -104,7 +104,7 @@ export const onMessageVoice = (bot) => {
           bot.context.answer_message_id
         )
 
-      const spinId = await spinnerOn(bot, chat_id)
+      const spinId = await spinnerOn(bot, chat_id, null, 'onMessageVoice 107')
 
       if (bot.context) {
         if (selectedLabel.includes('translate')) {

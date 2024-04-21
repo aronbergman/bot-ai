@@ -43,7 +43,6 @@ export const keyboardQuiz = async (bot, msg) => {
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
           const createStringValue = getStringOrDist(emoji)
-          console.log(emoji, value, msg.from.username)
           const quizRes = calculationOfWonTokens(emoji, value)
           await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
           const text = quizRes ? QUIZS[0].fin(emoji, quizRes) : QUIZS[0].finNeg(emoji)
@@ -84,8 +83,6 @@ export const keyboardQuiz = async (bot, msg) => {
           )
         })
       }
-      // const {} = res.data
-
     })
   })
 
@@ -108,7 +105,6 @@ export const keyboardQuiz = async (bot, msg) => {
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
 
-          console.log(emoji, value, msg.from.username)
           const quizRes = calculationOfWonTokens(emoji, value)
           await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
           const text = quizRes ? WON_A_MONTH_SUBSCRIPTION("@PiraJoke") : QUIZS[0].finNeg(emoji)

@@ -42,7 +42,6 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
     var eventEmitter = new events.EventEmitter()
 
     eventEmitter.on('change_chat_mode', async function() {
-      console.log("firstMessage", firstMessage)
       await bot.editMessageText(
         firstMessage.text,
         {
@@ -52,8 +51,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
             inline_keyboard: modesChatGPT.map((mode) => [{ text: mode.name, callback_data: mode.code }])
           }
         }
-      ).catch(() => {
-        console.log('!!')
+      ).catch((err) => {
+        console.log('🔺 change_chat_mode', err)
         return true
       })
     })
@@ -66,8 +65,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
           chat_id: chatID,
           ...qweryOptions
         }
-      ).catch(() => {
-        console.log('!')
+      ).catch((err) => {
+        console.log('🔺 first_step ', err)
         return true
       })
     })
@@ -78,8 +77,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
           { modeGPT: modesChatGPT[i].code },
           { where: { chat_id: chatID } }
         ).then(res => {
-          // console.log(MODS_CHAT[i].text)
-          bot.deleteMessage(chatID, firstMessage.message_id).catch(err => console.error(err))
+          // bot.deleteMessage(chatID, firstMessage.message_id).catch(err => console.error(err))
           firstMessage = modeChatGPT(bot, msg, {
             message_id: firstMessage.message_id,
             chat_id: chatID

@@ -1,13 +1,8 @@
-import axios from 'axios'
-import fs from 'fs'
-import { TYPE_RESPONSE_MJ } from '../constants/index.js'
-import { spinnerOff } from './spinner.js'
-
-export function createProgress(progress, type = 0) {
+export function createProgress(progress) {
   let res = []
   const typeEmoji = [
     { done: '🟩', empty: '🟨' },
-    { done: '🔝', empty: '🔜' }
+    { done: '|', empty: '.' }
   ]
 
   function roundMe(progress) {
@@ -30,18 +25,18 @@ export function createProgress(progress, type = 0) {
   return `${lineArray.join('')} ${progress}%`
 }
 
-export const loaderOn = async (progress, bot, chat_id, message_id, type) => {
+export const loaderOn = async (progress, bot, chat_id, message_id) => {
   if (!message_id) {
     const msg = bot.sendMessage(
       chat_id,
-      createProgress(progress, type)
+      createProgress(progress)
     ).catch(() => {
       console.error('🔺 loaderOn sendMessage')
     })
     return msg
   } else {
     bot.editMessageText(
-      createProgress(progress.replace('%', ''), type),
+      createProgress(progress.replace('%', '')),
       {
         message_id,
         chat_id
@@ -51,7 +46,3 @@ export const loaderOn = async (progress, bot, chat_id, message_id, type) => {
     })
   }
 }
-
-// export const loaderOff = async (bot, chat_id, message_id) => {
-//   await bot.deleteMessage(chat_id, message_id).catch(err => console.log(err.error))
-// }

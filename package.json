@@ -20,7 +20,8 @@
     "openai": "4.33.0",
     "payok": "^2.0.0",
     "sequelize": "^6.37.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "timestamp-conv": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

@@ -24,7 +24,6 @@ export const keyboardHelp = async (bot, msg) => {
             ...options
           }
         ).catch(() => {
-          console.log('!')
           return true
         })
         clearTimeout(timeout)

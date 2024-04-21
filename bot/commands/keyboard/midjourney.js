@@ -80,7 +80,7 @@ export const keyboardMidjourney = async (bot, msg) => {
         message_id: message_id,
         ...firstLevel.options
       }).catch(() => {
-        console.log('!')
+        console.log('🔺83')
         return true
       })
       clearTimeout(timeout)

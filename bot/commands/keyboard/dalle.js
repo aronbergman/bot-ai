@@ -68,7 +68,6 @@ export const keyboardDalle = async (bot, msg) => {
         message_id: message_id,
         ...firstLevel.options
       }).catch(() => {
-        console.log('!')
         return true
       })
       clearTimeout(timeout)

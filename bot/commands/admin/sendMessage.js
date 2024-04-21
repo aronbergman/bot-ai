@@ -3,7 +3,6 @@ import { INITIAL_SESSION } from '../../constants/index.js'
 export const sendMessage = bot => {
   bot.onText(/^\/msg+/ig, async msg => {
     const text = msg.text.split('&&')
-    console.log("text", text)
     const { id: chatId } = msg.chat
     const options = {
       parse_mode: 'HTML',

@@ -32,9 +32,9 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     // TODO: Запоминать контекст беседы пользователя или всегда начинать новый чат
     msg.ctx ??= INITIAL_SESSION
 
-    res = await spinnerOn(bot, chatID, 'GPT')
+    res = await spinnerOn(bot, chatID, null, 'chatGPT')
     let message = await bot.sendMessage(chatID, '...').catch(() => {
-      console.log('!!!')
+      console.log('🔺 37')
       return true
     })
 
@@ -78,7 +78,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     }, { where: { message_id: msg.message_id } }).catch()
 
     await bot.editMessageText(
-      response ? response : '....',
+      response ? response : '..:',
       {
         message_id: message.message_id,
         chat_id: chatID,
@@ -86,7 +86,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
         ...options
       }
     ).catch(() => {
-      console.log('!!!!')
+      console.log('🔺 89')
       return true
     })
 

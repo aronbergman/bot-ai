@@ -49,7 +49,6 @@ export const removeSudoer = (bot, sudoUser) => {
         )
       })
     } catch (error) {
-      console.log(error.message)
       await bot.sendMessage(
         chatID,
         'error: Invalid action. Please provide a valid action.',

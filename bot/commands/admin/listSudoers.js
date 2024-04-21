@@ -22,14 +22,12 @@ export const listSudoers = (bot, sudoUser) => {
     try {
       db.sudouser.count()
         .then(res => {
-          console.log(res)
           if (res > 0) {
             db.sudouser.findAll({
               limit: 10,
               subQuery: false,
               order: [['createdAt', 'DESC']]
             }).then(res => {
-              console.log('res findAll', res)
               const sudoers = res.map(user => `tg://user?id=${user.dataValues.userId}\n`)
               bot.sendMessage(
                 chatID,

@@ -1,6 +1,8 @@
 import events from 'events'
 import { db } from '../../db/index.js'
 import { modesChatGPT } from '../../constants/modes.js'
+import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
+import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
 
 export const keyboardChatGPT = async (bot, msg) => {
   const sendChatGPT = async (bot, chatId, options, modeGPT) => {
@@ -58,7 +60,6 @@ export const keyboardChatGPT = async (bot, msg) => {
           ...secondMessage.options
         }
       ).catch((err) => {
-        console.log('!!', err)
         return true
       })
     })
@@ -78,7 +79,6 @@ export const keyboardChatGPT = async (bot, msg) => {
               ...firstMessage.options
             }
           ).catch(() => {
-            console.log('!')
             return true
           })
 

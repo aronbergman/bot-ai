@@ -12,7 +12,6 @@ export const isModeMidjourney = async (bot, msg, match, sudoUser) => {
         { mode: 'GPT' },
         { where: { chat_id: msg.chat.id } }
       ).then((res) => {
-        console.log("res", res)
         return modeMidjourney(bot, sudoUser, msg, match)
       })
     } else if (res.mode === 'DALL-E') {

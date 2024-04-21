@@ -1,7 +1,7 @@
+import dotenv from 'dotenv'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
 import { spinnerOn } from '../../utils/spinner.js'
-import dotenv from 'dotenv'
 import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import { loaderOn } from '../../utils/loader.js'
 import { OpenAI } from '../../utils/openAi.js'
@@ -36,23 +36,8 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     return bot.sendMessage(chatID, 'Prompt can\'t be empty', options)
   }
 
-  // let spinner = await spinnerOn(bot, chatID)
-  let waiting = await loaderOn(0, bot, chatID, null, 1)
-
-  // var eventEmitter = new events.EventEmitter()
-  //
-  // eventEmitter.on(`REGENERATE_${chatID}_${msg.message_id}`, function(query) {
-  //   eventEmitter.removeAllListeners()
-  //   console.log('qyery', qyery)
-  //   // bot.deleteMessage(chatID, )
-  //   return modeDalle(bot, sudoUser, msg, match)
-  // })
-
-  // bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-  //   eventEmitter.emit(callbackQuery.data, callbackQuery)
-  //   // eventEmitter.removeAllListeners()
-  //   bot.answerCallbackQuery(callbackQuery.id, 'modes/dall-e', false)
-  // })
+  let spinner = await spinnerOn(bot, chatID, null, 'modeDalle')
+  let waiting = await loaderOn(0, bot, chatID, null)
 
   try {
 
@@ -64,7 +49,7 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     const imgDir = './Dall-e'
     const filePath = `${imgDir}/${userMessageId}.png`
 
-    await loaderOn('42%', bot, chatID, waiting?.message_id, 1)
+    await loaderOn('42%', bot, chatID, waiting?.message_id)
 
     await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
       waiting)
