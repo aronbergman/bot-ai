@@ -13,10 +13,10 @@ export function createProgress(progress) {
 
   const createLine = (x) => {
     for (let i = 0; i < x; i++) {
-      res.push(typeEmoji[type].done)
+      res.push(typeEmoji[0].done)
     }
     for (let i = 0; i < 10 - x; i++) {
-      res.push(typeEmoji[type].empty)
+      res.push(typeEmoji[0].empty)
     }
     return res
   }
