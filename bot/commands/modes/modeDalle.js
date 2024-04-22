@@ -46,13 +46,14 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     const response = await openAi.image(prompt)
 
     const imgUrl = response
-    const imgDir = './Dall-e'
+    const imgDir = './dalle'
     const filePath = `${imgDir}/${userMessageId}.png`
 
     await loaderOn('42%', bot, chatID, waiting?.message_id)
 
     await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
       waiting)
+    await bot.deleteMessage(chatID, spinner).catch()
   } catch (error) {
     await bot.sendMessage(chatID, `${error}`)
   }

@@ -1,6 +1,8 @@
 import { createReadStream } from 'fs'
 import { OpenAI as OpenAIApi } from 'openai'
 import dotenv from 'dotenv'
+import path from 'path'
+import fs from "fs";
 
 dotenv.config({ path: '../.env' })
 
@@ -75,9 +77,24 @@ export class OpenAI {
 
     const { text } = await this.openai.audio.transcriptions.create({
       model: 'whisper-1',
-      file: createReadStream(this.filepath),
+      file: createReadStream(this.filepath)
     })
 
-    return text;
+    return text
+  }
+
+  async textToSpeech(prompt, msg, voice) {
+      const imgDir = './text-to-speech'
+    const speechFile = path.resolve(`${imgDir}/@${msg.from.username}-${msg.message_id}.mp3`)
+    const mp3 = await this.openai.audio.speech.create({
+      model: 'tts-1',
+      voice: voice ?? 'nova',
+      input: prompt
+    })
+
+    const buffer = Buffer.from(await mp3.arrayBuffer())
+    await fs.promises.writeFile(speechFile, buffer)
+
+    return speechFile;
   }
 }

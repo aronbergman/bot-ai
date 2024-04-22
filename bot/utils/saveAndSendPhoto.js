@@ -27,7 +27,7 @@ export const saveAndSendPhoto = async (
         if (typeResponse === TYPE_RESPONSE_MJ.PHOTO) {
           prevMessageId = await bot.sendPhoto(chatID, stream, options)
           await bot.deleteMessage(chatID, loadingMessage?.message_id)
-           } else if (typeResponse === TYPE_RESPONSE_MJ.DOCUMENT) {
+        } else if (typeResponse === TYPE_RESPONSE_MJ.DOCUMENT) {
           prevMessageId = await bot.sendDocument(chatID, stream, options)
           await bot.deleteMessage(chatID, loadingMessage.message_id)
         }
@@ -62,7 +62,7 @@ export const saveAndSendPreloaderPhoto = async (
         const stream = fs.createReadStream(filePath)
         if (prev) {
           await bot.deleteMessage(chatID, prev).catch(() => {
-            console.log("🔺 general | error remove loader ", prev)
+            console.log('🔺 general | error remove loader ', prev)
           })
           photo = await bot.sendPhoto(chatID, stream, {
             caption: createProgress(progress?.replace('%', ''))

@@ -1,26 +1,12 @@
-import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
-import { db } from '../../db/index.js'
-import { COMMAND_GPT, START_DALLE, TARIFS } from '../../constants/index.js'
 import events from 'events'
 import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
 import { keyboardChatGPT } from './chat_gpt.js'
+import { COMMAND_GPT, START_DALLE, TARIFS } from '../../constants/index.js'
+import { db } from '../../db/index.js'
 
 dotenv.config({ path: '../.env' })
-
-/*
-
-TODO: Добавить обработку русскоязычных запросов.
-
-- Показать что вошли в мод
-- Принять текст и отдать на генерацию
-- закрыть режим
-- показать лоадер на пвремя ненерации
-- запустить процесс как из mi по загрузке картинки и ее отправке
-- отправить картинку
- */
-
 
 export const keyboardDalle = async (bot, msg) => {
   const sendDalle = async (bot, chatId, options) => {

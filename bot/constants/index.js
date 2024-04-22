@@ -74,6 +74,15 @@ export const TARIFS = [
   { text: '📆 100 запросов за 350,00 ₽', callback_data: 'REQUESTS_100_350' }
 ]
 
+export const VOICES = [
+  { text: 'Alloy', callback_data: 'alloy' },
+  { text: 'Echo', callback_data: 'echo' },
+  { text: 'Fable', callback_data: 'fable' },
+  { text: 'Onyx', callback_data: 'onyx' },
+  { text: 'Nova', callback_data: 'nova' },
+  { text: 'Shimmer', callback_data: 'shimmer' },
+]
+
 export const QUIZ_RULES = `
 Выиграй подписку в нашей эмодзи-викторине🔥
 
@@ -109,3 +118,7 @@ export const QUIZS = [
 
 export const WON_A_MONTH_SUBSCRIPTION = (link = '#') => `Поздравляем, ты выиграл подписку на месяц! 
 Поделись нашим ботом с 2 друзьями по твоей реферальной ссылке: ${link} и ни в чем себе не отказывай 🤖`
+
+export const START_TTS = `
+Я озвучу текст выбранным голосом! 🔈
+Напишите, что бы вы хотели услышать ✏️`

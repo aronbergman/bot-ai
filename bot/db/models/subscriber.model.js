@@ -68,6 +68,10 @@ export default (sequelize, DataTypes) => {
       },
       tags: {
         type: DataTypes.STRING,
+      },
+      tts_voice: {
+        type: DataTypes.STRING,
+        defaultValue: "alloy"
       }
     }
   )

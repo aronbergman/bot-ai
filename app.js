@@ -22,7 +22,8 @@ import {
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
   COMMAND_QUIZ,
-  COMMAND_SPEECH_TO_TEXT
+  COMMAND_SPEECH_TO_TEXT,
+  COMMAND_TEXT_TO_SPEECH
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
@@ -43,6 +44,7 @@ import { usePromoModel } from './bot/utils/promo/usePromoModel.js'
 import { keyboardSpeechToText } from './bot/commands/keyboard/keyboardSpeechToText.js'
 import { setQuizModeForSubs } from './bot/commands/admin/setQuizModeForSubs.js'
 import { midjourneyInfo } from './bot/commands/admin/midjourneyInfo.js'
+import { keyboardTextToSpeech } from './bot/commands/keyboard/tts.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -98,6 +100,9 @@ bot.on('message', async (msg, match) => {
       break
     case COMMAND_SPEECH_TO_TEXT:
       return keyboardSpeechToText(bot, msg)
+      break
+    case COMMAND_TEXT_TO_SPEECH:
+      return keyboardTextToSpeech(bot, msg)
       break
     case COMMAND_DALL_E:
       return keyboardDalle(bot, msg)

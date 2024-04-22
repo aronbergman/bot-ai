@@ -103,14 +103,13 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
       eventEmitter.emit(callbackQuery.data, callbackQuery)
       bot.answerCallbackQuery(callbackQuery.id, 'midjourney main', false)
-      eventEmitter.removeAllListeners()
     })
 
   } catch (error) {
     bot.deleteMessage(chatID, waiting.message_id).then()
-    // eventEmitter.removeAllListeners()
-    // await client.Reset()
-    // client.Close()
+    eventEmitter.removeAllListeners()
+    await client.Reset()
+    client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

@@ -18,10 +18,10 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
     let waiting = await loaderOn(0, bot, chatID)
 
   try {
-    if (prevMessageId)
-      await bot.deleteMessage(chatID, prevMessageId).catch(() => {
-        console.log("🔺 variation | error remove loader ", prevMessageId)
-      })
+    // if (prevMessageId)
+    //   await bot.deleteMessage(chatID, prevMessageId).catch(() => {
+    //     console.log("🔺 variation | error remove loader ", prevMessageId)
+    //   })
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data
@@ -104,9 +104,9 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
 
   } catch (error) {
     bot.deleteMessage(chatID, waiting.message_id).then()
-    // eventEmitter.removeAllListeners()
-    // await client.Reset()
-    // client.Close()
+    eventEmitter.removeAllListeners()
+    await client.Reset()
+    client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }
