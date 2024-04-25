@@ -14,7 +14,7 @@
     "freezer-midjourney-api": "^4.0.6",
     "groupdocs-conversion-cloud": "^24.4.0",
     "jsonwebtoken": "^9.0.2",
-    "midjourney": "^4.3.11",
+    "midjourney": "^4.3.17",
     "mysql2": "^3.9.3",
     "nanoid": "^5.0.7",
     "node-fetch": "^3.3.2",

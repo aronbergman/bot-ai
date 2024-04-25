@@ -1,5 +1,5 @@
 
-import { Midjourney } from 'freezer-midjourney-api'
+import { Midjourney } from 'midjourney'
 import Converter from 'timestamp-conv'
 
 export const midjourneyInfo = async (bot) => {

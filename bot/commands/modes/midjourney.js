@@ -1,4 +1,4 @@
-import { Midjourney } from 'freezer-midjourney-api'
+import { Midjourney } from 'midjourney'
 import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
 import { loaderOn } from '../../utils/loader.js'
 import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
@@ -49,7 +49,7 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
       SalaiToken: SALAI_TOKEN,
       // BotId: process.env.MJBot,
       // BotId: process.env.NijiBot,
-      // Debug: true,
+      Debug: true,
       Ws: true
     })
     await client.init()
