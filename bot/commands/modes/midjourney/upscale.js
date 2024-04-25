@@ -143,8 +143,8 @@ export const upscale = async (Variation, client, query, bot, chatID, prevMessage
   } catch (error) {
     bot.deleteMessage(chatID, waiting.message_id).then()
     eventEmitter.removeAllListeners()
-    await client.Reset()
-    client.Close()
+    // await client.Reset()
+    // client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

@@ -98,8 +98,8 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
   } catch (error) {
     bot.deleteMessage(chatID, waiting.message_id).then()
     eventEmitter.removeAllListeners()
-    await client.Reset()
-    client.Close()
+    // await client.Reset()
+    // client.Close()
     await bot.sendMessage(chatID, `${error}`)
   }
 }

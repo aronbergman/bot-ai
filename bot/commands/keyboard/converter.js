@@ -1,5 +1,3 @@
-import { GetSupportedConversionTypesRequest, InfoApi } from 'groupdocs-conversion-cloud'
-
 import { Converter } from '../../utils/converter.js'
 
 export const keyboardConverter = async (bot, msg) => {
