@@ -1,11 +1,3 @@
-/*
-image1  image2
-image3  image4
-U1  U2  U3  U4  <-  Upscale
-V1  V2  V3  V4  <-   variation
-  REGENERATE    <-   variation
- */
-
 import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../../utils/saveAndSendPhoto.js'
 import { loaderOn } from '../../../utils/loader.js'
 import { db } from '../../../db/index.js'
@@ -18,10 +10,11 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
     let waiting = await loaderOn(0, bot, chatID)
 
   try {
-    // if (prevMessageId)
-    //   await bot.deleteMessage(chatID, prevMessageId).catch(() => {
-    //     console.log("🔺 variation | error remove loader ", prevMessageId)
-    //   })
+    if (prevMessageId)
+      await bot.deleteMessage(chatID, prevMessageId).catch(() => {
+        console.log("🔺 variation | error remove loader ", prevMessageId)
+      })
+
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message
     const selectedLabel = query.data

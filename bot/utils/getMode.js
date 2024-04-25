@@ -3,6 +3,7 @@ import { modeMidjourney } from '../commands/modes/midjourney.js'
 import { onMessageTextDefault } from '../commands/onMessageTextDefault.js'
 import { modeDalle } from '../commands/modes/modeDalle.js'
 import { textToSpeech } from '../commands/textToSpeech.js'
+import { createFullName } from './createFullName.js'
 
 export const isModeMidjourney = async (bot, msg, match, sudoUser) => {
   await db.subscriber.findOne({

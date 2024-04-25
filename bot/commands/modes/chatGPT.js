@@ -5,6 +5,7 @@ import { errorMessage } from '../hoc/errorMessage.js'
 import { modesChatGPT } from '../../constants/modes.js'
 import { db } from '../../db/index.js'
 import { exceptionForHistoryLogging } from '../../utils/exceptionForHistoryLogging.js'
+import { createFullName } from '../../utils/createFullName.js'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   let res
@@ -15,7 +16,6 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   const msgId = msg.message_id
   const options = {
     reply_to_message_id: msgId,
-    parse_mode: 'HTML',
     ...qweryOptions
   }
 
@@ -57,7 +57,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       content: newMessage
     })
 
-    const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID)
+    const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID, x.parse_mode)
 
     if (!response) {
       throw new Error('Something went wrong please try again.')
@@ -73,17 +73,17 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     db.history.update({
       chat_id: msg.chat.id,
       nickname: msg.chat.username,
-      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+      fullname: createFullName(msg.from),
       response: exceptionForHistoryLogging(msg.from.id, response)
     }, { where: { message_id: msg.message_id } }).catch()
 
     await bot.editMessageText(
       response ? response : '..:',
       {
+        ...options,
         message_id: message.message_id,
         chat_id: chatID,
         parse_mode: x['parse_mode'],
-        ...options
       }
     ).catch(() => {
       console.log('🔺 89')

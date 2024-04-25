@@ -122,7 +122,7 @@ export const keyboardChatGPT = async (bot, msg) => {
           { where: { chat_id: chatId } }
         ).then(res => {
           bot.select_mode = 'GPT'
-          return sendChatGPT(bot, chatId, options)
+          return sendChatGPT(bot, chatId, options, "assistant")
         })
       } else {
         db.subscriber.create({

@@ -53,8 +53,10 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
 
     await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, spinner,
       waiting)
-    await bot.deleteMessage(chatID, spinner).catch()
+    await bot.deleteMessage(chatID, waiting.message_id).catch()
   } catch (error) {
+    await bot.deleteMessage(chatID, spinner)
+    await bot.deleteMessage(chatID, waiting.message_id)
     await bot.sendMessage(chatID, `${error}`)
   }
 }

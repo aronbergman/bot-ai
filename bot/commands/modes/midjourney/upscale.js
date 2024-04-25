@@ -17,10 +17,10 @@ export const upscale = async (Variation, client, query, bot, chatID, prevMessage
   let waiting = await loaderOn(0, bot, chatID)
 
   try {
-    // if (prevMessageId)
-    //   await bot.deleteMessage(chatID, prevMessageId).catch(() => {
-    //     console.log('🔺 upscale | error remove loader ', prevMessageId)
-    //   })
+    if (prevMessageId)
+      await bot.deleteMessage(chatID, prevMessageId).catch(() => {
+        console.log('🔺 upscale | error remove loader ', prevMessageId)
+      })
 
     const upscaleLabel = query.data
     const selectedL = upscaleLabel.split('+')[0]

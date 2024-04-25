@@ -16,13 +16,12 @@ import authRoutes from './api/routes/auth.routes.js'
 import userRoutes from './api/routes/user.routes.js'
 import subsRoutes from './api/routes/subs.routes.js'
 import {
-  COMMAND_ACCOUNT,
-  COMMAND_DALL_E,
+  COMMAND_ACCOUNT, COMMAND_ARCHIVING,
+  COMMAND_DALL_E, COMMAND_FILE_CONVERTOR,
   COMMAND_GPT,
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
   COMMAND_QUIZ,
-  COMMAND_SPEECH_TO_TEXT,
   COMMAND_TEXT_TO_SPEECH
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
@@ -45,6 +44,10 @@ import { keyboardSpeechToText } from './bot/commands/keyboard/keyboardSpeechToTe
 import { setQuizModeForSubs } from './bot/commands/admin/setQuizModeForSubs.js'
 import { midjourneyInfo } from './bot/commands/admin/midjourneyInfo.js'
 import { keyboardTextToSpeech } from './bot/commands/keyboard/tts.js'
+import { keyboardConverter } from './bot/commands/keyboard/converter.js'
+import { createFullName } from './bot/utils/createFullName.js'
+import { Converter } from './bot/utils/converter.js'
+import { onMessageDocument } from './bot/commands/onMessageDocument.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -58,6 +61,11 @@ startBot(bot)
 
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
+
+  // понять что это файл
+  if (msg.document) {
+    return onMessageDocument(bot, msg)
+  }
 
   if (msg?.chat?.type === 'supergroup' || msg.voice)
     return true
@@ -75,14 +83,14 @@ bot.on('message', async (msg, match) => {
     chat_id: msg.chat.id,
     message_id: msg.message_id,
     nickname: msg.chat.username,
-    fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+    fullname: createFullName(msg.from),
     request: exceptionForHistoryLogging(msg.from.id, msg.text)
   }).catch(async () => {
     await db.history.create({
       chat_id: msg.chat.id,
       message_id: msg.message_id,
       nickname: msg.chat.username,
-      fullname: `${msg.from.first_name} ${msg.from.last_name}`,
+      fullname: createFullName(msg.from),
       request: 'VERY_LONG_MESSAGE'
     })
   })
@@ -95,16 +103,18 @@ bot.on('message', async (msg, match) => {
     case COMMAND_GPT:
       return keyboardChatGPT(bot, msg)
       break
+    case COMMAND_ARCHIVING:
+    case COMMAND_FILE_CONVERTOR:
+      return keyboardConverter(bot, msg)
+      break
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
-      break
-    case COMMAND_SPEECH_TO_TEXT:
-      return keyboardSpeechToText(bot, msg)
       break
     case COMMAND_TEXT_TO_SPEECH:
       return keyboardTextToSpeech(bot, msg)
       break
     case COMMAND_DALL_E:
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardDalle(bot, msg)
       break
     case COMMAND_HELP:
@@ -120,7 +130,7 @@ bot.on('message', async (msg, match) => {
   }
 })
 
-onMessageVoice(bot);
+onMessageVoice(bot)
 
 // Use admin command
 // TODO: Разрешить эти команды только пользователям с ролью администратор

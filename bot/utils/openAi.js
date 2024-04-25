@@ -2,9 +2,34 @@ import { createReadStream } from 'fs'
 import { OpenAI as OpenAIApi } from 'openai'
 import dotenv from 'dotenv'
 import path from 'path'
-import fs from "fs";
+import fs from 'fs'
 
 dotenv.config({ path: '../.env' })
+
+const mdReplace = (text, parceMode) => {
+  if (parceMode === 'MarkdownV2')
+    return text
+      .replace(/\_/g, '\\_')
+      // .replace(/\*/g, '\\*')
+      .replace(/\[/g, '\\[')
+      .replace(/\]/g, '\\]')
+      .replace(/\(/g, '\\(')
+      .replace(/\)/g, '\\)')
+      .replace(/\~/g, '\\~')
+      // .replace(/\`/g, '\\`')
+      .replace(/\>/g, '\\>')
+      .replace(/\#/g, '\\#')
+      .replace(/\+/g, '\\+')
+      .replace(/\-/g, '\\-')
+      .replace(/\=/g, '\\=')
+      .replace(/\|/g, '\\|')
+      .replace(/\{/g, '\\{')
+      .replace(/\}/g, '\\}')
+      .replace(/\./g, '\\.')
+      .replace(/\!/g, '\\!')
+  else
+    return text
+}
 
 export class OpenAI {
   roles = {
@@ -13,7 +38,10 @@ export class OpenAI {
     Assistant: 'assistant'
   }
 
-  chatGPTVersion = 'gpt-3.5-turbo'
+  // TODO: BILL: Если куплена подписка и есть доступные запросы из лимитов ставить 4
+  chatGPTVersion = 'gpt-4'
+
+  // chatGPTVersion = 'gpt-3.5-turbo'
 
   constructor(filepath) {
     this.openai = new OpenAIApi({
@@ -22,7 +50,7 @@ export class OpenAI {
     this.filepath = filepath
   }
 
-  async chat(messages, bot, editMessage, chatId) {
+  async chat(messages, bot, editMessage, chatId, parceMode) {
     const response = await this.openai.chat.completions.create({
       model: this.chatGPTVersion,
       messages,
@@ -40,8 +68,10 @@ export class OpenAI {
         && answer.length % process.env.CHAT_GPT_SPEED === 0
       ) {
         // process.stdout.write('🟩')
-        await bot.editMessageText(answer, {
-          message_id: editMessage.message_id, chat_id: chatId
+        await bot.editMessageText(mdReplace(answer, parceMode), {
+          message_id: editMessage.message_id,
+          chat_id: chatId,
+          parse_mode: parceMode
         }).then(() => {
           prevAnswer = answer
         }).catch((err) => {
@@ -51,8 +81,10 @@ export class OpenAI {
       }
     }
 
-    await bot.editMessageText(answer, {
-      message_id: editMessage.message_id, chat_id: chatId
+    await bot.editMessageText(mdReplace(answer, parceMode), {
+      parse_mode: parceMode,
+      message_id: editMessage.message_id,
+      chat_id: chatId
     }).catch((err) => {
       console.log('💀 openai.chat', err.message)
     })
@@ -63,8 +95,10 @@ export class OpenAI {
   async image(prompt) {
     let response = await this.openai.images.generate({
       prompt,
-      n: 4,
-      size: '512x512',
+      model: 'dall-e-3',
+      n: 1,
+      size: '1024x1024',
+      style: 'natural', // "vivid"
       quality: 'hd'
     })
     return response.data[0].url
@@ -84,7 +118,7 @@ export class OpenAI {
   }
 
   async textToSpeech(prompt, msg, voice) {
-      const imgDir = './text-to-speech'
+    const imgDir = './text-to-speech'
     const speechFile = path.resolve(`${imgDir}/@${msg.from.username}-${msg.message_id}.mp3`)
     const mp3 = await this.openai.audio.speech.create({
       model: 'tts-1',
@@ -95,6 +129,6 @@ export class OpenAI {
     const buffer = Buffer.from(await mp3.arrayBuffer())
     await fs.promises.writeFile(speechFile, buffer)
 
-    return speechFile;
+    return speechFile
   }
 }

@@ -9,7 +9,7 @@ export const TYPE_RESPONSE_MJ = {
 // TODO: сделать акцент для удобства людей с ограниченными возможностями. TTS STT
 export const COMMAND_GPT = '🤖 ChatGPT'
 export const COMMAND_TEXT_TO_SPEECH = 'Text to Voice'
-export const COMMAND_SPEECH_TO_TEXT = 'Voice to Text'
+export const COMMAND_ARCHIVING = 'File archiving'
 export const COMMAND_FILE_CONVERTOR = 'File convertor'
 export const COMMAND_DALL_E = '🎨️ DALL-E'
 export const COMMAND_MIDJOURNEY = '🏞 Midjourney'

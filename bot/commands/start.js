@@ -4,7 +4,7 @@ import {
   COMMAND_GPT,
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ, COMMAND_SPEECH_TO_TEXT,
+  COMMAND_QUIZ,
   COMMAND_START, COMMAND_TEXT_TO_SPEECH,
   INITIAL_SESSION
 } from '../constants/index.js'
@@ -31,7 +31,7 @@ export const startBot = bot => {
           ],
           [
             { text: COMMAND_TEXT_TO_SPEECH },
-            { text: COMMAND_SPEECH_TO_TEXT },
+            // { text: COMMAND_ARCHIVING },
             { text: COMMAND_FILE_CONVERTOR }
           ],
           [
