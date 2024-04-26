@@ -59,16 +59,23 @@ bot.on('polling_error', console.log)
 // Use command
 startBot(bot)
 
+bot.on('document', async (msg, match) => {
+  return onMessageDocument(bot, msg)
+})
+
 bot.on('message', async (msg, match) => {
   // TODO: add msg.reply_to_message
 
-  // понять что это файл
+  // // понять что это файл
   if (msg.document) {
-    return onMessageDocument(bot, msg)
+    console.log("msg.document", msg.document)
+    return true
   }
 
-  if (msg?.chat?.type === 'supergroup' || msg.voice)
+  if (msg?.chat?.type === 'supergroup' || msg.voice) {
+    console.log('supergroup?', msg?.chat?.type, msg?.chat)
     return true
+  }
 
   if (msg.text === 'X2PROMO') {
     await usePromoModel(bot, msg.text, msg.chat.id, msg.from)
@@ -105,6 +112,7 @@ bot.on('message', async (msg, match) => {
       break
     case COMMAND_ARCHIVING:
     case COMMAND_FILE_CONVERTOR:
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardConverter(bot, msg)
       break
     case COMMAND_MIDJOURNEY:
@@ -138,9 +146,9 @@ getId(bot)
 sendMessage(bot)
 midjourneyInfo(bot)
 setQuizModeForSubs(bot)
-addSudoer(bot, sudoUser)
-removeSudoer(bot, sudoUser)
-listSudoers(bot, sudoUser)
+addSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+removeSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+listSudoers(bot, sudoUser) // TODO: Удалить этот метод и таблицу
 
 const app = express()
 

@@ -6,6 +6,7 @@ import { Converter } from '../utils/converter.js'
 import fs from 'fs'
 import { formatsConterter } from '../constants/formatsConterter.js'
 import { loaderOn } from '../utils/loader.js'
+import { errorMessage } from './hoc/errorMessage.js'
 
 // TODO: теряется оригинальное имя файла
 // TODO: сделать имя файла как message_id а не file_27
@@ -81,15 +82,15 @@ export const onMessageDocument = async (bot, msg) => {
 
   const pagination = await bot.sendMessage(msg.chat.id, 'Выберите формат, в который вы бы хотели конвертировать файл', {
     ...getPagination(1, result, msg.chat.id)
-  }).then(() => bot.deleteMessage(msg.chat.id, spinner))
-    .catch(() => bot.deleteMessage(msg.chat.id, spinner))
+  }).then(() => bot.deleteMessage(msg.chat.id, spinner).catch())
+    .catch(() => bot.deleteMessage(msg.chat.id, spinner).catch())
 
   bot.on('callback_query', async function(message) {
     console.log('message', message)
     var msg = message.message
 
     if (message.data.includes(msg.chat.id)) {
-      await bot.deleteMessage(msg.chat.id, message.message.message_id)
+      await bot.deleteMessage(msg.chat.id, message.message.message_id).catch()
       const waiting = await loaderOn(0, bot, msg.chat.id)
       const resFile = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}/getFile?file_id=${fileId}`)
       const res2 = await resFile.json()
@@ -98,9 +99,10 @@ export const onMessageDocument = async (bot, msg) => {
       const downloadURL = `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${filePath}`
       download(downloadURL, path.join('conversions', fileName), () => {
         console.log('🟩Done!')
-        bot.sendMessage(process.env.NOTIF_GROUP, `🔧 ${type} to ${message.data.split('-')[0]}`)
+        bot.sendMessage(process.env.NOTIF_GROUP, `🔧 ${mst.from.first_name} ${type} to ${message.data.split('-')[0]}`).catch()
         loaderOn('12%', bot, msg.chat.id, waiting?.message_id)
         // отправить файл на сервер сервиса
+
         converter.getUpload(`conversions/${fileName}`).then(res => {
           loaderOn('37%', bot, msg.chat.id, waiting?.message_id)
           // начать процедуру конфертации
@@ -108,10 +110,15 @@ export const onMessageDocument = async (bot, msg) => {
             `conversions/${fileName}`,
             message.data.split('-')[0] // формат в который производим конвертацию
           ).then(res => {
+            console.log('RES', res)
             loaderOn('64%', bot, msg.chat.id, waiting?.message_id)
-            // скачать файл с их сервера после конвертации и отправить файл в чат после конвертации
-            converter.getDownload(res[0].path, res[0].name, msg.chat.id, bot, waiting?.message_id)
-            // удалить все файлы на первом и втором этапах с сервера
+            if (res.length) {
+              // скачать файл с их сервера после конвертации и отправить файл в чат после конвертации
+              converter.getDownload(res[0].path, res[0].name, msg.chat.id, bot, waiting?.message_id)
+              // удалить все файлы на первом и втором этапах с сервера
+            } else {
+              errorMessage(bot, 'херовая длинна массива', msg, converter.getDownload, "converter.getConverter")
+            }
           })
         })
       })
