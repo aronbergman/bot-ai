@@ -5,15 +5,17 @@ import {
   COMMAND_HELP,
   COMMAND_MIDJOURNEY,
   COMMAND_QUIZ,
-  COMMAND_START, COMMAND_TEXT_TO_SPEECH,
+  COMMAND_TEXT_TO_SPEECH,
   INITIAL_SESSION
 } from '../constants/index.js'
 import { db } from '../db/index.js'
 import dotenv from "dotenv";
+import { ct } from '../utils/createTranslate.js'
 dotenv.config();
 
 export const startBot = bot => {
   bot.onText(/\/start|\/echo/, async msg => {
+     const t = await ct(msg);
     const { id: chatId } = msg.chat
     const msgId = msg.message_id
     const { id } = msg.from
@@ -46,7 +48,7 @@ export const startBot = bot => {
     try {
       await bot.sendMessage(
         chatId,
-        COMMAND_START,
+        t('start'),
         options
       )
 

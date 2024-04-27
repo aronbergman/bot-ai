@@ -3,13 +3,15 @@ import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
 import { keyboardChatGPT } from './chat_gpt.js'
-import { COMMAND_GPT, START_DALLE, TARIFS } from '../../constants/index.js'
+import { COMMAND_GPT, TARIFS } from '../../constants/index.js'
 import { db } from '../../db/index.js'
+import { ct } from '../../utils/createTranslate.js'
 
 dotenv.config({ path: '../.env' })
 
 export const keyboardDalle = async (bot, msg) => {
   const sendDalle = async (bot, chatId, options) => {
+    const t = await ct(msg)
     let accountMessage = await bot.sendMessage(
       chatId,
       '🎨',
@@ -17,7 +19,7 @@ export const keyboardDalle = async (bot, msg) => {
     ).catch(err => console.log(err))
 
     const firstLevel = {
-      message: START_DALLE,
+      message: t('start_dalle'),
       options: {
         ...options,
         reply_markup: {
@@ -35,13 +37,13 @@ export const keyboardDalle = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_M_${chatId}` }],
             [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_M_${chatId}` }],
-            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_M_${chatId}` }],
             [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_M_${chatId}` }],
-            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_M_${chatId}` }],
             [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_M_${chatId}` }],
-            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_M_${chatId}`  }],
+            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_M_${chatId}` }],
             [{ text: 'Вернуться в меню', callback_data: `get_first_level_M_${chatId}` }]
           ]
         }
@@ -156,7 +158,7 @@ Payok - оплачивайте следующими способами:
                   [{ text: '| Российская карта | Payok |', url: linkCR.payUrl }],
                   [{ text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
                   [{ text: '| СБП | Payok |', url: linkSBP.payUrl }],
-                   [{ text: 'Вернуться в меню', callback_data: `get_first_level_M_${chatId}` }]
+                  [{ text: 'Вернуться в меню', callback_data: `get_first_level_M_${chatId}` }]
                 ]
               }
             }).catch(err => console.log(err))

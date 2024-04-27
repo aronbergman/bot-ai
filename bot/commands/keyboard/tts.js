@@ -1,12 +1,14 @@
 import events from 'events'
 import dotenv from 'dotenv'
 import { keyboardChatGPT } from './chat_gpt.js'
-import { COMMAND_GPT, START_TTS, VOICES } from '../../constants/index.js'
+import { COMMAND_GPT, VOICES } from '../../constants/index.js'
 import { db } from '../../db/index.js'
+import { ct } from '../../utils/createTranslate.js'
 
 dotenv.config({ path: '../.env' })
 
 export const keyboardTextToSpeech = async (bot, msg) => {
+  const t = await ct(msg);
   const sendTextToSpeech = async (bot, chatId, options) => {
     let accountMessage = await bot.sendMessage(
       chatId,
@@ -15,7 +17,7 @@ export const keyboardTextToSpeech = async (bot, msg) => {
     ).catch(err => console.log(err))
 
     const firstLevel = {
-      message: START_TTS,
+      message: t('start_tts'),
       options: {
         ...options,
         reply_markup: {

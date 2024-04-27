@@ -2,7 +2,6 @@ import dotenv from 'dotenv'
 import TelegramBot from 'node-telegram-bot-api'
 import express from 'express'
 import cors from 'cors'
-// Import command
 import { startBot } from './bot/commands/start.js'
 import { addSudoer } from './bot/commands/admin/addSudoer.js'
 import { removeSudoer } from './bot/commands/admin/removeSudoer.js'
@@ -40,13 +39,11 @@ import Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { exceptionForHistoryLogging } from './bot/utils/exceptionForHistoryLogging.js'
 import { usePromoModel } from './bot/utils/promo/usePromoModel.js'
-import { keyboardSpeechToText } from './bot/commands/keyboard/keyboardSpeechToText.js'
 import { setQuizModeForSubs } from './bot/commands/admin/setQuizModeForSubs.js'
 import { midjourneyInfo } from './bot/commands/admin/midjourneyInfo.js'
 import { keyboardTextToSpeech } from './bot/commands/keyboard/tts.js'
 import { keyboardConverter } from './bot/commands/keyboard/converter.js'
 import { createFullName } from './bot/utils/createFullName.js'
-import { Converter } from './bot/utils/converter.js'
 import { onMessageDocument } from './bot/commands/onMessageDocument.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
@@ -68,7 +65,7 @@ bot.on('message', async (msg, match) => {
 
   // // понять что это файл
   if (msg.document) {
-    console.log("msg.document", msg.document)
+    console.log('msg.document', msg.document)
     return true
   }
 

@@ -9,6 +9,9 @@ import SudoUserSchema from './models/sudoer.model.js'
 import QuizSchema from './models/quiz.model.js'
 import HistorySchema from './models/history.model.js'
 import TranslateSchema from './models/translait.model.js'
+import LangRuSchema from './models/lang_ru.model.js'
+import LangFrSchema from './models/lang_fr.model.js'
+import LangEnSchema from './models/lang_en.model.js'
 import { dbConfig } from './db.config.js'
 import HelperModel from './models/helper.model.js'
 
@@ -47,6 +50,9 @@ db.quiz = QuizSchema(sequelize, DataTypes)
 db.history = HistorySchema(sequelize, DataTypes)
 db.translate = TranslateSchema(sequelize, DataTypes)
 db.helper = HelperModel(sequelize, DataTypes)
+db.ru = LangRuSchema(sequelize, DataTypes)
+db.fr = LangFrSchema(sequelize, DataTypes)
+db.en = LangEnSchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",

@@ -4,11 +4,12 @@ import * as events from 'events'
 import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
-import { createAccountMessage } from '../../utils/createAccountMessage.js'
+import { ct } from '../../utils/createTranslate.js'
 
 dotenv.config({ path: '../.env' })
 
 export const keyboardMyAccount = async (bot, msg) => {
+  const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -109,7 +110,7 @@ export const keyboardMyAccount = async (bot, msg) => {
 
     eventEmitter.on(`get_first_level_A_${chatId}`, function() {
       bot.editMessageText(
-        createAccountMessage(0, 0),
+        t('account'),
         {
           message_id: accountMessage.message_id,
           chat_id: chatId,
@@ -215,7 +216,7 @@ Payok - оплачивайте следующими способами:
       }).then(res => {
         clearTimeout(timeout)
         bot.editMessageText(
-          createAccountMessage(res.dataValues.tokens, res.dataValues.paid_days),
+          t('account'),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,

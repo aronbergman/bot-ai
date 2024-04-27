@@ -1,3 +1,4 @@
+// TODO: добавить возможность отслеживать есть ли у пользователя запущенные генерации и вообще статус, какой процесс теряется
 export default (sequelize, DataTypes) => {
   const MidjourneySchema = sequelize.define('midjourney',
     {

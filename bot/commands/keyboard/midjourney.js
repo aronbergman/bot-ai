@@ -1,11 +1,11 @@
-import { autoRemoveMessage } from '../hoc/autoRemoveMessage.js'
 import { db } from '../../db/index.js'
-import { COMMAND_GPT, START_MIDJOURNEY, TARIFS } from '../../constants/index.js'
+import { COMMAND_GPT, TARIFS } from '../../constants/index.js'
 import events from 'events'
 import { PAYOK } from 'payok'
 import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
 import { keyboardChatGPT } from './chat_gpt.js'
+import { ct } from '../../utils/createTranslate.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -36,6 +36,7 @@ TODO: Добавить обработку русскоязычных запро�
 
 export const keyboardMidjourney = async (bot, msg) => {
   const sendMidjourney = async (bot, chatId, options) => {
+    const t = await ct(msg);
     let accountMessage = await bot.sendMessage(
       chatId,
       '✏️',
@@ -43,7 +44,7 @@ export const keyboardMidjourney = async (bot, msg) => {
     ).catch(err => console.log(err))
 
     const firstLevel = {
-      message: START_MIDJOURNEY,
+      message: t('start_midjourney'),
       options: {
         ...options,
         reply_markup: {

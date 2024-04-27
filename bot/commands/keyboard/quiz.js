@@ -1,5 +1,4 @@
-import {
-  QUIZ_RULES, QUIZS, WON_A_MONTH_SUBSCRIPTION
+import { QUIZS, WON_A_MONTH_SUBSCRIPTION
 } from '../../constants/index.js'
 import events from 'events'
 import { removeQueryFromPrevMessage } from '../hoc/removeQueryFromPrevMsg.js'
@@ -9,11 +8,13 @@ import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
 import { calculationOfWonTokens } from '../../utils/quiz/calculationOfWonTokens.js'
 import { nanoid } from 'nanoid'
 import dotenv from "dotenv";
+import { ct } from '../../utils/createTranslate.js'
 dotenv.config();
 
 const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
 
 export const keyboardQuiz = async (bot, msg) => {
+    const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -226,7 +227,7 @@ export const keyboardQuiz = async (bot, msg) => {
         await bot.deleteMessage(chatId, accountMessage.message_id)
         accountMessage = await bot.sendMessage(
           chatId,
-          QUIZ_RULES,
+          t('start_quiz'),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,
