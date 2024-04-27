@@ -8,14 +8,23 @@ export const TYPE_RESPONSE_MJ = {
 }
 // TODO: сделать акцент для удобства людей с ограниченными возможностями. TTS STT
 export const COMMAND_GPT = '🤖 ChatGPT'
-export const COMMAND_TEXT_TO_SPEECH = 'Text to Voice'
-export const COMMAND_ARCHIVING = 'File archiving'
-export const COMMAND_FILE_CONVERTOR = 'File convertor'
+export const COMMAND_TEXT_TO_SPEECH_EN = 'Text to Speech'
+export const COMMAND_TEXT_TO_SPEECH_RU = 'Текст в речь'
+export const COMMAND_TEXT_TO_SPEECH_FR = 'Texte à voix'
+export const COMMAND_FILE_CONVERTOR_EN = 'File convertor'
+export const COMMAND_FILE_CONVERTOR_FR = 'Convertisseur de fichiers'
+export const COMMAND_FILE_CONVERTOR_RU = 'Конвертр файлов'
 export const COMMAND_DALL_E = '🎨️ DALL-E'
 export const COMMAND_MIDJOURNEY = '🏞 Midjourney'
-export const COMMAND_ACCOUNT = '🔐 Мой аккаунт'
-export const COMMAND_QUIZ = '🎰 Викторина'
-export const COMMAND_HELP = '🔍 Помощь'
+export const COMMAND_ACCOUNT_RU = '🔐 Мой аккаунт'
+export const COMMAND_ACCOUNT_EN = '🔐 My account'
+export const COMMAND_ACCOUNT_FR = '🔐 Mon compte'
+export const COMMAND_QUIZ_RU = '🎰 Викторина'
+export const COMMAND_QUIZ_EN = '🎰 Quiz'
+export const COMMAND_QUIZ_FR = '🎰 Jeu-Concours'
+export const COMMAND_HELP_RU = '🔍 Помощь'
+export const COMMAND_HELP_EN = '🔍 Support'
+export const COMMAND_HELP_FR = '🔍 l\'Aide'
 
 export const TARIFS = [
   { text: '📆 1 день за 89,00 ₽', callback_data: 'DAYS_1_89' },

@@ -8,7 +8,7 @@ import { ct } from '../../utils/createTranslate.js'
 dotenv.config({ path: '../.env' })
 
 export const keyboardTextToSpeech = async (bot, msg) => {
-  const t = await ct(msg);
+  const t = await ct(msg)
   const sendTextToSpeech = async (bot, chatId, options) => {
     let accountMessage = await bot.sendMessage(
       chatId,
@@ -22,14 +22,14 @@ export const keyboardTextToSpeech = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Выбрать голос', callback_data: `voice_M_${chatId}` }]
+            [{ text: t('btn_select_voice'), callback_data: `voice_M_${chatId}` }]
           ]
         }
       }
     }
 
     const buyLevel = {
-      message: 'Выберите голос, которым я буду произносить для вас текст.',
+      message: t('select_voice'),
       options: {
         ...options,
         reply_markup: {
@@ -40,7 +40,7 @@ export const keyboardTextToSpeech = async (bot, msg) => {
             [{ text: VOICES[3].text, callback_data: `${VOICES[3].callback_data}_M_${chatId}` }],
             [{ text: VOICES[4].text, callback_data: `${VOICES[4].callback_data}_M_${chatId}` }],
             [{ text: VOICES[5].text, callback_data: `${VOICES[5].callback_data}_M_${chatId}` }],
-            [{ text: 'Вернуться в меню', callback_data: `first_voice_M_${chatId}` }]
+            [{ text: t('return_to_menu'), callback_data: `first_voice_M_${chatId}` }]
           ]
         }
       }
@@ -80,9 +80,7 @@ export const keyboardTextToSpeech = async (bot, msg) => {
           { where: { chat_id: chatId } }
         ).then(() => {
           bot.editMessageText(
-            `
-Я озвучу текст голосом ${VOICES[i].text} 🔈
-Напишите, что бы вы хотели услышать ✏️`,
+            t('selected_voice', { 0: VOICES[i].text }),
             {
               message_id: accountMessage.message_id,
               chat_id: chatId,

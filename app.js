@@ -15,13 +15,22 @@ import authRoutes from './api/routes/auth.routes.js'
 import userRoutes from './api/routes/user.routes.js'
 import subsRoutes from './api/routes/subs.routes.js'
 import {
-  COMMAND_ACCOUNT, COMMAND_ARCHIVING,
-  COMMAND_DALL_E, COMMAND_FILE_CONVERTOR,
+  COMMAND_ACCOUNT_EN,
+  COMMAND_ACCOUNT_FR,
+  COMMAND_ACCOUNT_RU,
+  COMMAND_DALL_E,
+  COMMAND_FILE_CONVERTOR_EN,
+  COMMAND_FILE_CONVERTOR_FR,
+  COMMAND_FILE_CONVERTOR_RU,
   COMMAND_GPT,
-  COMMAND_HELP,
+  COMMAND_HELP_EN,
+  COMMAND_HELP_FR,
+  COMMAND_HELP_RU,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ,
-  COMMAND_TEXT_TO_SPEECH
+  COMMAND_QUIZ_EN, COMMAND_QUIZ_FR, COMMAND_QUIZ_RU,
+  COMMAND_TEXT_TO_SPEECH_EN,
+  COMMAND_TEXT_TO_SPEECH_FR,
+  COMMAND_TEXT_TO_SPEECH_RU
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
@@ -100,36 +109,38 @@ bot.on('message', async (msg, match) => {
   })
 
   switch (msg.text) {
-    case COMMAND_ACCOUNT:
+    case COMMAND_ACCOUNT_RU:
+    case COMMAND_ACCOUNT_FR:
+    case COMMAND_ACCOUNT_EN:
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardMyAccount(bot, msg)
-      break
     case COMMAND_GPT:
       return keyboardChatGPT(bot, msg)
-      break
-    case COMMAND_ARCHIVING:
-    case COMMAND_FILE_CONVERTOR:
+    case COMMAND_FILE_CONVERTOR_FR:
+    case COMMAND_FILE_CONVERTOR_EN:
+    case COMMAND_FILE_CONVERTOR_RU:
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardConverter(bot, msg)
-      break
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
-      break
-    case COMMAND_TEXT_TO_SPEECH:
+    case COMMAND_TEXT_TO_SPEECH_EN:
+    case COMMAND_TEXT_TO_SPEECH_RU:
+    case COMMAND_TEXT_TO_SPEECH_FR:
       return keyboardTextToSpeech(bot, msg)
-      break
     case COMMAND_DALL_E:
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardDalle(bot, msg)
       break
-    case COMMAND_HELP:
+    case COMMAND_HELP_RU:
+    case COMMAND_HELP_EN:
+    case COMMAND_HELP_FR:
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardHelp(bot, msg)
-      break
-    case COMMAND_QUIZ:
+    case COMMAND_QUIZ_RU:
+    case COMMAND_QUIZ_EN:
+    case COMMAND_QUIZ_FR:
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardQuiz(bot, msg)
-      break
     default:
       return isModeMidjourney(bot, msg, match, sudoUser)
   }
@@ -138,7 +149,6 @@ bot.on('message', async (msg, match) => {
 onMessageVoice(bot)
 
 // Use admin command
-// TODO: Разрешить эти команды только пользователям с ролью администратор
 getId(bot)
 sendMessage(bot)
 midjourneyInfo(bot)

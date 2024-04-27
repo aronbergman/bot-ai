@@ -6,6 +6,8 @@ import { textToSpeech } from '../commands/textToSpeech.js'
 import { createFullName } from './createFullName.js'
 
 export const isModeMidjourney = async (bot, msg, match, sudoUser) => {
+  if (msg.text?.match(/^\/+/ig))
+    return
   await db.subscriber.findOne({
     where: { chat_id: msg.chat.id, user_id: msg.from.id }
   }).then(res => {

@@ -1,21 +1,18 @@
 import {
-  COMMAND_ACCOUNT,
-  COMMAND_DALL_E, COMMAND_FILE_CONVERTOR,
+  COMMAND_DALL_E,
   COMMAND_GPT,
-  COMMAND_HELP,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ,
-  COMMAND_TEXT_TO_SPEECH,
   INITIAL_SESSION
 } from '../constants/index.js'
 import { db } from '../db/index.js'
-import dotenv from "dotenv";
+import dotenv from 'dotenv'
 import { ct } from '../utils/createTranslate.js'
-dotenv.config();
+
+dotenv.config()
 
 export const startBot = bot => {
   bot.onText(/\/start|\/echo/, async msg => {
-     const t = await ct(msg);
+    const t = await ct(msg)
     const { id: chatId } = msg.chat
     const msgId = msg.message_id
     const { id } = msg.from
@@ -32,14 +29,13 @@ export const startBot = bot => {
             { text: COMMAND_MIDJOURNEY }
           ],
           [
-            { text: COMMAND_TEXT_TO_SPEECH },
-            // { text: COMMAND_ARCHIVING },
-            { text: COMMAND_FILE_CONVERTOR }
+            { text: t('keyboard_tts') },
+            { text: t('keyboard_convertor') }
           ],
           [
-            { text: COMMAND_QUIZ },
-            { text: COMMAND_ACCOUNT },
-            { text: COMMAND_HELP }
+            { text: t('keyboard_quiz') },
+            { text: t('keyboard_acc') },
+            { text: t('keyboard_help') }
           ]
         ]
       }
