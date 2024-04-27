@@ -28,15 +28,15 @@ export const keyboardMyAccount = async (bot, msg) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🔐 Купить подписку', callback_data: `buy_subscription_A_${chatId}` }],
-            [{ text: 'Реферальная программа', callback_data: `referral_program_A_${chatId}` }]
+            [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_A_${chatId}` }],
+            [{ text: t('keyboard_referral'), callback_data: `referral_program_A_${chatId}` }]
           ]
         }
       }
     }
     // TODO: рефакторинг в отдельный файл
     const buyLevel = {
-      message: 'Выберите тарифный план, который хотите приобрести.',
+      message: t('keyboard_tariff'),
       options: {
         ...generalOptions,
         reply_markup: {
