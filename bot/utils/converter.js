@@ -42,11 +42,11 @@ export class Converter {
     settings.format = format
     settings.outputPath = 'converted'
 
-    return this.apiConvert.convertDocument(new ConvertDocumentRequest(settings)).then(res => {
+    return await this.apiConvert.convertDocument(new ConvertDocumentRequest(settings)).then(res => {
       console.log('res', res)
       return res
     }).catch(err => {
-      console.log('err', err)
+      return console.log('err', err)
     })
   }
 
