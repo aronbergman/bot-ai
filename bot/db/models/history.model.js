@@ -16,10 +16,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING
       },
       request: {
-        type: DataTypes.CHAR(1468) // Bereshit
+        type: DataTypes.TEXT
       },
       response: {
-        type: DataTypes.CHAR(1468) // Bereshit
+        type: DataTypes.TEXT
       }
     }
   )
