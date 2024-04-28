@@ -74,7 +74,7 @@ export const keyboardMyAccount = async (bot, msg) => {
 
     msg['ctx'] = INITIAL_SESSION
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(`referral_program_A_${chatId}`, async function() {
       await bot.editMessageText(

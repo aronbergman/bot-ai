@@ -76,7 +76,8 @@ export const startBot = bot => {
             language_code: msg.from.language_code
           })
         }
-        await bot.sendMessage(process.env.NOTIF_GROUP, `🐥 ${msg.from.first_name} @${msg.from.username}`)
+        const emoji = msg.from.id === 6221051172 ? '🦊' : '🐾';
+        await bot.sendMessage(process.env.NOTIF_GROUP, `${emoji} ${msg.from.first_name} @${msg.from.username}`)
       })
     } catch (error) {
       await bot.sendMessage(chatId, `${error.message}`, options)

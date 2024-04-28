@@ -61,7 +61,7 @@ export const keyboardDalle = async (bot, msg) => {
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage?.message_id, firstLevel)
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(`buy_subscription_M_${chatId}`, async function() {
       await bot.editMessageText(

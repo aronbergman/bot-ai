@@ -1,20 +1,20 @@
-import { QUIZS, WON_A_MONTH_SUBSCRIPTION
+import {
+  QUIZS, WON_A_MONTH_SUBSCRIPTION
 } from '../../constants/index.js'
 import events from 'events'
-import { removeQueryFromPrevMessage } from '../hoc/removeQueryFromPrevMsg.js'
 import { db } from '../../db/index.js'
-import { calculatingAttempts } from '../../utils/quiz/calculatingAttempts.js'
 import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
 import { calculationOfWonTokens } from '../../utils/quiz/calculationOfWonTokens.js'
 import { nanoid } from 'nanoid'
-import dotenv from "dotenv";
+import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
-dotenv.config();
+
+dotenv.config()
 
 const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
 
 export const keyboardQuiz = async (bot, msg) => {
-    const t = await ct(msg)
+  const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -23,20 +23,78 @@ export const keyboardQuiz = async (bot, msg) => {
     reply_to_message_id: msgId
   }
 
-  var eventEmitter = new events.EventEmitter()
+  try {
+    accountMessage = await bot.sendMessage(
+      chatId,
+      '🪄',
+      options
+    )
+
+    await db.subscriber.findOne({
+      where: {
+        chat_id: chatId
+      }
+    }).then(res => {
+
+      let keyboard = []
+      let keyboard2 = []
+
+      if (res?.dataValues?.quiz_subs_available === 0 && res.dataValues?.quiz_token_available === 0) {
+        keyboard.push({ text: '⌛️ Новые игры через неделю', callback_data: `NO_ATTEMPTS` })
+      } else {
+        if (res?.dataValues?.quiz_subs_available !== 0)
+          keyboard.push({
+            text: `Выиграй подписку 🥳 (${res.dataValues.quiz_subs_available})`,
+            callback_data: `WIN_SUBS_${chatId}`
+          })
+        if (res?.dataValues?.quiz_token_available !== 0)
+          keyboard2.push({
+            text: `Выиграй запросы 🤓 (${res.dataValues.quiz_token_available})`,
+            callback_data: `WIN_REQ_${chatId}`
+          })
+      }
+
+      const timeout = setTimeout(async () => {
+        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
+        await bot.deleteMessage(chatId, accountMessage.message_id)
+        accountMessage = await bot.sendMessage(
+          chatId,
+          t('start_quiz'),
+          {
+            message_id: accountMessage.message_id,
+            chat_id: chatId,
+            ...options,
+            reply_markup: {
+              inline_keyboard: [
+                keyboard,
+                keyboard2,
+                [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
+              ]
+            }
+          }
+        )
+        clearTimeout(timeout)
+      }, 1000)
+
+    })
+  } catch (error) {
+    await bot.sendMessage(chatId, `${error.message}`, options)
+  }
+
+    const eventEmitter = new events.EventEmitter()
 
   eventEmitter.on(`WIN_REQ_${chatId}`, async function(qwery) {
     eventEmitter.removeAllListeners()
-    await removeQueryFromPrevMessage(bot, chatId, accountMessage)
+    // await removeQueryFromPrevMessage(bot, chatId, accountMessage)
+    await bot.deleteMessage(chatId, accountMessage.message_id)
     await db.subscriber.findOne({
       where: {
         chat_id: chatId
       }
     }).then(async res => {
-      let quizAvailable = calculatingAttempts(res?.dataValues, 'REQUESTS')
 
-      if (quizAvailable > 0) {
-        bot.sendDice(accountMessage.chat.id, {
+      if (res?.dataValues.quiz_token_available > 0) {
+        bot.sendDice(msg.chat.id, {
           emoji: miniGames[Math.floor(Math.random() * miniGames.length)],
           reply_to_message_id: msgId,
           disable_notification: true,
@@ -73,12 +131,11 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = quizAvailable - 1
+          const available = res?.dataValues.quiz_token_available - 1
 
           await db.subscriber.update(
             {
-              quiz_available: available,
-              quiz_type_available: available ? 'REQUESTS' : 'NO_ATTEMPTS'
+              quiz_token_available: available,
             },
             { where: { chat_id: chatId } }
           )
@@ -89,16 +146,16 @@ export const keyboardQuiz = async (bot, msg) => {
 
   eventEmitter.on(`WIN_SUBS_${chatId}`, async function(qwery) {
     eventEmitter.removeAllListeners()
-    await removeQueryFromPrevMessage(bot, chatId, accountMessage)
+    // await removeQueryFromPrevMessage(bot, chatId, accountMessage)
+    await bot.deleteMessage(chatId, accountMessage.message_id)
     await db.subscriber.findOne({
       where: {
         chat_id: chatId
       }
     }).then(async res => {
-      let quizAvailable = calculatingAttempts(res?.dataValues, 'SUBSCRIBE')
 
-      if (quizAvailable > 0) {
-        bot.sendDice(accountMessage.chat.id, {
+      if (res?.dataValues.quiz_subs_available > 0) {
+        bot.sendDice(msg.chat.id, {
           emoji: '🎰',
           reply_to_message_id: msgId,
           disable_notification: true,
@@ -108,7 +165,7 @@ export const keyboardQuiz = async (bot, msg) => {
 
           const quizRes = calculationOfWonTokens(emoji, value)
           await bot.sendMessage(process.env.NOTIF_GROUP, `${msg.from.first_name} играет в ${emoji}, value ${value}, tokens ${quizRes} @${msg.from.username}`)
-          const text = quizRes ? WON_A_MONTH_SUBSCRIPTION("@PiraJoke") : QUIZS[0].finNeg(emoji)
+          const text = quizRes ? WON_A_MONTH_SUBSCRIPTION('@PiraJoke') : QUIZS[0].finNeg(emoji)
 
           setTimeout((emoji, value, chatId) => {
             bot.sendMessage(
@@ -144,12 +201,11 @@ export const keyboardQuiz = async (bot, msg) => {
             }
           )
 
-          const available = quizAvailable - 1
+          const available = res?.dataValues.quiz_subs_available - 1
 
           await db.subscriber.update(
             {
-              quiz_available: available,
-              quiz_type_available: available ? 'SUBSCRIBE' : 'NO_ATTEMPTS'
+              quiz_subs_available: available,
             },
             { where: { chat_id: chatId } }
           )
@@ -159,6 +215,7 @@ export const keyboardQuiz = async (bot, msg) => {
   })
 
   eventEmitter.on(`HISTORY_QUIZ_${chatId}`, async function() {
+    await bot.deleteMessage(chatId, accountMessage.message_id)
     await db.quiz.findAll({
       where: {
         chat_id: chatId
@@ -186,66 +243,4 @@ export const keyboardQuiz = async (bot, msg) => {
     eventEmitter.emit(callbackQuery.data)
     bot.answerCallbackQuery(callbackQuery.id, 'quiz', false)
   })
-
-  try {
-    accountMessage = await bot.sendMessage(
-      chatId,
-      '🪄',
-      options
-    )
-
-    await db.subscriber.findOne({
-      where: {
-        chat_id: chatId
-      }
-    }).then(res => {
-
-      let keyboard = []
-      let keyboard2 = []
-
-      // res.dataValues.quiz_available
-
-      if (res?.dataValues?.quiz_type_available === 'NO_ATTEMPTS') {
-        keyboard.push({ text: '⌛️ Новая игра через неделю', callback_data: `NO_ATTEMPTS` })
-      } else if (res?.dataValues.quiz_type_available === 'SUBSCRIBE') {
-        keyboard.push({
-          text: `Выиграй подписку 🥳 (${res.dataValues.quiz_available})`,
-          callback_data: `WIN_SUBS_${chatId}`
-        })
-      } else if (res?.dataValues.quiz_type_available === 'REQUESTS') {
-        keyboard.push({
-          text: `Выиграй запросы 🤓 (${res.dataValues.quiz_available})`,
-          callback_data: `WIN_REQ_${chatId}`
-        })
-      } else {
-        keyboard.push({ text: 'Выиграй запросы 🤓', callback_data: `WIN_REQ_${chatId}` })
-        keyboard2.push({ text: 'Выиграй подписку 🥳', callback_data: `WIN_SUBS_${chatId}` })
-      }
-
-      const timeout = setTimeout(async () => {
-        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
-        await bot.deleteMessage(chatId, accountMessage.message_id)
-        accountMessage = await bot.sendMessage(
-          chatId,
-          t('start_quiz'),
-          {
-            message_id: accountMessage.message_id,
-            chat_id: chatId,
-            ...options,
-            reply_markup: {
-              inline_keyboard: [
-                keyboard,
-                keyboard2,
-                [{ text: '👾 Статистика игр', callback_data: `HISTORY_QUIZ_${chatId}` }]
-              ]
-            }
-          }
-        )
-        clearTimeout(timeout)
-      }, 1000)
-
-    })
-  } catch (error) {
-    await bot.sendMessage(chatId, `${error.message}`, options)
-  }
 }

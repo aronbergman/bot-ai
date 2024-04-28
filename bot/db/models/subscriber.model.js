@@ -11,13 +11,13 @@ export default (sequelize, DataTypes) => {
         required: true
       },
       first_name: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
       },
       last_name: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
       },
       username: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
       },
       language_code: {
         type: DataTypes.STRING,
@@ -32,18 +32,19 @@ export default (sequelize, DataTypes) => {
         defaultValue: 'assistant'
       },
       tokens: {
-        type: DataTypes.DOUBLE
+        type: DataTypes.DOUBLE,
       },
       paid_days: {
-        type: DataTypes.DOUBLE
+        type: DataTypes.DOUBLE,
       },
       user_id_referral_program: {
-        type: DataTypes.DOUBLE
+        type: DataTypes.DOUBLE,
       },
-      quiz_type_available: {
-        type: DataTypes.STRING,
+      quiz_subs_available: {
+        type: DataTypes.DOUBLE,
+        defaultValue: 3
       },
-      quiz_available: {
+      quiz_token_available: {
         type: DataTypes.DOUBLE,
         defaultValue: 3
       },

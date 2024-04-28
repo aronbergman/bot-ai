@@ -49,7 +49,7 @@ export const keyboardChatGPT = async (bot, msg) => {
       )
     }, 1000, chatId, accountMessage.message_id)
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(`CHANGE_CHAT_MODE:${chatId}`, async function() {
       await bot.editMessageText(

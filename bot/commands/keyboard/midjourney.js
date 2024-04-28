@@ -49,8 +49,8 @@ export const keyboardMidjourney = async (bot, msg) => {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '🏞 Купить подписку', callback_data: `buy_subscription_M_${chatId}` }],
-            [{ text: 'Выйти', callback_data: `${COMMAND_GPT}_M_${chatId}` }]
+            [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_M_${chatId}` }],
+            [{ text: t('exit_to_gpt'), callback_data: `${COMMAND_GPT}_M_${chatId}` }]
           ]
         }
       }
@@ -87,7 +87,7 @@ export const keyboardMidjourney = async (bot, msg) => {
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage.message_id, firstLevel)
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(`buy_subscription_M_${chatId}`, async function() {
       await bot.editMessageText(

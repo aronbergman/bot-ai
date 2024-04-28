@@ -39,7 +39,7 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
     )
 
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on('change_chat_mode', async function() {
       await bot.editMessageText(

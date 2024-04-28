@@ -57,7 +57,7 @@ export const keyboardTextToSpeech = async (bot, msg) => {
       clearTimeout(timeout)
     }, 1000, chatId, accountMessage?.message_id, firstLevel)
 
-    var eventEmitter = new events.EventEmitter()
+    const eventEmitter = new events.EventEmitter()
 
     eventEmitter.on(`voice_M_${chatId}`, async function() {
       await bot.editMessageText(
