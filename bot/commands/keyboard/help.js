@@ -1,4 +1,4 @@
-export const keyboardHelp = async (bot, msg) => {
+export const keyboardHelp = async (bot, msg, t) => {
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -17,7 +17,7 @@ export const keyboardHelp = async (bot, msg) => {
       const timeout = setTimeout(() => {
         // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
         accountMessage = bot.editMessageText(
-          "Text for help",
+          t('description_help'),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,

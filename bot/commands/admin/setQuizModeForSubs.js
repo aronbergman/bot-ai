@@ -22,7 +22,7 @@ export const setQuizModeForSubs = (bot) => {
             { where: { username: text[1] ?? msg.from.username } }
           ).then(() => {
             bot.sendMessage(process.env.NOTIF_GROUP,
-              `🎁 subs:${quiz_subs_available} token:${quiz_token_available} ${text[1] ?? msg.from.username} `
+              `🎁 subs +${quiz_subs_available}, tokens +${quiz_token_available} for ${text[1] ?? msg.from.username} `
             )
           })
         } catch (error) {

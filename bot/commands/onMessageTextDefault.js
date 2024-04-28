@@ -4,7 +4,7 @@ import { db } from '../db/index.js'
 import { removeQueryFromPrevMessage } from './hoc/removeQueryFromPrevMsg.js'
 import { modesChatGPT } from '../constants/modes.js'
 
-export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
+export const onMessageTextDefault = async (bot, msg, match, sudoUser, t) => {
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
 
@@ -24,8 +24,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser) => {
       ...optionsGeneral,
       reply_markup: {
         inline_keyboard: [
-          [{ text: 'Новый диалог', callback_data: 'create_new_chat' },
-            { text: 'Изменить характер ', callback_data: 'change_chat_mode' }]
+          [{ text: t('btn_new_chat'), callback_data: 'create_new_chat' },
+            { text: t('btn_change_mode'), callback_data: 'change_chat_mode' }]
         ]
       }
     }

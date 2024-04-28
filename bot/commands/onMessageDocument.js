@@ -112,7 +112,7 @@ export const onMessageDocument = async (bot, msg) => {
           ).then(res => {
             console.log('RES', res)
             loaderOn('64%', bot, msg.chat.id, waiting?.message_id)
-            if (res.length) {
+            if (res) {
               // скачать файл с их сервера после конвертации и отправить файл в чат после конвертации
               converter.getDownload(res[0].path, res[0].name, msg.chat.id, bot, waiting?.message_id)
               // удалить все файлы на первом и втором этапах с сервера

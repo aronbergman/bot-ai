@@ -54,6 +54,7 @@ import { keyboardTextToSpeech } from './bot/commands/keyboard/tts.js'
 import { keyboardConverter } from './bot/commands/keyboard/converter.js'
 import { createFullName } from './bot/utils/createFullName.js'
 import { onMessageDocument } from './bot/commands/onMessageDocument.js'
+import { ct } from './bot/utils/createTranslate.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -70,6 +71,7 @@ bot.on('document', async (msg, match) => {
 })
 
 bot.on('message', async (msg, match) => {
+  const t = await ct(msg)
   // TODO: add msg.reply_to_message
 
   // // понять что это файл
@@ -135,14 +137,14 @@ bot.on('message', async (msg, match) => {
     case COMMAND_HELP_EN:
     case COMMAND_HELP_FR:
       switchToMode('GPT', msg.chat.id, msg.from)
-      return keyboardHelp(bot, msg)
+      return keyboardHelp(bot, msg, t)
     case COMMAND_QUIZ_RU:
     case COMMAND_QUIZ_EN:
     case COMMAND_QUIZ_FR:
       switchToMode('GPT', msg.chat.id, msg.from)
-      return keyboardQuiz(bot, msg)
+      return keyboardQuiz(bot, msg, true, t)
     default:
-      return isModeMidjourney(bot, msg, match, sudoUser)
+      return isModeMidjourney(bot, msg, match, sudoUser, t)
   }
 })
 

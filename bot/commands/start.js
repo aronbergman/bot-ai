@@ -76,7 +76,7 @@ export const startBot = bot => {
             language_code: msg.from.language_code
           })
         }
-        const emoji = msg.from.id === 6221051172 ? '🦊' : '🐾';
+        const emoji = (msg.from.id === 6221051172) || (msg.from.id === 963869223) ? '🐾' : '➕';
         await bot.sendMessage(process.env.NOTIF_GROUP, `${emoji} ${msg.from.first_name} @${msg.from.username}`)
       })
     } catch (error) {
