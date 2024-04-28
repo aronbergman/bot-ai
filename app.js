@@ -122,7 +122,7 @@ bot.on('message', async (msg, match) => {
     case COMMAND_FILE_CONVERTOR_EN:
     case COMMAND_FILE_CONVERTOR_RU:
       switchToMode('GPT', msg.chat.id, msg.from)
-      return keyboardConverter(bot, msg)
+      return keyboardConverter(bot, msg, t)
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
     case COMMAND_TEXT_TO_SPEECH_EN:
