@@ -11,7 +11,8 @@ dotenv.config()
 
 const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
 
-export const keyboardQuiz = async (bot, msg, isDescription, t) => {
+export const keyboardQuiz = async (bot, msg, isDescription) => {
+  const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
   const msgId = msg.message_id
@@ -104,7 +105,7 @@ export const keyboardQuiz = async (bot, msg, isDescription, t) => {
             { where: { chat_id: chatId } }
           ).then(res => {
 
-            setTimeout((emoji, value, chatId) => {
+            setTimeout((emoji, value, chatId, t) => {
               bot.sendMessage(
                 chatId,
                 text,
@@ -118,8 +119,8 @@ export const keyboardQuiz = async (bot, msg, isDescription, t) => {
                   { where: { chat_id: chatId } }
                 )
               })
-              return keyboardQuiz(bot, msg, false, t)
-            }, 4400, emoji, value, chatId)
+              return keyboardQuiz(bot, msg, false)
+            }, 4400, emoji, value, chatId, t)
           })
         })
       }
@@ -184,14 +185,14 @@ export const keyboardQuiz = async (bot, msg, isDescription, t) => {
             },
             { where: { chat_id: chatId } }
           ).then(res => {
-            setTimeout((emoji, value, chatId) => {
+            setTimeout((emoji, value, chatId, t) => {
               bot.sendMessage(
                 chatId,
                 text,
                 options
               )
-              return keyboardQuiz(bot, msg, false, t)
-            }, 5000, emoji, value, chatId)
+              return keyboardQuiz(bot, msg, false)
+            }, 5000, emoji, value, chatId, t)
           })
         })
       }
@@ -213,6 +214,7 @@ export const keyboardQuiz = async (bot, msg, isDescription, t) => {
 
       for (let i = 0; i < res.length; i++) {
         let someDate = new Date(res[i].dataValues.createdAt).toLocaleString('ru')
+        // TODO: переделать логику расчета на 1 11 22 33 44 55 66
         if (res[i].dataValues.name === 'MACHINE')
           text.push(`${res[i].dataValues.quiz_res > 55 ? '🎁' : '➖'}       ${getStringOrDist(null, res[i].dataValues.name)}       ${someDate}\n`)
         else

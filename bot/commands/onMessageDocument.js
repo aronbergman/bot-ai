@@ -98,7 +98,7 @@ export const onMessageDocument = async (bot, msg) => {
       const fileName = filePath.split('/')[1]
       const downloadURL = `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${filePath}`
       download(downloadURL, path.join('conversions', fileName), async () => {
-        console.log('🟩Done!')
+        console.log('🟩Done!', msg)
         bot.sendMessage(process.env.NOTIF_GROUP, `🔧 ${msg.from.first_name} ${type} to ${message.data.split('-')[0]}`).catch()
         loaderOn('12%', bot, msg.chat.id, waiting?.message_id)
         // отправить файл на сервер сервиса

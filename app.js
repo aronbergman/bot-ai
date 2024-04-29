@@ -142,7 +142,7 @@ bot.on('message', async (msg, match) => {
     case COMMAND_QUIZ_EN:
     case COMMAND_QUIZ_FR:
       switchToMode('GPT', msg.chat.id, msg.from)
-      return keyboardQuiz(bot, msg, true, t)
+      return keyboardQuiz(bot, msg, true)
     default:
       return isModeMidjourney(bot, msg, match, sudoUser, t)
   }
