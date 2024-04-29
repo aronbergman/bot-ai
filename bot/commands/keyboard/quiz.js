@@ -85,7 +85,7 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
           const createStringValue = getStringOrDist(emoji)
           const quizRes = calculationOfWonTokens(emoji, value)
           await bot.sendMessage(process.env.NOTIF_GROUP, `${emoji} ${msg.from.first_name} – tokens: ${quizRes} (${value}) @${msg.from.username}`)
-          const text = quizRes ? t('win_token', { emoji, count: quizRes })(emoji, quizRes) : t('desc_not_win', {emoji})
+          const text = quizRes ? t('win_token', { emoji, count: quizRes }) : t('desc_not_win', {emoji})
 
           await db.quiz.create(
             {
