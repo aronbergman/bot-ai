@@ -24,7 +24,7 @@ export const keyboardConverter = async (bot, msg) => {
       clearTimeout(timeout)
     }, 1500, msg.chat.id, accountMessage?.message_id)
   } catch (e) {
-    await bot.deleteMessage(msg.chat.id, accountMessage.message_id)
+     bot.deleteMessage(msg.chat.id, accountMessage.message_id)
     return errorMessage(bot, e.message, msg, 'keybourd/converter')
   }
 }
