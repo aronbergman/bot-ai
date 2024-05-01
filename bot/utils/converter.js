@@ -47,7 +47,7 @@ export class Converter {
       console.log('res', res)
       return res
     }).catch(err => {
-      errorMessage(bot, err.message, msg, 'convertor')
+      errorMessage(bot, err, msg, 'convertor')
       return console.log('err', err)
     })
   }
