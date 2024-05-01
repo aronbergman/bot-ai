@@ -74,7 +74,7 @@ export const keyboardChatGPT = async (bot, msg) => {
         ).then(async res => {
           // TODO: отправить сообщение приветствие
           await bot.editMessageText(
-            `<b>ChatGPT</b> 3.5 – ${character(modesChatGPT[i].code)?.name}\n${character(modesChatGPT[i].code)?.welcome}`,
+            `<b>ChatGPT</b> 3.5 – ${t(character(modesChatGPT[i].code)?.name)}\n${t(character(modesChatGPT[i].code)?.welcome)}`,
             {
               message_id: accountMessage.message_id,
               chat_id: chatId,
