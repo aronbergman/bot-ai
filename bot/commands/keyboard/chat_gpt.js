@@ -34,7 +34,7 @@ export const keyboardChatGPT = async (bot, msg) => {
       options: {
         ...options,
         reply_markup: {
-          inline_keyboard: modesChatGPT.map((mode) => [{ text: mode.name, callback_data: mode.code }])
+          inline_keyboard: modesChatGPT.map((mode) => [{ text: t(mode.name), callback_data: mode.code }])
         }
       }
     }
