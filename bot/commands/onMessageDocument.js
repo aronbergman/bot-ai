@@ -104,22 +104,23 @@ export const onMessageDocument = async (bot, msg) => {
           await stepperOn(bot, msg.from.id, 1, waiting)
           // отправить файл на сервер сервиса
 
-          await converter.getUpload(`conversions/${fileName}`).then(async res => {
-            await stepperOn(bot, msg.from.id, 2, waiting)
-            // начать процедуру конфертации
-          })
+          await converter.getUpload(`conversions/${fileName}`)
+            .then(async res => {
+              await stepperOn(bot, msg.from.id, 2, waiting)
+              // начать процедуру конфертации
 
-          const newFile = await converter.getConverter(
-            `conversions/${fileName}`,
-            msg.data.split('-')[0], // формат в который производим конвертацию
-            bot,
-            msg
-          )
+              const newFile = await converter.getConverter(
+                `conversions/${fileName}`,
+                msg.data.split('-')[0], // формат в который производим конвертацию
+                bot,
+                msg
+              )
 
-          if (newFile) {
-            await stepperOn(bot, msg.from.id, 3, waiting)
-            await converter.getDownload(newFile[0].path, newFile[0].name, msg.from.id, bot, waiting?.message_id)
-          }
+              if (newFile) {
+                await stepperOn(bot, msg.from.id, 3, waiting)
+                await converter.getDownload(newFile[0].path, newFile[0].name, msg.from.id, bot, waiting?.message_id)
+              }
+            })
         })
 
         return true

@@ -39,9 +39,9 @@ export class OpenAI {
   }
 
   // TODO: BILL: Если куплена подписка и есть доступные запросы из лимитов ставить 4
-  chatGPTVersion = 'gpt-4'
+  // chatGPTVersion = 'gpt-4'
 
-  // chatGPTVersion = 'gpt-3.5-turbo'
+  chatGPTVersion = 'gpt-3.5-turbo'
 
   constructor(filepath) {
     this.openai = new OpenAIApi({
