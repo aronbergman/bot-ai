@@ -17,7 +17,6 @@ export const errorMessage = async (bot, error, msg, component) => {
 
   await db.subscriber.findOne({
     where: {
-      chat_id: msg.chat.id,
       user_id: msg.from.id
     }
   }).then(sub => {
@@ -26,7 +25,7 @@ export const errorMessage = async (bot, error, msg, component) => {
       subValues.push(`${key}: ${sub.dataValues[key]}`)
     }
     bot.sendMessage(process.env.SENTRY_GROUP, `⚡️ <b>${error}</b> \n\n🔺 <b>${component || 'not found'} ${msg.message_id}</b>\n\n${subValues.join('\n')}`, {parse_mode: 'HTML'})
-    bot.sendMessage(msg.chat.id, `☠️ Произошла ошибка, пожалуйста, попробуйте позже\nError: ${msg.message_id}`, options)
+    bot.sendMessage(msg.from.id, `☠️ Произошла ошибка, пожалуйста, попробуйте позже\nError: ${msg.message_id}`, options)
   })
 
 //   bot.sendMessage(process.env.SENTRY_GROUP, `

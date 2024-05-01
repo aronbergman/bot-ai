@@ -12,6 +12,7 @@ import {
 import { saveAndSendConvertedDocument } from './saveAndSendPhoto.js'
 import fs from 'fs'
 import { loaderOn } from './loader.js'
+import { errorMessage } from '../commands/hoc/errorMessage.js'
 
 dotenv.config({ path: '../../../.env' })
 
@@ -36,7 +37,7 @@ export class Converter {
       })
   }
 
-  async getConverter(filePath, format) {
+  async getConverter(filePath, format, bot, msg) {
     let settings = new ConvertSettings()
     settings.filePath = filePath
     settings.format = format
@@ -46,6 +47,7 @@ export class Converter {
       console.log('res', res)
       return res
     }).catch(err => {
+      errorMessage(bot, err.message, msg, 'convertor')
       return console.log('err', err)
     })
   }
@@ -54,7 +56,6 @@ export class Converter {
     let res = new DownloadFileRequest(filePath)
     await this.apiFile.downloadFile(res)
       .then(function(response) {
-        loaderOn('81%', bot, chatID, waitingID)
         console.log('Expected response type is Stream: ' + response.length)
         return saveAndSendConvertedDocument(fileName, response, chatID, bot, waitingID)
       })

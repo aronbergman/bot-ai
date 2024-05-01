@@ -3,8 +3,10 @@ import { db } from '../../db/index.js'
 import { modesChatGPT } from '../../constants/modes.js'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
+import { ct } from '../../utils/createTranslate.js'
 
 export const keyboardChatGPT = async (bot, msg) => {
+  const t = await ct(msg)
   const sendChatGPT = async (bot, chatId, options, modeGPT) => {
 
     const character = (mGPT) => modesChatGPT.find(mode => mode.code === mGPT)
@@ -16,19 +18,19 @@ export const keyboardChatGPT = async (bot, msg) => {
     )
 
     const firstMessage = {
-      text: `<b>ChatGPT</b> 3.5 – ${character(modeGPT)?.name}\n${character(modeGPT)?.welcome}`,
+      text: `<b>ChatGPT</b> 3.5 – ${t(character(modeGPT)?.name)}\n${t(character(modeGPT)?.welcome)}`,
       options: {
         ...options,
         reply_markup: {
           inline_keyboard: [
-            [{ text: 'Изменить характер', callback_data: `CHANGE_CHAT_MODE:${chatId}` }]
+            [{ text: t('btn_change_mode'), callback_data: `CHANGE_CHAT_MODE:${chatId}` }]
           ]
         }
       }
     }
 
     const secondMessage = {
-      text: 'Выберите характер',
+      text: t('msg_chat_mode'),
       options: {
         ...options,
         reply_markup: {

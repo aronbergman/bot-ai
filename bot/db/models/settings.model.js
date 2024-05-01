@@ -1,7 +1,7 @@
 // TODO: Подключи эту схему, она нужна для управления настройками глобально в строке 0 и настройками для каждого чата по отдельности, если кого-то нужно ограничить или перенаправить, дав отдельные токены
 export default (sequelize, DataTypes) => {
   const SettingsSchema = sequelize.define('settings', {
-    chat_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
       primaryKey: true

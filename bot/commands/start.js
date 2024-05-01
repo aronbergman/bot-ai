@@ -7,6 +7,7 @@ import {
 import { db } from '../db/index.js'
 import dotenv from 'dotenv'
 import { ct } from '../utils/createTranslate.js'
+import { stepperOn } from '../utils/stepper.js'
 
 dotenv.config()
 

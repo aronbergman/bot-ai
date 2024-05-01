@@ -112,6 +112,7 @@ export const keyboardMidjourney = async (bot, msg) => {
     })
 
     eventEmitter.on(`${COMMAND_GPT}_M_${chatId}`, function() {
+      eventEmitter.removeAllListeners()
       return keyboardChatGPT(bot, msg)
     })
 

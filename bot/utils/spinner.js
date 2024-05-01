@@ -29,5 +29,5 @@ export const spinnerOff = async (bot, chat_id, message_id) => {
   return bot.deleteMessage(
     chat_id,
     message_id?.message_id ?? message_id
-  )
+  ).catch()
 }

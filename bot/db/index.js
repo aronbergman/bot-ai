@@ -12,6 +12,7 @@ import TranslateSchema from './models/translait.model.js'
 import LangRuSchema from './models/lang_ru.model.js'
 import LangFrSchema from './models/lang_fr.model.js'
 import LangEnSchema from './models/lang_en.model.js'
+import SettingsSchema from './models/settings.model.js'
 import { dbConfig } from './db.config.js'
 import HelperModel from './models/helper.model.js'
 
@@ -53,6 +54,7 @@ db.helper = HelperModel(sequelize, DataTypes)
 db.ru = LangRuSchema(sequelize, DataTypes)
 db.fr = LangFrSchema(sequelize, DataTypes)
 db.en = LangEnSchema(sequelize, DataTypes)
+db.settings = SettingsSchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",
