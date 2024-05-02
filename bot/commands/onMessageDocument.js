@@ -6,8 +6,9 @@ import fetch from 'node-fetch'
 import { loaderOn } from '../utils/loader.js'
 import { spinnerOn } from '../utils/spinner.js'
 import { Converter } from '../utils/converter.js'
-import { formats, formatsConterter } from '../constants/formatsConterter.js'
+import { formats, formatsConvertor } from '../constants/formatsConterter.js'
 import { stepperOn } from '../utils/stepper.js'
+import { sleep } from '../utils/sleep.js'
 
 // TODO: теряется оригинальное имя файла
 // TODO: сделать имя файла как message_id а не file_27
@@ -38,7 +39,7 @@ function getPagination(current, formatsArray, msgID) {
   const keys = []
   if (current > 1) keys.push({ text: `«1`, callback_data: '1' })
   if (current > 2) keys.push({ text: `‹${current - 1}`, callback_data: (current - 1).toString() })
-  keys.push({ text: `-${current}-`, callback_data: current.toString() })
+  // keys.push({ text: `-${current}-`, callback_data: current.toString() })
   if (current < formatPages.length - 1) keys.push({ text: `${current + 1}›`, callback_data: (current + 1).toString() })
   if (current < formatPages.length) keys.push({
     text: `${formatPages.length}»`,
@@ -76,8 +77,7 @@ export const onMessageDocument = async (bot, msg) => {
     return true
   }
 
-  // const x = typesForConverter.targetFormats.filter(i => formatsConterter.filter(x => i === x ? x : null))
-  let result = typesForConverter.targetFormats.filter((arr) => formatsConterter.includes(arr))
+  let result = typesForConverter.targetFormats.filter((arr) => formatsConvertor.includes(arr))
 
   await bot.sendMessage(msg.chat.id, 'Выберите формат, в который вы бы хотели конвертировать файл', {
     ...getPagination(1, result, msg.chat.id)
@@ -87,11 +87,9 @@ export const onMessageDocument = async (bot, msg) => {
   const eventEmitter = new events.EventEmitter()
 
   for (let i = 0; result.length > i; i++) {
-    console.log('${result[i]}${msg.chat.id}', `${result[i]}${msg.from.id}`)
-
     eventEmitter.on(`${result[i]}-${msg.from.id}`, async function(msg) {
       if (msg.data.includes(msg.from.id)) {
-        await bot.deleteMessage(msg.from.id, msg.message.message_id).catch()
+        await bot.deleteMessage(msg.from.id, msg.message.message_id).catch((error) => console.log('error dm', error))
         const waiting = await stepperOn(bot, msg.from.id, 0)
         const resFile = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}/getFile?file_id=${fileId}`)
         const res2 = await resFile.json()
@@ -100,15 +98,12 @@ export const onMessageDocument = async (bot, msg) => {
         const downloadURL = `https://api.telegram.org/file/bot${process.env.TELEGRAM_API_KEY}/${filePath}`
         download(downloadURL, path.join('conversions', fileName), async () => {
           console.log('🟩Done!', msg)
-          bot.sendMessage(process.env.NOTIF_GROUP, `🔧 ${msg.from.first_name} ${type} to ${msg.data.split('-')[0]}`).catch()
+          bot.sendMessage(process.env.NOTIF_GROUP, `⚙️ ${msg.from.first_name} converts file from ${type} to ${msg.data.split('-')[0]}`).catch()
           await stepperOn(bot, msg.from.id, 1, waiting)
-          // отправить файл на сервер сервиса
-
           await converter.getUpload(`conversions/${fileName}`)
             .then(async res => {
               await stepperOn(bot, msg.from.id, 2, waiting)
-              // начать процедуру конфертации
-
+              await sleep(3000)
               const newFile = await converter.getConverter(
                 `conversions/${fileName}`,
                 msg.data.split('-')[0], // формат в который производим конвертацию

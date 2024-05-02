@@ -73,10 +73,7 @@ bot.on('document', async (msg, match) => {
 bot.on('message', async (msg, match) => {
   const t = await ct(msg)
   // TODO: add msg.reply_to_message
-
-  // // понять что это файл
   if (msg.document) {
-    console.log('msg.document', msg.document)
     return true
   }
 
