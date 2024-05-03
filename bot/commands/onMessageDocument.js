@@ -90,7 +90,7 @@ export const onMessageDocument = async (bot, msg) => {
     eventEmitter.on(`${result[i]}-${msg.from.id}`, async function(msg) {
       if (msg.data.includes(msg.from.id)) {
         await bot.deleteMessage(msg.from.id, msg.message.message_id).catch((error) => console.log('error dm', error))
-        const waiting = await stepperOn(bot, msg.from.id, 0)
+        const waiting = await stepperOn(bot, msg, 0)
         const resFile = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}/getFile?file_id=${fileId}`)
         const res2 = await resFile.json()
         const filePath = res2.result.file_path
@@ -99,10 +99,10 @@ export const onMessageDocument = async (bot, msg) => {
         download(downloadURL, path.join('conversions', fileName), async () => {
           console.log('🟩Done!', msg)
           bot.sendMessage(process.env.NOTIF_GROUP, `⚙️ ${msg.from.first_name} converts file from ${type} to ${msg.data.split('-')[0]}`).catch()
-          await stepperOn(bot, msg.from.id, 1, waiting)
+          await stepperOn(bot, msg, 1, waiting)
           await converter.getUpload(`conversions/${fileName}`)
             .then(async res => {
-              await stepperOn(bot, msg.from.id, 2, waiting)
+              await stepperOn(bot, msg, 2, waiting)
               await sleep(3000)
               const newFile = await converter.getConverter(
                 `conversions/${fileName}`,
@@ -112,7 +112,7 @@ export const onMessageDocument = async (bot, msg) => {
               )
 
               if (newFile) {
-                await stepperOn(bot, msg.from.id, 3, waiting)
+                await stepperOn(bot, msg, 3, waiting)
                 await converter.getDownload(newFile[0].path, newFile[0].name, msg.from.id, bot, waiting?.message_id)
               }
             })

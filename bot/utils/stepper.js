@@ -1,13 +1,16 @@
-export const stepperOn = async (bot, chat_id, stepNowIndex, prevMessage) => {
+import { ct } from './createTranslate.js'
+
+export const stepperOn = async (bot, msg, stepNowIndex, prevMessage) => {
+  const t = await ct(msg)
   const done = '✅'
   const wait = '⏩'
 
   const stepsArray1 = [
-    'Импорт файла из Telegram',
-    'Выгрузка файла на сервер',
-    'Конвертация файла',
-    'Выгрузка нового файла на сервер Telegram',
-    'Загрузка файла на устройство',
+    t("msg:converter1ph"),
+    t("msg:converter2ph"),
+    t("msg:converter3ph"),
+    t("msg:converter4ph"),
+    t("msg:converter(5ph"),
   ]
 
   const steps = stepsArray1.map((step, index) => {
@@ -17,13 +20,13 @@ export const stepperOn = async (bot, chat_id, stepNowIndex, prevMessage) => {
   if (prevMessage) {
     return bot.editMessageText(steps.join(''),
       {
-        chat_id,
+        chat_id: msg.from.id,
         message_id: prevMessage.message_id
       }
     )
   } else {
     const answer = await bot.sendMessage(
-      chat_id,
+      msg.from.id,
       steps.join('')
     )
     return new Promise(res => res(answer))
