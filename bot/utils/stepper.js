@@ -10,7 +10,7 @@ export const stepperOn = async (bot, msg, stepNowIndex, prevMessage) => {
     t("msg:converter2ph"),
     t("msg:converter3ph"),
     t("msg:converter4ph"),
-    t("msg:converter(5ph"),
+    t("msg:converter5ph"),
   ]
 
   const steps = stepsArray1.map((step, index) => {

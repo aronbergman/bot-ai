@@ -83,9 +83,10 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
           const createStringValue = getStringOrDist(emoji)
-          const quizRes = calculationOfWonTokens(emoji, value)
+          // const quizRes = calculationOfWonTokens(emoji, value)
+          const quizRes = value
           await bot.sendMessage(process.env.NOTIF_GROUP, `${emoji} ${msg.from.first_name} – tokens: ${quizRes} (${value}) @${msg.from.username}`)
-          const text = quizRes ? t('win_token', { emoji, count: quizRes }) : t('desc_not_win', {emoji})
+          const text = quizRes ? t('win_token', { emoji, count: quizRes }) : t('desc_not_win', { emoji })
 
           await db.quiz.create(
             {
@@ -111,14 +112,19 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
                 text,
                 options
               )
-              db.subscriber.findOne(
-                { where: { chat_id: chatId } }
-              ).then(res => {
-                db.subscriber.update(
-                  { tokens: res.dataValues.tokens + quizRes },
+              db.settings.findOne(
+                { where: { user_id: 0 } }
+              ).then(settings => {
+                db.subscriber.findOne(
                   { where: { chat_id: chatId } }
-                )
+                ).then(res => {
+                  db.subscriber.update(
+                    { tokens: (res.dataValues.tokens + (quizRes * settings.dataValues['m_factor_req'])) },
+                    { where: { chat_id: chatId } }
+                  )
+                })
               })
+
               return keyboardQuiz(bot, msg, false)
             }, 4400, emoji, value, chatId, t)
           })
@@ -146,26 +152,46 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
         }).then(async (quiz) => {
           const { emoji, value } = quiz.dice
 
-          const quizRes = calculationOfWonTokens(emoji, value)
+          const { dataValues } = await db.settings.findOne(
+            { where: { user_id: 0 } }
+          )
+
+          // const quizRes = calculationOfWonTokens(emoji, value)
+          const quizRes = value
           await bot.sendMessage(process.env.NOTIF_GROUP, `${emoji} ${msg.from.first_name} – ${value} (${quizRes}) @${msg.from.username}`)
 
-          const text = quizRes ? t('win_subscribe_month', { 0: '@PiraJoke' }) : t('desc_not_win', {emoji})
+          // const text = quizRes ? t('win_subscribe_month', { 0: '@PiraJoke' }) : t('desc_not_win', {emoji})
+          const text = t('win_token', { emoji, count: (quizRes * dataValues['m_factor_sub']) })
 
           if (quizRes) {
-            await db.payment.create({
-              payment_id: nanoid(7),
-              type_of_tariff: 'DAYS',
-              duration: 30,
-              user_id: chatId,
-              username: msg.from.username,
-              payment_method: 'QUIZ',
-              payment_confirmed: new Date()
+            // await db.payment.create({
+            //   payment_id: nanoid(7),
+            //   type_of_tariff: 'DAYS',
+            //   duration: 30,
+            //   user_id: chatId,
+            //   username: msg.from.username,
+            //   payment_method: 'QUIZ',
+            //   payment_confirmed: new Date()
+            // })
+
+            db.settings.findOne(
+              { where: { user_id: 0 } }
+            ).then(settings => {
+              db.subscriber.findOne(
+                { where: { chat_id: chatId } }
+              ).then(res => {
+                db.subscriber.update(
+                  { tokens: (res.dataValues.tokens + (quizRes * dataValues['m_factor_sub'])) },
+                  { where: { chat_id: chatId } }
+                )
+              })
             })
-            await db.subscriber.update({
-              paid_days: 30
-            }, { where: { chat_id: chatId } })
+
+            // await db.subscriber.update({
+            //   paid_days: 30
+            // }, { where: { chat_id: chatId } })
             // TODO: Ждем рефералов сделать рефералку на 3 из 5 ссылок пришли от пользователя
-            await bot.sendMessage(process.env.NOTIF_GROUP, `🎰 @${msg.from.username} выиграл подписку, ждём рефералов...`)
+            // await bot.sendMessage(process.env.NOTIF_GROUP, `🎰 @${msg.from.username} выиграл подписку, ждём рефералов...`)
           }
 
           await db.quiz.create(
@@ -185,14 +211,14 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
             },
             { where: { chat_id: chatId } }
           ).then(res => {
-            setTimeout((emoji, value, chatId, t) => {
+            setTimeout((emoji, value, chatId, text) => {
               bot.sendMessage(
                 chatId,
                 text,
                 options
               )
               return keyboardQuiz(bot, msg, false)
-            }, 5000, emoji, value, chatId, t)
+            }, 2000, emoji, value, chatId, text)
           })
         })
       }
@@ -228,5 +254,7 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
   bot.on('callback_query', function onCallbackQuery(callbackQuery) {
     eventEmitter.emit(callbackQuery.data)
     bot.answerCallbackQuery(callbackQuery.id, 'quiz', false)
+    eventEmitter.removeAllListeners()
+    // TODO: исправить баг. запуск нескольких игр одновременно
   })
 }

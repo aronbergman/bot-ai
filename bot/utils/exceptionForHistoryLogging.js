@@ -4,7 +4,7 @@ export const exceptionForHistoryLogging = (fromId, message) => {
     6221051172 // aronbergman
   ]
 
-  if (exceptionIds.find((i) => i === fromId) !== -1)
+  if (exceptionIds.find((i) => i === fromId))
     return `${message?.length ?? 0} CONFIDENTIAL`
   else
     return `${message?.length ?? 0} ${message}`
