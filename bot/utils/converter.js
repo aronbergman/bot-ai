@@ -11,8 +11,8 @@ import {
 } from 'groupdocs-conversion-cloud'
 import { saveAndSendConvertedDocument } from './saveAndSendPhoto.js'
 import fs from 'fs'
-import { loaderOn } from './loader.js'
 import { errorMessage } from '../commands/hoc/errorMessage.js'
+import { db } from '../db/index.js'
 
 dotenv.config({ path: '../../../.env' })
 
@@ -52,15 +52,20 @@ export class Converter {
     })
   }
 
-  async getDownload(filePath, fileName, chatID, bot, waitingID) {
+  async getDownload(filePath, fileName, chatID, bot, waitingID, resFileName, taskID) {
     let res = new DownloadFileRequest(filePath)
     await this.apiFile.downloadFile(res)
       .then(function(response) {
         console.log('Expected response type is Stream: ' + response.length)
-        return saveAndSendConvertedDocument(fileName, response, chatID, bot, waitingID)
+        return saveAndSendConvertedDocument(fileName, response, chatID, bot, waitingID, resFileName, taskID)
       })
       .catch(function(error) {
         console.log('Error: ' + error.message)
+
+        db.convertor_requests.update(
+        { status: 'error' },
+        { where: { document_id: taskID } }
+      )
       })
   }
 

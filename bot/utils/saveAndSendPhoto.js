@@ -2,6 +2,7 @@ import fs from 'fs'
 import axios from 'axios'
 import { TYPE_RESPONSE_MJ } from '../constants/index.js'
 import { createProgress } from './loader.js'
+import { db } from '../db/index.js'
 
 export const saveAndSendPhoto = async (
   imgUrl,
@@ -83,7 +84,9 @@ export const saveAndSendConvertedDocument = async (
   buffer,
   chatID,
   bot,
-  prev
+  prev,
+  resFileName,
+  taskID
 ) => {
   const docDir = './converted'
   const filePath = `${docDir}/${filename}`
@@ -94,17 +97,26 @@ export const saveAndSendConvertedDocument = async (
     }
 
     fs.writeFileSync(filePath, Buffer.from(buffer, 'binary'))
-    const stream = fs.createReadStream(filePath)
-    if (prev) {
+    fs.renameSync(`${filePath}`, resFileName)
+    const stream = fs.createReadStream(resFileName)
+
+    file = await bot.sendDocument(chatID, stream, {
+      // caption: createProgress(progress?.replace('%', ''))
+    }).then(async () => {
       await bot.deleteMessage(chatID, prev).catch(() => {
         console.log('🔺 general | error remove loader ', prev)
       })
-    file = await bot.sendDocument(chatID, stream, {
-      // caption: createProgress(progress?.replace('%', ''))
+      await db.convertor_requests.update(
+        { status: 'done' },
+        { where: { document_id: taskID } }
+      )
     })
-    }
     return file
   } catch (error) {
     console.log(error)
+    await db.convertor_requests.update(
+      { status: 'error' },
+      { where: { document_id: taskID } }
+    )
   }
 }

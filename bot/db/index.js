@@ -13,6 +13,8 @@ import LangRuSchema from './models/lang_ru.model.js'
 import LangFrSchema from './models/lang_fr.model.js'
 import LangEnSchema from './models/lang_en.model.js'
 import SettingsSchema from './models/settings.model.js'
+import Chatgpt3RequestsSchema from './models/chatgpt3_requests.model.js'
+import ConvertorRequestsSchema from './models/convertor_requests.model.js'
 import { dbConfig } from './db.config.js'
 import HelperModel from './models/helper.model.js'
 
@@ -55,6 +57,8 @@ db.ru = LangRuSchema(sequelize, DataTypes)
 db.fr = LangFrSchema(sequelize, DataTypes)
 db.en = LangEnSchema(sequelize, DataTypes)
 db.settings = SettingsSchema(sequelize, DataTypes)
+db.chat3_requests = Chatgpt3RequestsSchema(sequelize, DataTypes)
+db.convertor_requests = ConvertorRequestsSchema(sequelize, DataTypes)
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",

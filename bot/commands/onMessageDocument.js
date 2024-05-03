@@ -3,12 +3,14 @@ import path from 'path'
 import events from 'events'
 import request from 'request'
 import fetch from 'node-fetch'
-import { loaderOn } from '../utils/loader.js'
 import { spinnerOn } from '../utils/spinner.js'
 import { Converter } from '../utils/converter.js'
 import { formats, formatsConvertor } from '../constants/formatsConterter.js'
 import { stepperOn } from '../utils/stepper.js'
 import { sleep } from '../utils/sleep.js'
+import { db } from '../db/index.js'
+import { Op } from 'sequelize'
+import { nanoid } from 'nanoid'
 
 // TODO: теряется оригинальное имя файла
 // TODO: сделать имя файла как message_id а не file_27
@@ -60,6 +62,7 @@ const download = (url, path, callback) => {
 }
 
 export const onMessageDocument = async (bot, msg) => {
+  const options = { parse_mode: 'HTML', reply_to_message_id: msg.message_id }
   const converter = new Converter()
   // const formats = await converter.getSupportedConversionTypes()
   // включить лоадер
@@ -71,9 +74,29 @@ export const onMessageDocument = async (bot, msg) => {
   console.log('type', type)
   let typesForConverter = formats.find(i => i.sourceFormat === type)
 
+  const isATaskAtWork = await db.convertor_requests.findOne({
+    where: {
+      chat_id: msg.chat.id,
+      [Op.or]: [{ status: 'work' }, { status: 'suspense' }]
+    }
+  })
+
+  if (isATaskAtWork) {
+    const { file_name, format_from, format_to, status } = isATaskAtWork.dataValues
+    console.log('isATaskAtWork', isATaskAtWork)
+    await bot.deleteMessage(msg.chat.id, spinner)
+    return bot.sendMessage(msg.chat.id,
+      `Пожалуйста, дождитесь завершения работы по прoшлой задаче:\n
+<b>${file_name}.${format_from}</b> в формат <b>${format_to}</b>\n
+Статус: ${status}\n
+Возможность отмены задачи посвятся через час, после того как сервер не справився`,
+      options
+    )
+  }
+
   if (!typesForConverter) {
     await bot.deleteMessage(msg.chat.id, spinner)
-    await bot.sendMessage(msg.chat.id, 'Данный формат файла не поддерживается')
+    await bot.sendMessage(msg.chat.id, 'Данный формат файла не поддерживается', options)
     return true
   }
 
@@ -89,8 +112,26 @@ export const onMessageDocument = async (bot, msg) => {
   for (let i = 0; result.length > i; i++) {
     eventEmitter.on(`${result[i]}-${msg.from.id}`, async function(msg) {
       if (msg.data.includes(msg.from.id)) {
+
+        const fileType = msg.document['file_name'].split('.')
+        const type = fileType[fileType.length - 1]
+        const name = fileType.map(i => i !== type ? i : '') // добавить алгоритм который будет убирать тоьлко последнюю точку
+
+        const createTask = await db.convertor_requests.create({
+          document_id: nanoid(10),
+          chat_id: msg.from.id,
+          message_id: msg.message.message_id, // я его удаляю ниже, это точно нужно?
+          status: 'work',
+          file_name: name.join(''),
+          format_from: type,
+          format_to: msg.data.split('-')[0],
+          priority: 0
+        })
+
+        console.log('createTask', createTask)
+
         await bot.deleteMessage(msg.from.id, msg.message.message_id).catch((error) => console.log('error dm', error))
-        const waiting = await stepperOn(bot, msg, 0)
+        const waiting = await stepperOn(bot, msg, 0) // верочтно логичнее будет сохранить прошлое сообщение msg.message.message_id
         const resFile = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_API_KEY}/getFile?file_id=${fileId}`)
         const res2 = await resFile.json()
         const filePath = res2.result.file_path
@@ -112,8 +153,11 @@ export const onMessageDocument = async (bot, msg) => {
               )
 
               if (newFile) {
+                // тут нужно создать строку с новым именем файла с форматом в который производим конвертацию
+                const newFileName = `${createTask.dataValues['file_name']}.${createTask.dataValues['format_to']}`
+                const taskID = createTask.dataValues['document_id']
                 await stepperOn(bot, msg, 3, waiting)
-                await converter.getDownload(newFile[0].path, newFile[0].name, msg.from.id, bot, waiting?.message_id)
+                await converter.getDownload(newFile[0].path, newFile[0].name, msg.from.id, bot, waiting?.message_id, newFileName, taskID)
               }
             })
         })
@@ -124,6 +168,7 @@ export const onMessageDocument = async (bot, msg) => {
   }
 
   bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+    callbackQuery.document = msg.document
     eventEmitter.emit(callbackQuery.data, callbackQuery)
     bot.answerCallbackQuery(callbackQuery.id, 'on_message_document', false)
 
@@ -133,6 +178,8 @@ export const onMessageDocument = async (bot, msg) => {
         message_id: callbackQuery.message.message_id
       })
       bot.editMessageText('Выберите формат, в который вы бы хотели конвертировать файл', editOptions)
+    } else {
+      eventEmitter.removeAllListeners()
     }
   })
 

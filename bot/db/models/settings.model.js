@@ -1,44 +1,38 @@
-// TODO: Подключи эту схему, она нужна для управления настройками глобально в строке 0 и настройками для каждого чата по отдельности, если кого-то нужно ограничить или перенаправить, дав отдельные токены
 export default (sequelize, DataTypes) => {
   const SettingsSchema = sequelize.define('settings', {
     user_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DOUBLE,
       defaultValue: 0,
       primaryKey: true
     },
-    converter_switch: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
+    cost_chat: {
+      type: DataTypes.DOUBLE,
+      required: true
     },
-    midjourney_switch: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
+    cost_midjourney: {
+      type: DataTypes.DOUBLE,
+      required: true
     },
-    chatgpt_switch: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
+    cost_dalle: {
+      type: DataTypes.DOUBLE,
+      required: true
     },
-    dalle_switch: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1
+    cost_converter: {
+      type: DataTypes.DOUBLE,
+      required: true
     },
-    chatgpt_default_version: {
-      type: DataTypes.STRING,
-      defaultValue: 'gpt-4'
+    cost_tts: {
+      type: DataTypes.DOUBLE,
+      required: true
     },
-    chatgpt_subs_version: {
-      type: DataTypes.STRING,
-      defaultValue: 'gpt-3.5-turbo'
+    m_factor_req: {
+       type: DataTypes.DOUBLE,
+      required: true
     },
-    converter_sid: {
-      type: DataTypes.STRING
+    m_factor_sub: {
+       type: DataTypes.DOUBLE,
+      required: true
     },
-    converter_key: {
-      type: DataTypes.STRING
-    },
-    openai_key_temp: {
-      type: DataTypes.STRING
-    }
   })
 
   return SettingsSchema
