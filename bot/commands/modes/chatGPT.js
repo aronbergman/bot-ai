@@ -6,8 +6,12 @@ import { modesChatGPT } from '../../constants/modes.js'
 import { db } from '../../db/index.js'
 import { exceptionForHistoryLogging } from '../../utils/exceptionForHistoryLogging.js'
 import { createFullName } from '../../utils/createFullName.js'
+import { calculationOfNumberOfTokens } from '../../utils/checkTokens.js'
+import { ct } from '../../utils/createTranslate.js'
+import { Sequelize } from 'sequelize'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
+  const t = await ct(msg)
   let res
   let modeGPT
   let newMessage
@@ -46,7 +50,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       newMessage = msg.text ?? msg.sticker?.emoji
       msg.ctx = INITIAL_SESSION
     } else if (msg.text) {
-      newMessage = x?.prompt_start
+      newMessage = await t(x?.prompt_start)
       newMessage = newMessage + '\n\n' + msg.text
     } else {
       newMessage = msg.sticker.emoji
@@ -58,6 +62,14 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     })
 
     const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID, x.parse_mode)
+
+    const textSum = response + newMessage
+    const tokenCounts = await calculationOfNumberOfTokens(textSum)
+
+    await db.subscriber.update(
+      { tokens: Sequelize.literal(`tokens - ${tokenCounts.length}`) },
+      { where: { user_id: chatID } }
+    )
 
     if (!response) {
       throw new Error('Something went wrong please try again.')
@@ -83,7 +95,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
         ...options,
         message_id: message.message_id,
         chat_id: chatID,
-        parse_mode: x['parse_mode'],
+        parse_mode: x['parse_mode']
       }
     ).catch(() => {
       console.log('🔺 89')

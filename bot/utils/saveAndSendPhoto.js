@@ -90,6 +90,7 @@ export const saveAndSendConvertedDocument = async (
 ) => {
   const docDir = './converted'
   const filePath = `${docDir}/${filename}`
+  const newPath = `${docDir}/${resFileName}`
   let file
   try {
     if (!fs.existsSync(docDir)) {
@@ -97,7 +98,7 @@ export const saveAndSendConvertedDocument = async (
     }
 
     fs.writeFileSync(filePath, Buffer.from(buffer, 'binary'))
-    fs.renameSync(`${filePath}`, resFileName)
+    fs.renameSync(filePath, newPath)
     const stream = fs.createReadStream(resFileName)
 
     file = await bot.sendDocument(chatID, stream, {

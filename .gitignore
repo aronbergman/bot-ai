@@ -2,6 +2,7 @@ node_modules
 admin/node_modules
 public
 .env
+.idea
 *.log
 .DS_Store
 storage/public

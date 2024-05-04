@@ -12,7 +12,7 @@ export const COMMAND_TEXT_TO_SPEECH_EN = 'Text to Speech'
 export const COMMAND_TEXT_TO_SPEECH_RU = 'Текст в речь'
 export const COMMAND_TEXT_TO_SPEECH_FR = 'Texte à voix'
 export const COMMAND_FILE_CONVERTOR_EN = 'File convertor'
-export const COMMAND_FILE_CONVERTOR_FR = 'Convertisseur de fichiers'
+export const COMMAND_FILE_CONVERTOR_FR = 'Convertisseur de fichiers 📄'
 export const COMMAND_FILE_CONVERTOR_RU = 'Конвертр файлов'
 export const COMMAND_DALL_E = '🎨️ DALL-E'
 export const COMMAND_MIDJOURNEY = '🏞 Midjourney'
@@ -44,5 +44,13 @@ export const VOICES = [
   { text: 'Nova', callback_data: 'nova' },
   { text: 'Shimmer', callback_data: 'shimmer' },
 ]
+
+export const REQUEST_TYPES = {
+    CHAT_GPT: 'CHAT_GPT',
+    MIDJOUNEY: 'MIDJOUNEY',
+    DALLE: 'DALLE',
+    TTS: 'TTS',
+    CONVERTOR: 'CONVERTOR'
+  }
 
 // ['🎲', '🎯', '🏀', '⚽', '🎳', '🎰']

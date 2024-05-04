@@ -1,8 +1,6 @@
 import events from 'events'
 import { db } from '../../db/index.js'
 import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
-import { calculationOfWonTokens } from '../../utils/quiz/calculationOfWonTokens.js'
-import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
 import { createNewQuizKeyboard } from '../../utils/quiz/createNewQuizKeyboard.js'
@@ -33,9 +31,7 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
         chat_id: chatId
       }
     }).then(res => {
-
       const keyboard = createNewQuizKeyboard(res, chatId, t)
-
       const timeout = setTimeout(async () => {
         // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
         await bot.deleteMessage(chatId, accountMessage.message_id)
