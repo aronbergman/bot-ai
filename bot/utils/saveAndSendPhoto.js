@@ -99,7 +99,7 @@ export const saveAndSendConvertedDocument = async (
 
     fs.writeFileSync(filePath, Buffer.from(buffer, 'binary'))
     fs.renameSync(filePath, newPath)
-    const stream = fs.createReadStream(resFileName)
+    const stream = fs.createReadStream(newPath)
 
     file = await bot.sendDocument(chatID, stream, {
       // caption: createProgress(progress?.replace('%', ''))
