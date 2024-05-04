@@ -9,7 +9,7 @@ import { keyboardQuiz } from './quiz.js'
 
 dotenv.config({ path: '../.env' })
 
-export const isTokensEmpty = async (bot, msg) => {
+export const isTokensEmpty = async (bot, msg, tokens) => {
   const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
@@ -223,7 +223,7 @@ Payok - оплачивайте следующими способами:
       }).then(res => {
         clearTimeout(timeout)
         bot.editMessageText(
-          t('msg:empty_tokens'),
+          t('msg:empty_tokens', {tokens}),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,

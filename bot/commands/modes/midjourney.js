@@ -106,8 +106,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     })
 
   } catch (error) {
-    bot.deleteMessage(chatID, waiting.message_id).then()
-    eventEmitter.removeAllListeners()
+    // bot.deleteMessage(chatID, waiting.message_id).then()
+    // eventEmitter.removeAllListeners()
     // await client.Reset()
     // client.Close()
     await bot.sendMessage(chatID, `${error}`)

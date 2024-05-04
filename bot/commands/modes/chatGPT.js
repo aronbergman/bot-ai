@@ -63,7 +63,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
 
     const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID, x.parse_mode)
 
-    const textSum = response + newMessage
+    const textSum = (response + newMessage)
     const tokenCounts = await calculationOfNumberOfTokens(textSum)
 
     await db.subscriber.update(

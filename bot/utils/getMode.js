@@ -6,8 +6,8 @@ import { textToSpeech } from '../commands/textToSpeech.js'
 import { createFullName } from './createFullName.js'
 import { checkTokens } from './checkTokens.js'
 import { REQUEST_TYPES } from '../constants/index.js'
-import { keyboardMyAccount } from '../commands/keyboard/my_account.js'
 import { isTokensEmpty } from '../commands/keyboard/empty_tokens.js'
+import { switchToMode } from './switchToChatMode.js'
 
 export const isModeMidjourney = async (bot, msg, match, sudoUser, t) => {
   if (msg.text?.match(/^\/+/ig))
@@ -15,19 +15,21 @@ export const isModeMidjourney = async (bot, msg, match, sudoUser, t) => {
   await db.subscriber.findOne({
     where: { chat_id: msg.chat.id, user_id: msg.from.id }
   }).then(async res => {
-    if (res.mode === 'MIDJOURNEY') {
+    const isPermission = await checkTokens(res.mode, msg.text, msg.chat.id)
+    if (!isPermission)
+      return isTokensEmpty(bot, msg, res.dataValues['tokens'])
+
+    if (res.mode === REQUEST_TYPES.MIDJOURNEY) {
+      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return modeMidjourney(bot, sudoUser, msg, match)
-    } else if (res.mode === 'DALL-E') {
+    } else if (res.mode === REQUEST_TYPES.DALLE) {
+      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return modeDalle(bot, sudoUser, msg, match)
-    } else if (res.mode === 'TTS') {
+    } else if (res.mode === REQUEST_TYPES.TTS) {
+      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return textToSpeech(bot, msg.chat.id, msg, msg.text, res.tts_voice)
     } else {
-      const isPermission = await checkTokens(REQUEST_TYPES.CHAT_GPT, msg.text, msg.chat.id)
-      console.log('isPermission', isPermission)
-      if (isPermission)
-        return onMessageTextDefault(bot, msg, match, sudoUser, t)
-      else
-        return isTokensEmpty(bot, msg)
+      return onMessageTextDefault(bot, msg, match, sudoUser, t)
     }
   }).catch(() => true)
 }

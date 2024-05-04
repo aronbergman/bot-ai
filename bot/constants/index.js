@@ -46,11 +46,17 @@ export const VOICES = [
 ]
 
 export const REQUEST_TYPES = {
-    CHAT_GPT: 'CHAT_GPT',
-    MIDJOUNEY: 'MIDJOUNEY',
-    DALLE: 'DALLE',
+    GPT: 'GPT',
+    MIDJOURNEY: 'MIDJOURNEY',
+    DALLE: 'DALL-E',
     TTS: 'TTS',
     CONVERTOR: 'CONVERTOR'
   }
 
-// ['🎲', '🎯', '🏀', '⚽', '🎳', '🎰']
+export const REQUEST_TYPES_COST = {
+    GPT: 'cost_chat',
+    TTS: 'cost_tts',
+    MIDJOURNEY: 'MIDJOURNEY',
+    DALLE: 'DALLE',
+    CONVERTOR: 'CONVERTOR',
+  }
