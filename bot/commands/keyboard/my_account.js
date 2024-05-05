@@ -60,7 +60,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
             [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_A_${msgId}` }],
             [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_A_${msgId}` }],
             [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_A_${msgId}` }],
-            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${msgId}` }]
+            [{ text: t('return_to_menu'), callback_data: `get_first_level_A_${msgId}` }]
           ]
         }
       }
@@ -106,7 +106,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
       })
 
     for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(`${TARIFS[i].callback_data}_A_${chatId}`, function() {
+      eventEmitter.on(`${TARIFS[i].callback_data}_A_${msgId}`, function() {
         const tarif = TARIFS[i].callback_data.split('_')
 
         const payok = new PAYOK({
@@ -131,28 +131,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
             amount: invoice.dataValues.price,
             payment: invoice.dataValues.payment_id,
             desc: TARIFS[i].text,
-            method: 'cd'
-          })
-
-          const linkSBP = payok.getPaymentLink({
-            amount: invoice.dataValues.price,
-            payment: invoice.dataValues.payment_id,
-            desc: TARIFS[i].text,
             method: 'sbp'
-          })
-
-          const linkCR = payok.getPaymentLink({
-            amount: invoice.dataValues.price,
-            payment: invoice.dataValues.payment_id,
-            desc: TARIFS[i].text,
-            method: 'cru'
-          })
-
-          const linkCW = payok.getPaymentLink({
-            amount: invoice.dataValues.price,
-            payment: invoice.dataValues.payment_id,
-            desc: TARIFS[i].text,
-            method: 'cwo'
           })
 
           bot.editMessageText(
@@ -170,11 +149,8 @@ Payok - оплачивайте следующими способами:
               chat_id: chatId,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: '| Оплатить через Payok |', url: link.payUrl }],
-                  [{ text: '| Российская карта | Payok |', url: linkCR.payUrl }],
-                  [{ text: '| Зарубежная карта | Payok |', url: linkCW.payUrl }],
-                  [{ text: '| СБП | Payok |', url: linkSBP.payUrl }],
-                  [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
+                  [{ text: t('btn:payok-rub'), url: link.payUrl }],
+                  [{ text: t('return_to_menu'), callback_data: `get_first_level_A_${chatId}` }]
                 ]
               }
             }).catch(err => console.log(err))
@@ -215,7 +191,7 @@ Payok - оплачивайте следующими способами:
           }
         ).catch(err => console.log(err))
       })
-    }, (prevMessageForEdit) ? 0 : 1000, accountMessage)
+    }, prevMessageForEdit ? 0 : 1500, accountMessage)
   } catch (error) {
     await bot.sendMessage(chatId, `${error.message}`, generalOptions)
   }
