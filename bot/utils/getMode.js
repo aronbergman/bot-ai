@@ -15,9 +15,9 @@ export const isModeMidjourney = async (bot, msg, match, sudoUser, t) => {
   await db.subscriber.findOne({
     where: { chat_id: msg.chat.id, user_id: msg.from.id }
   }).then(async res => {
-    const isPermission = await checkTokens(res.mode, msg.text, msg.chat.id)
-    if (!isPermission)
-      return isTokensEmpty(bot, msg, res.dataValues['tokens'])
+    const {tokensAvailable, price} = await checkTokens(res.mode, msg.chat.id, msg.text)
+    if (tokensAvailable <= price)
+      return isTokensEmpty(bot, msg, tokensAvailable, price)
 
     if (res.mode === REQUEST_TYPES.MIDJOURNEY) {
       switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)

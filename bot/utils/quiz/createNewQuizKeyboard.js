@@ -12,7 +12,7 @@ export const createNewQuizKeyboard = (res, chatId, t) => {
       })
     if (res?.dataValues?.quiz_token_available !== 0)
       keyboard2.push({
-        text: `${t('btn_win_tokens')} 🤓 (${res.dataValues.quiz_token_available})`,
+        text: `${t('btn_win_tokens')} (${res.dataValues.quiz_token_available})`,
         callback_data: `WIN_REQ_${chatId}`
       })
   }

@@ -30,7 +30,8 @@ import {
   COMMAND_QUIZ_EN, COMMAND_QUIZ_FR, COMMAND_QUIZ_RU,
   COMMAND_TEXT_TO_SPEECH_EN,
   COMMAND_TEXT_TO_SPEECH_FR,
-  COMMAND_TEXT_TO_SPEECH_RU
+  COMMAND_TEXT_TO_SPEECH_RU,
+  REQUEST_TYPES
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
 import { keyboardMyAccount } from './bot/commands/keyboard/my_account.js'
@@ -55,6 +56,8 @@ import { keyboardConverter } from './bot/commands/keyboard/converter.js'
 import { createFullName } from './bot/utils/createFullName.js'
 import { onMessageDocument } from './bot/commands/onMessageDocument.js'
 import { ct } from './bot/utils/createTranslate.js'
+import { checkTokens } from './bot/utils/checkTokens.js'
+import { isTokensEmpty } from './bot/commands/keyboard/empty_tokens.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -67,6 +70,9 @@ bot.on('polling_error', console.log)
 startBot(bot)
 
 bot.on('document', async (msg, match) => {
+  const {tokensAvailable, price} = await checkTokens(REQUEST_TYPES.CONVERTOR, msg.chat.id)
+  if (tokensAvailable <= price)
+    return isTokensEmpty(bot, msg, tokensAvailable, price)
   return onMessageDocument(bot, msg)
 })
 

@@ -6,10 +6,11 @@ import { nanoid } from 'nanoid'
 import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
 import { keyboardQuiz } from './quiz.js'
+import { referralLevelCreator } from '../../utils/payments/referralLevelCreator.js'
 
 dotenv.config({ path: '../.env' })
 
-export const isTokensEmpty = async (bot, msg, tokens) => {
+export const isTokensEmpty = async (bot, msg, tokens, price) => {
   const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
@@ -29,9 +30,9 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_A_${chatId}` }],
-            [{ text: t('keyboard_referral'), callback_data: `referral_program_A_${chatId}` }],
-            [{ text: t('keyboard_quiz'), callback_data: `keyboard_quiz_A_${chatId}` }]
+            [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_A_${msgId}` }],
+            [{ text: t('keyboard_referral'), callback_data: `referral_program_A_${msgId}` }],
+            [{ text: t('keyboard_quiz'), callback_data: `keyboard_quiz_A_${msgId}` }]
           ]
         }
       }
@@ -43,32 +44,14 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
         ...generalOptions,
         reply_markup: {
           inline_keyboard: [
-            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_A_${chatId}` }],
-            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_A_${chatId}` }],
-            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
-          ]
-        }
-      }
-    }
-    // TODO: рефакторинг в отдельный файл
-    // TODO: сделать реферальную программу
-    const referralLevel = {
-      message: '🤝 Зарабатывайте запросы с нашей реферальной системой\n' +
-        '\n' +
-        'С каждого приглашенного пользователя вы получаете: 3 запроса ChatGPT и 1 запрос Midjourney\n' +
-        'Приглашено за все время вами человек: 0\n' +
-        '\n' +
-        'Ваша пригласительная ссылка: https://t.me/XXX?start=user-XXX',
-      options: {
-        ...generalOptions,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${chatId}` }]
+            [{ text: TARIFS[0].text, callback_data: `${TARIFS[0].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[1].text, callback_data: `${TARIFS[1].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[2].text, callback_data: `${TARIFS[2].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[3].text, callback_data: `${TARIFS[3].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[4].text, callback_data: `${TARIFS[4].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[5].text, callback_data: `${TARIFS[5].callback_data}_A_${msgId}` }],
+            [{ text: TARIFS[6].text, callback_data: `${TARIFS[6].callback_data}_A_${msgId}` }],
+            [{ text: 'Вернуться в меню', callback_data: `get_first_level_A_${msgId}` }]
           ]
         }
       }
@@ -78,7 +61,7 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
 
     const eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on(`referral_program_A_${chatId}`, async function() {
+    eventEmitter.on(`referral_program_A_${msgId}`, async function() {
       await bot.editMessageText(
         'text',
         {
@@ -88,7 +71,7 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`buy_subscription_A_${chatId}`, async function() {
+    eventEmitter.on(`buy_subscription_A_${msgId}`, async function() {
       await bot.editMessageText(
         buyLevel.message,
         {
@@ -99,12 +82,14 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`keyboard_quiz_A_${chatId}`, async function() {
+    eventEmitter.on(`keyboard_quiz_A_${msgId}`, async function() {
       eventEmitter.removeAllListeners()
       return keyboardQuiz(bot, msg, true)
     })
 
-    eventEmitter.on(`referral_program_A_${chatId}`, async function() {
+    const referralLevel = await referralLevelCreator(msg, generalOptions, msgId, 'empty_tokens')
+
+    eventEmitter.on(`referral_program_A_${msgId}`, async function() {
       await bot.editMessageText(
         referralLevel.message,
         {
@@ -115,7 +100,7 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`get_first_level_A_${chatId}`, function() {
+    eventEmitter.on(`get_first_level_A_${msgId}`, function() {
       bot.editMessageText(
         t('account'),
         {
@@ -127,7 +112,7 @@ export const isTokensEmpty = async (bot, msg, tokens) => {
     })
 
     for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(`${TARIFS[i].callback_data}_A_${chatId}`, function() {
+      eventEmitter.on(`${TARIFS[i].callback_data}_A_${msgId}`, function() {
         const tarif = TARIFS[i].callback_data.split('_')
 
         const payok = new PAYOK({
@@ -223,7 +208,7 @@ Payok - оплачивайте следующими способами:
       }).then(res => {
         clearTimeout(timeout)
         bot.editMessageText(
-          t('msg:empty_tokens', {tokens}),
+          t('msg:empty_tokens', {tokens, price}),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,

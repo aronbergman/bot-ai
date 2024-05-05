@@ -20,23 +20,35 @@ export async function calculationOfNumberOfTokens(text, type = REQUEST_TYPES_COS
   return tokens.length * settings[type] //
 }
 
-async function isTokens(userID, settings, countTokens, typeRequest) {
-  const { tokens } = await db.subscriber.findOne({ where: { user_id: userID } })
-  return tokens >= ((await countTokens) * settings[REQUEST_TYPES_COST[typeRequest]])
+export async function calculationForConvertor(type) {
+  const { dataValues: settings } = await db.settings.findOne({ where: { user_id: 0 } })
+  return settings[type]
 }
 
-export const checkTokens = async (typeRequest, text, userID) => {
+async function isTokens(userID, settings, countTokens, typeRequest) {
+  const { tokens: tokensAvailable } = await db.subscriber.findOne({ where: { user_id: userID } })
+  return {
+    tokensAvailable,
+    price: ((await countTokens) * settings[REQUEST_TYPES_COST[typeRequest]]),
+
+  }
+}
+
+export const checkTokens = async (typeRequest, userID, text = '') => {
   const { dataValues: settings } = await db.settings.findOne({ where: { user_id: 0 } })
   let countTokens
 
   switch (typeRequest) {
-    case REQUEST_TYPES.GPT: // умножение на коэффицент
-    case REQUEST_TYPES.TTS: // умножение на коэффицент
-    case REQUEST_TYPES.MIDJOURNEY: // умножение на коэффицент
-    case REQUEST_TYPES.DALLE: // умножение на коэффицент
+    case REQUEST_TYPES.GPT:
+    case REQUEST_TYPES.TTS:
+    case REQUEST_TYPES.MIDJOURNEY:
+    case REQUEST_TYPES.DALLE:
+      // умножение на коэффицент
       countTokens = await calculationOfNumberOfTokens(text, REQUEST_TYPES_COST[typeRequest], 'gpt-3.5-turbo')
       return isTokens(userID, settings, countTokens, typeRequest)
-    case REQUEST_TYPES.CONVERTOR: // стоимость конвертации 1 отправленного файла в таблице
+    case REQUEST_TYPES.CONVERTOR:
+      // стоимость конвертации 1 отправленного файла в таблице
+      return isTokens(userID, settings, 1, typeRequest)
     default:
       return false
   }
