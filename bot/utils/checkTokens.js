@@ -30,15 +30,13 @@ export const checkTokens = async (typeRequest, text, userID) => {
   let countTokens
 
   switch (typeRequest) {
-    case REQUEST_TYPES.GPT:
+    case REQUEST_TYPES.GPT: // умножение на коэффицент
+    case REQUEST_TYPES.TTS: // умножение на коэффицент
+    case REQUEST_TYPES.MIDJOURNEY: // умножение на коэффицент
+    case REQUEST_TYPES.DALLE: // умножение на коэффицент
       countTokens = await calculationOfNumberOfTokens(text, REQUEST_TYPES_COST[typeRequest], 'gpt-3.5-turbo')
       return isTokens(userID, settings, countTokens, typeRequest)
-    case REQUEST_TYPES.TTS:
-      countTokens = await calculationOfNumberOfTokens(text, REQUEST_TYPES_COST[typeRequest], 'gpt-4')
-      return isTokens(userID, settings, countTokens, typeRequest)
-    case REQUEST_TYPES.DALLE:
-    case REQUEST_TYPES.MIDJOURNEY:
-    case REQUEST_TYPES.CONVERTOR:
+    case REQUEST_TYPES.CONVERTOR: // стоимость конвертации 1 отправленного файла в таблице
     default:
       return false
   }

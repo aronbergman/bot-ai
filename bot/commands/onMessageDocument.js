@@ -11,10 +11,9 @@ import { sleep } from '../utils/sleep.js'
 import { db } from '../db/index.js'
 import { Op } from 'sequelize'
 import { nanoid } from 'nanoid'
+import { ct } from '../utils/createTranslate.js'
 
-// TODO: теряется оригинальное имя файла
-// TODO: сделать имя файла как message_id а не file_27
-// TODO: опталедять тип файла от типа в meta telegram
+// TODO: определять тип файла от типа в meta telegram
 
 function getPagination(current, formatsArray, msgID) {
   var formats = []
@@ -62,12 +61,11 @@ const download = (url, path, callback) => {
 }
 
 export const onMessageDocument = async (bot, msg) => {
+  const t = await ct(msg)
   const options = { parse_mode: 'HTML', reply_to_message_id: msg.message_id }
   const converter = new Converter()
   // const formats = await converter.getSupportedConversionTypes()
-  // включить лоадер
   let spinner = await spinnerOn(bot, msg.chat.id, null, 'document')
-  // сохранить файл на мой сервер
   const fileId = msg.document.file_id
   const fileType = msg.document['file_name'].split('.')
   const type = fileType[fileType.length - 1]
@@ -85,24 +83,22 @@ export const onMessageDocument = async (bot, msg) => {
     const { file_name, format_from, format_to, status } = isATaskAtWork.dataValues
     console.log('isATaskAtWork', isATaskAtWork)
     await bot.deleteMessage(msg.chat.id, spinner)
-    return bot.sendMessage(msg.chat.id,
-      `Пожалуйста, дождитесь завершения работы по прoшлой задаче:\n
-<b>${file_name}.${format_from}</b> в формат <b>${format_to}</b>\n
-Статус: ${status}\n
-Возможность отмены задачи посвятся через час, после того как сервер не справився`,
+    return bot.sendMessage(
+      msg.chat.id,
+      t('msg:cnvrt:prev-task-is-work', { file_name, format_from, format_to, status }),
       options
     )
   }
 
   if (!typesForConverter) {
     await bot.deleteMessage(msg.chat.id, spinner)
-    await bot.sendMessage(msg.chat.id, 'Данный формат файла не поддерживается', options)
+    await bot.sendMessage(msg.chat.id, t('msg:cnvrt:bad-file-format'), options)
     return true
   }
 
   let result = typesForConverter.targetFormats.filter((arr) => formatsConvertor.includes(arr))
 
-  await bot.sendMessage(msg.chat.id, 'Выберите формат, в который вы бы хотели конвертировать файл', {
+  await bot.sendMessage(msg.chat.id, t('msg:cnvtr:select-format'), {
     ...getPagination(1, result, msg.chat.id)
   }).then(() => bot.deleteMessage(msg.chat.id, spinner).catch())
     .catch(() => bot.deleteMessage(msg.chat.id, spinner).catch())
@@ -177,7 +173,7 @@ export const onMessageDocument = async (bot, msg) => {
         chat_id: msg.from.id,
         message_id: callbackQuery.message.message_id
       })
-      bot.editMessageText('Выберите формат, в который вы бы хотели конвертировать файл', editOptions)
+      bot.editMessageText(t('msg:cnvtr:select-format'), editOptions)
     } else {
       eventEmitter.removeAllListeners()
     }

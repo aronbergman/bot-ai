@@ -56,7 +56,7 @@ export const REQUEST_TYPES = {
 export const REQUEST_TYPES_COST = {
     GPT: 'cost_chat',
     TTS: 'cost_tts',
-    MIDJOURNEY: 'MIDJOURNEY',
-    DALLE: 'DALLE',
-    CONVERTOR: 'CONVERTOR',
+    MIDJOURNEY: 'cost_midjourney',
+    DALLE: 'cost_dalle',
+    CONVERTOR: 'cost_converter',
   }
