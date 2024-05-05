@@ -172,7 +172,7 @@ export const onMessageDocument = async (bot, msg) => {
     eventEmitter.emit(callbackQuery.data, callbackQuery)
     bot.answerCallbackQuery(callbackQuery.id, 'on_message_document', false)
 
-    if (!callbackQuery.data.includes(msg.from.id)) {
+    if (!callbackQuery.data.includes(msg.from.id) && callbackQuery.data.length <= 2) {
       const editOptions = Object.assign({}, getPagination(parseInt(callbackQuery.data), result, msg.from.id), {
         chat_id: msg.from.id,
         message_id: callbackQuery.message.message_id

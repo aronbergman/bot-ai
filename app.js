@@ -88,7 +88,7 @@ bot.on('message', async (msg, match) => {
   }
 
   if (msg.from.username !== 'aronbergman' && process.env.SERVER === 'DEVELOPMENT')
-    bot.sendMessage(msg.chat.id, `🤖\n<i>привет ${msg.from.first_name}, этот бот работает не стабильно, он удобен для дебага и не доступен, если выключен ноутбук. Так-же запросы могут теряться из-за перезапуска приложения во время тестирования\n стабильная версия</i> @crayonAI_bot 🤟🏻`, { parse_mode: 'HTML' }).then(r => {
+    bot.sendMessage(msg.chat.id, `🤖\n${t('msg:open-dev-bot', { name: msg.from.first_name })} @PaperClip_gptbot 🤟🏻`, { parse_mode: 'HTML' }).then(r => {
     })
 
   await db.history.create({
@@ -158,26 +158,20 @@ listSudoers(bot, sudoUser) // TODO: Удалить этот метод и таб
 
 const app = express()
 
-if (process.env.SERVER !== 'DEVELOPMENT')
-  Sentry.init({
-    dsn: 'https://cd16320a573f069cdc9afe19e324c2cb@o392602.ingest.us.sentry.io/4507084187893760',
-    integrations: [
-      // enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
-      // enable Express.js middleware tracing
-      new Sentry.Integrations.Express({ app }),
-      nodeProfilingIntegration()
-    ],
-    // Performance Monitoring
-    tracesSampleRate: 1.0, //  Capture 100% of the transactions
-    // Set sampling rate for profiling - this is relative to tracesSampleRate
-    profilesSampleRate: 1.0
-  })
+Sentry.init({
+  dsn: 'https://cd16320a573f069cdc9afe19e324c2cb@o392602.ingest.us.sentry.io/4507084187893760',
+  integrations: [
+    new Sentry.Integrations.Http({ tracing: true }),
+    new Sentry.Integrations.Express({ app }),
+    nodeProfilingIntegration()
+  ],
+  tracesSampleRate: 1.0,
+  profilesSampleRate: 1.0
+})
 
-if (process.env.SERVER !== 'DEVELOPMENT') {
-  app.use(Sentry.Handlers.requestHandler())
-  app.use(Sentry.Handlers.tracingHandler())
-}
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.tracingHandler())
+Sentry.setTag('build', process.env.SERVER)
 
 var corsOptions = {
   origin: `${PROTOCOL}://${CORS_HOST}:${REACT_ADMIN_PORT}`
@@ -217,7 +211,5 @@ function initial() {
   })
 }
 
-if (process.env.SERVER !== 'DEVELOPMENT')
-  app.use(Sentry.Handlers.errorHandler())
-
+app.use(Sentry.Handlers.errorHandler())
 app.listen(NODE_REST_PORT, () => console.log(`🟡 REST API is listening on port ${NODE_REST_PORT}`))
