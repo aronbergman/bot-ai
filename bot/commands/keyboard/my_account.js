@@ -139,7 +139,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
             after_completion: {
               type: 'redirect',
               redirect: {
-                url: `https://154.56.63.128:3012/api/subs/payment-success?paymentID=${invoice.dataValues['payment_id']}&userID=${invoice.dataValues['chat_id']}&tokens=${invoice.dataValues['tokens']}`
+                url: `http://154.56.63.128:3012/api/subs/payment-success?paymentID=${invoice.dataValues['payment_id']}&userID=${invoice.dataValues['user_id']}&tokens=${invoice.dataValues['tokens']}`
               }
             }
           })
