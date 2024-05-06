@@ -27,13 +27,55 @@ export const COMMAND_HELP_EN = '🔍 Support'
 export const COMMAND_HELP_FR = '🔍 l\'Aide'
 
 export const TARIFS = [
-  { text: '📆 1 день за 89,00 ₽', callback_data: 'DAYS_1_89' },
-  { text: '📆 7 дней за 299,00 ₽', callback_data: 'DAYS_7_299' },
-  { text: '📆 30 дней за 350,00 ₽', callback_data: 'DAYS_30_350' },
-  { text: '📆 90 дней за 1499,00 ₽', callback_data: 'DAYS_90_1499' },
-  { text: '📆 20 запросов за 99,00 ₽', callback_data: 'REQUESTS_20_99' },
-  { text: '📆 50 запросов за 179,00 ₽', callback_data: 'REQUESTS_50_179' },
-  { text: '📆 100 запросов за 350,00 ₽', callback_data: 'REQUESTS_100_350' }
+  {
+    text: '10.000 🍪 for 7 days',
+    callback_data: 'DAYS_7_10000',
+    duration_days: 7,
+    price_stripe: 'price_1PDV8G033yepPfsGBNvZ6XRr',
+    price_payok: '69'
+  },
+  {
+    text: '30.000 🍪 for 7 days',
+    callback_data: 'DAYS_7_30000',
+    duration_days: 7,
+    price_stripe: 'price_1PDWkC033yepPfsGETJ8sEey',
+    price_payok: '199'
+  },
+  {
+    text: '150.000 🍪 for 1 month',
+    callback_data: 'DAYS_30_150000',
+    duration_days: 30,
+    price_stripe: 'price_1PDWlg033yepPfsGa4W2wSIP',
+    price_payok: '499'
+  },
+  {
+    text: '620.000 🍪 for 6 month',
+    callback_data: 'DAYS_30_620000',
+    duration_days: 180,
+    price_stripe: 'price_1PDWoJ033yepPfsGDhkbouQB',
+    price_payok: '1900'
+  },
+  {
+    text: '2.000.000 🍪 for 1 year',
+    callback_data: 'DAYS_365_2000000',
+    duration_days: 365,
+    price_stripe: 'price_1PDWrA033yepPfsGtHlwFzqC',
+    price_payok: '4700'
+  },
+  {
+    text: '4.200.000 🍪 for 1 year',
+    callback_data: 'DAYS_365_4200000',
+    duration_days: 365,
+    price_stripe: 'price_1PDWt8033yepPfsGETZl0hzT',
+    price_payok: '9300'
+  },
+  {
+    text: '10.000.000 🍪 for 1 year',
+    callback_data: 'DAYS_365_10000000',
+    duration_days: 365,
+    price_stripe: 'price_1PDWuB033yepPfsGsRmon1WR',
+    price_payok: '20000'
+  }
 ]
 
 export const VOICES = [
@@ -42,21 +84,21 @@ export const VOICES = [
   { text: 'Fable', callback_data: 'fable' },
   { text: 'Onyx', callback_data: 'onyx' },
   { text: 'Nova', callback_data: 'nova' },
-  { text: 'Shimmer', callback_data: 'shimmer' },
+  { text: 'Shimmer', callback_data: 'shimmer' }
 ]
 
 export const REQUEST_TYPES = {
-    GPT: 'GPT',
-    MIDJOURNEY: 'MIDJOURNEY',
-    DALLE: 'DALL-E',
-    TTS: 'TTS',
-    CONVERTOR: 'CONVERTOR'
-  }
+  GPT: 'GPT',
+  MIDJOURNEY: 'MIDJOURNEY',
+  DALLE: 'DALL-E',
+  TTS: 'TTS',
+  CONVERTOR: 'CONVERTOR'
+}
 
 export const REQUEST_TYPES_COST = {
-    GPT: 'cost_chat',
-    TTS: 'cost_tts',
-    MIDJOURNEY: 'cost_midjourney',
-    DALLE: 'cost_dalle',
-    CONVERTOR: 'cost_converter',
-  }
+  GPT: 'cost_chat',
+  TTS: 'cost_tts',
+  MIDJOURNEY: 'cost_midjourney',
+  DALLE: 'cost_dalle',
+  CONVERTOR: 'cost_converter'
+}

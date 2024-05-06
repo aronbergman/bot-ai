@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
 import { referralLevelCreator } from '../../utils/payments/referralLevelCreator.js'
 import { keyboardQuiz } from './quiz.js'
+import Stripe from 'stripe';
 
 dotenv.config({ path: '../.env' })
 
@@ -106,8 +107,27 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
       })
 
     for (let i = 0; i < TARIFS.length; i++) {
-      eventEmitter.on(`${TARIFS[i].callback_data}_A_${msgId}`, function() {
-        const tarif = TARIFS[i].callback_data.split('_')
+      eventEmitter.on(`${TARIFS[i].callback_data}_A_${msgId}`, async function() {
+        const tariff = TARIFS.filter(t => t['callback_data'] === TARIFS[i].callback_data)
+        // Set your secret key. Remember to switch to your live secret key in production.
+// See your keys here: https://dashboard.stripe.com/apikeys
+        const stripe = new Stripe(process.env.STRIPE_API)
+        const paymentLink = await stripe.paymentLinks.create({
+          line_items: [
+            {
+              price: tariff[0]['price_stripe'],
+              quantity: 1
+            }
+          ],
+          after_completion: {
+            type: 'redirect',
+            redirect: {
+              url: 'https://example.com'
+            }
+          }
+        })
+
+        console.log('paymentLink', paymentLink)
 
         const payok = new PAYOK({
           apiId: process.env.PAYOK_APIID,
@@ -118,27 +138,23 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
 
         db.payment.create({
           payment_id: nanoid(7),
-          type_of_tariff: tarif[0],
-          duration: tarif[1],
-          price: tarif[2],
-          currency: 'RUB',
+          type_of_tariff: tariff[0]['text'],
+          duration_days: tariff[0]['duration_days'],
           user_id: chatId,
           username: msg.from.username,
-          payment_method: 'PAYOK'
         }).then((invoice) => {
 
           const link = payok.getPaymentLink({
-            amount: invoice.dataValues.price,
+            amount: tariff[0]['price_payok'],
             payment: invoice.dataValues.payment_id,
-            desc: TARIFS[i].text,
+            desc: tariff[0]['text'],
             method: 'sbp'
           })
 
           bot.editMessageText(
             `🔗 Осталось только оплатить
 
-Подписка ${invoice.dataValues.type_of_tariff} ${invoice.dataValues.duration} 
-Сумма: ${invoice.dataValues.price} ${invoice.dataValues.currency}
+Подписка ${tariff[0]['text']}
 Номер платежа: ${invoice.dataValues.payment_id}
 
 Payok - оплачивайте следующими способами:
@@ -150,7 +166,8 @@ Payok - оплачивайте следующими способами:
               reply_markup: {
                 inline_keyboard: [
                   [{ text: t('btn:payok-rub'), url: link.payUrl }],
-                  [{ text: t('return_to_menu'), callback_data: `get_first_level_A_${chatId}` }]
+                  [{ text: t('btn:stripe'), url: paymentLink.url }],
+                  [{ text: t('return_to_menu'), callback_data: `get_first_level_A_${chatId}` }] // TODO: не работает
                 ]
               }
             }).catch(err => console.log(err))
@@ -170,7 +187,7 @@ Payok - оплачивайте следующими способами:
 
     accountMessage = prevMessageForEdit ?? await bot.sendMessage(
       chatId,
-      '🔐',
+      changeDescription ? '🧃' : '🔐',
       generalOptions
     ).catch(err => console.log(err))
 

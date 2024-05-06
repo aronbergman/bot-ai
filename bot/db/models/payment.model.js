@@ -11,26 +11,22 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true
       },
-      payment_confirmed: {
+      payment_confirmed: { // DATE
         allowNull: true,
         type: DataTypes.DATE,
       },
-      type_of_tariff: { // "DAYS" || "REQUESTS"
+      type_of_tariff: { // страка названия при выставлении счёта
         type: DataTypes.STRING,
         allowNull: false,
       },
-      duration: { // "7" "100"
+      duration_days: { // "7" "30" "365"
         type: DataTypes.DOUBLE,
         allowNull: false,
-      },
-      subs_end_date: { // TODO: Добавить подсчет после подтверждения оплаты
-        type: DataTypes.DATE,
-        allowNull: true,
       },
       price: { // 199 (сумма проведенная через stripe)
         type: DataTypes.STRING
       },
-      currency: { // "RUB" (строка валюты платежа)
+      currency: { // "RUB" "EUR" (строка валюты платежа)
         type: DataTypes.STRING
       },
       user_id: { // кому принадлежит подписка
@@ -40,9 +36,6 @@ export default (sequelize, DataTypes) => {
       username: { // кому принадлежит подписка
         type: DataTypes.STRING,
         allowNull: true,
-      },
-      payment_method: { // "stripe", "referal"
-        type: DataTypes.STRING
       },
     }
   )
