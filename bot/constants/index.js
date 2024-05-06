@@ -28,6 +28,7 @@ export const COMMAND_HELP_FR = '🔍 l\'Aide'
 
 export const TARIFS = [
   {
+    tokens: 10000,
     text: '10.000 🍪 for 7 days',
     callback_data: 'DAYS_7_10000',
     duration_days: 7,
@@ -35,6 +36,7 @@ export const TARIFS = [
     price_payok: '69'
   },
   {
+    tokens: 30000,
     text: '30.000 🍪 for 7 days',
     callback_data: 'DAYS_7_30000',
     duration_days: 7,
@@ -42,6 +44,7 @@ export const TARIFS = [
     price_payok: '199'
   },
   {
+    tokens: 150000,
     text: '150.000 🍪 for 1 month',
     callback_data: 'DAYS_30_150000',
     duration_days: 30,
@@ -49,6 +52,7 @@ export const TARIFS = [
     price_payok: '499'
   },
   {
+    tokens: 620000,
     text: '620.000 🍪 for 6 month',
     callback_data: 'DAYS_30_620000',
     duration_days: 180,
@@ -56,6 +60,7 @@ export const TARIFS = [
     price_payok: '1900'
   },
   {
+    tokens: 2000000,
     text: '2.000.000 🍪 for 1 year',
     callback_data: 'DAYS_365_2000000',
     duration_days: 365,
@@ -63,6 +68,7 @@ export const TARIFS = [
     price_payok: '4700'
   },
   {
+    tokens: 4200000,
     text: '4.200.000 🍪 for 1 year',
     callback_data: 'DAYS_365_4200000',
     duration_days: 365,
@@ -70,6 +76,7 @@ export const TARIFS = [
     price_payok: '9300'
   },
   {
+    tokens: 10000000,
     text: '10.000.000 🍪 for 1 year',
     callback_data: 'DAYS_365_10000000',
     duration_days: 365,

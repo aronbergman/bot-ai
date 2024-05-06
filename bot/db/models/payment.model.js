@@ -23,6 +23,10 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         allowNull: false,
       },
+      tokens: {
+        type: DataTypes.DOUBLE,
+        allowNull: false,
+      },
       price: { // 199 (сумма проведенная через stripe)
         type: DataTypes.STRING
       },

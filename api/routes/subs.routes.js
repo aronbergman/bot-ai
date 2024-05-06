@@ -1,5 +1,6 @@
 import authJwt from "./../middleware/authJwt.js";
 import { allSubs } from '../controllers/subs.controller.js'
+import { paymentSuccess } from '../controllers/payments.controller.js'
 
 export default function(app) {
   app.use(function(req, res, next) {
@@ -14,5 +15,10 @@ export default function(app) {
     "/api/subs/all",
     [authJwt.verifyToken, authJwt.isAdmin],
     allSubs
+  );
+
+  app.get(
+    "/api/subs/payment-success",
+    paymentSuccess
   );
 };

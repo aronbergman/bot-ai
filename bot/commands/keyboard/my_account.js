@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
 import { referralLevelCreator } from '../../utils/payments/referralLevelCreator.js'
 import { keyboardQuiz } from './quiz.js'
-import Stripe from 'stripe';
+import Stripe from 'stripe'
 
 dotenv.config({ path: '../.env' })
 
@@ -112,22 +112,6 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
         // Set your secret key. Remember to switch to your live secret key in production.
 // See your keys here: https://dashboard.stripe.com/apikeys
         const stripe = new Stripe(process.env.STRIPE_API)
-        const paymentLink = await stripe.paymentLinks.create({
-          line_items: [
-            {
-              price: tariff[0]['price_stripe'],
-              quantity: 1
-            }
-          ],
-          after_completion: {
-            type: 'redirect',
-            redirect: {
-              url: 'https://example.com'
-            }
-          }
-        })
-
-        console.log('paymentLink', paymentLink)
 
         const payok = new PAYOK({
           apiId: process.env.PAYOK_APIID,
@@ -142,13 +126,28 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
           duration_days: tariff[0]['duration_days'],
           user_id: chatId,
           username: msg.from.username,
-        }).then((invoice) => {
+          tokens: tariff[0]['tokens']
+        }).then(async (invoice) => {
+
+          const paymentLink = await stripe.paymentLinks.create({
+            line_items: [
+              {
+                price: tariff[0]['price_stripe'],
+                quantity: 1
+              }
+            ],
+            after_completion: {
+              type: 'redirect',
+              redirect: {
+                url: `https://154.56.63.128:3012/api/subs/payment-success?paymentID=${invoice.dataValues['payment_id']}&userID=${invoice.dataValues['chat_id']}&tokens=${invoice.dataValues['tokens']}`
+              }
+            }
+          })
 
           const link = payok.getPaymentLink({
             amount: tariff[0]['price_payok'],
-            payment: invoice.dataValues.payment_id,
-            desc: tariff[0]['text'],
-            method: 'sbp'
+            payment: invoice.dataValues.payment_id, // TODO: не показывать ID
+            desc: tariff[0]['text']
           })
 
           bot.editMessageText(
@@ -165,8 +164,8 @@ Payok - оплачивайте следующими способами:
               chat_id: chatId,
               reply_markup: {
                 inline_keyboard: [
-                  [{ text: t('btn:payok-rub'), url: link.payUrl }],
                   [{ text: t('btn:stripe'), url: paymentLink.url }],
+                  // [{ text: t('btn:payok-rub'), url: link.payUrl }],
                   [{ text: t('return_to_menu'), callback_data: `get_first_level_A_${chatId}` }] // TODO: не работает
                 ]
               }
