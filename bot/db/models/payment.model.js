@@ -41,6 +41,9 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      values_of_success: { // строка для формирования страницы успешной оплаты
+        type: DataTypes.TEXT,
+      }
     }
   )
   return PaymentSchema

@@ -1,5 +1,7 @@
 import { db } from '../../bot/db/index.js'
 import { Sequelize } from 'sequelize'
+import { successPage } from '../templates/success-page.js'
+import { createDate } from '../utils/create-date.js'
 
 export const paymentSuccess = (req, res) => {
   // найти один счет, который якобы оплачен
@@ -25,8 +27,10 @@ export const paymentSuccess = (req, res) => {
       { where: { user_id: invoice.dataValues['user_id'] } }
     )
 
-    // отправить html c позитивным сообщением и просьбой вернуться в бота
-    res.status(200).send(`${invoice['dataValues']['type_of_tariff']} успешно зачислены!`)
+    const values = `${invoice['values_of_success']}&&${createDate()}`.split('&&')
+    const successTemplate = successPage(values)
+
+    res.status(200).send(successTemplate)
   })
 
 }

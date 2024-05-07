@@ -8,6 +8,7 @@ import { ct } from '../../utils/createTranslate.js'
 import { referralLevelCreator } from '../../utils/payments/referralLevelCreator.js'
 import { keyboardQuiz } from './quiz.js'
 import Stripe from 'stripe'
+import { createFullName } from '../../utils/createFullName.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -120,13 +121,26 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
           shop: process.env.PAYOK_SHOP
         })
 
+        const valuesOfSuccess = [
+          t('html-success:title', { name: createFullName(msg.from) }),
+          t('html-success:date-fin'),
+          t('html-success:tokens'),
+          tariff[0]['text'],
+          t('html-success:days', { days: tariff[0]['duration_days'] }),
+          t('html-success:btn'),
+          tariff[0]['tokens'],
+          t('html-success:details-title'),
+          t('html-success:details-date'),
+        ]
+
         db.payment.create({
           payment_id: nanoid(7),
           type_of_tariff: tariff[0]['text'],
           duration_days: tariff[0]['duration_days'],
           user_id: chatId,
           username: msg.from.username,
-          tokens: tariff[0]['tokens']
+          tokens: tariff[0]['tokens'],
+          values_of_success: valuesOfSuccess.join('&&')
         }).then(async (invoice) => {
 
           const paymentLink = await stripe.paymentLinks.create({

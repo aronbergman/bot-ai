@@ -33,9 +33,11 @@ export default (sequelize, DataTypes) => {
       },
       tokens: {
         type: DataTypes.DOUBLE,
+        defaultValue: 10000,
       },
       paid_days: {
         type: DataTypes.DOUBLE,
+        defaultValue: 7
       },
       user_id_referral_program: {
         type: DataTypes.DOUBLE,
