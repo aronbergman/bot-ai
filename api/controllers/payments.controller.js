@@ -12,8 +12,14 @@ export const paymentSuccess = (req, res) => {
       tokens: req.query?.tokens
     }
   }).then(async invoice => {
-    console.log('invoice', invoice['dataValues'])
-    //  если он есть - зачислить пользователю токены и дату активации и дату окончания
+    const values = `${invoice['values_of_success']}&&${createDate()}`.split('&&')
+    const successTemplate = successPage(values)
+
+    if (invoice['payment_confirmed'])
+      return res.status(200).send(successTemplate)
+
+    res.status(200).send(successTemplate)
+
     await db.payment.update(
       { payment_confirmed: Sequelize.literal('CURRENT_TIMESTAMP') },
       { where: { payment_id: req.query?.paymentID } }
@@ -26,11 +32,6 @@ export const paymentSuccess = (req, res) => {
       },
       { where: { user_id: invoice.dataValues['user_id'] } }
     )
-
-    const values = `${invoice['values_of_success']}&&${createDate()}`.split('&&')
-    const successTemplate = successPage(values)
-
-    res.status(200).send(successTemplate)
   })
 
 }
