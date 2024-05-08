@@ -25,7 +25,12 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
     disable_web_page_preview: true
   }
   try {
-
+    const { tokens } = await db.subscriber.findOne({
+      where: {
+        chat_id: chatId,
+        user_id: msg.from.id
+      }
+    })
     const inlineKeyboard = [
       [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_A_${msgId}` }],
       [{ text: t('keyboard_referral'), callback_data: `referral_program_A_${msgId}` }],
@@ -92,7 +97,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
 
     eventEmitter.on(`get_first_level_A_${msgId}`, function() {
       bot.editMessageText(
-        t('account'),
+        t('account', { tokens }),
         {
           message_id: accountMessage.message_id,
           chat_id: chatId,
@@ -130,7 +135,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
           t('html-success:btn'),
           tariff[0]['tokens'],
           t('html-success:details-title'),
-          t('html-success:details-date'),
+          t('html-success:details-date')
         ]
 
         db.payment.create({

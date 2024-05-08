@@ -22,7 +22,7 @@ export const COMMAND_ACCOUNT_FR = '🔐 Mon compte'
 export const COMMAND_QUIZ_RU = '🎰 Викторина'
 export const COMMAND_QUIZ_EN = '🎰 Quiz'
 export const COMMAND_QUIZ_FR = '🎰 Jeu-Concours'
-export const COMMAND_HELP_RU = '🔍 Помощь'
+export const COMMAND_HELP_RU = '🔍 Информация'
 export const COMMAND_HELP_EN = '🔍 Support'
 export const COMMAND_HELP_FR = '🔍 l\'Aide'
 
