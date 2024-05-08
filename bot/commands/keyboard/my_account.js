@@ -19,18 +19,18 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
   const msgId = msg.message_id
   const { id } = msg.from
 
+  const { dataValues: { tokens, paid_days } } = await db.subscriber.findOne({
+    where: {
+      user_id: msg.from.id
+    }
+  })
+
   const generalOptions = {
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
     disable_web_page_preview: true
   }
   try {
-    const { tokens, paid_days } = await db.subscriber.findOne({
-      where: {
-        chat_id: chatId,
-        user_id: msg.from.id
-      }
-    })
     const inlineKeyboard = [
       [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_A_${msgId}` }],
       [{ text: t('keyboard_referral'), callback_data: `referral_program_A_${msgId}` }],
@@ -95,8 +95,8 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
       ).catch(err => console.log(err))
     })
 
-    eventEmitter.on(`get_first_level_A_${msgId}`, function() {
-      bot.editMessageText(
+    eventEmitter.on(`get_first_level_A_${msgId}`, async function() {
+      await bot.editMessageText(
         t('account', { tokens, paid_days }),
         {
           message_id: accountMessage.message_id,
@@ -218,7 +218,7 @@ Payok - оплачивайте следующими способами:
       }).then(res => {
         clearTimeout(timeout)
         bot.editMessageText(
-          changeDescription ? changeDescription : t('account'),
+          changeDescription ? changeDescription : t('account', { tokens, paid_days }),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,
