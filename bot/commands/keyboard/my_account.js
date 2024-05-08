@@ -25,7 +25,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
     disable_web_page_preview: true
   }
   try {
-    const { tokens } = await db.subscriber.findOne({
+    const { tokens, paid_days } = await db.subscriber.findOne({
       where: {
         chat_id: chatId,
         user_id: msg.from.id
@@ -97,7 +97,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
 
     eventEmitter.on(`get_first_level_A_${msgId}`, function() {
       bot.editMessageText(
-        t('account', { tokens }),
+        t('account', { tokens, paid_days }),
         {
           message_id: accountMessage.message_id,
           chat_id: chatId,
