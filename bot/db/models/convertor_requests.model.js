@@ -29,7 +29,7 @@ export default (sequelize, DataTypes) => {
       format_to: {
         type: DataTypes.STRING
       },
-      priority: {
+      price_tokens: {
         type: DataTypes.DOUBLE, // 0 - no, 1 - yes
       }
     }

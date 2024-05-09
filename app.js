@@ -58,6 +58,7 @@ import { onMessageDocument } from './bot/commands/onMessageDocument.js'
 import { ct } from './bot/utils/createTranslate.js'
 import { checkTokens } from './bot/utils/checkTokens.js'
 import { isTokensEmpty } from './bot/commands/keyboard/empty_tokens.js'
+import { refundTokensIfError } from './bot/commands/admin/refundTokensIfError.js'
 
 const { TELEGRAM_API_KEY, SUDO_USER, NODE_REST_PORT, REACT_ADMIN_PORT, PROTOCOL, CORS_HOST } = process.env
 const sudoUser = parseInt(SUDO_USER, 10)
@@ -161,6 +162,7 @@ setQuizModeForSubs(bot)
 addSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
 removeSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
 listSudoers(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+refundTokensIfError(bot)
 
 const app = express()
 

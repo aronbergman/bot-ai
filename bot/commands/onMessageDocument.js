@@ -113,6 +113,8 @@ export const onMessageDocument = async (bot, msg) => {
         const type = fileType[fileType.length - 1]
         const name = fileType.map(i => i !== type ? i : '') // добавить алгоритм который будет убирать тоьлко последнюю точку
 
+        const { dataValues: settings } = await db.settings.findOne({ where: { user_id: 0 } })
+
         const createTask = await db.convertor_requests.create({
           document_id: nanoid(10),
           chat_id: msg.from.id,
@@ -121,7 +123,7 @@ export const onMessageDocument = async (bot, msg) => {
           file_name: name.join(''),
           format_from: type,
           format_to: msg.data.split('-')[0],
-          priority: 0
+          price_tokens: settings['cost_converter']
         })
 
         console.log('createTask', createTask)
