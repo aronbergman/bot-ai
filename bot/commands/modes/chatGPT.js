@@ -67,8 +67,8 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     const tokenCounts = await calculationOfNumberOfTokens(textSum)
 
     await db.subscriber.update(
-      { tokens: Sequelize.literal(`tokens - ${tokenCounts.length}`) },
-      { where: { user_id: chatID } }
+      { tokens: Sequelize.literal(`tokens - ${tokenCounts}`) },
+      { where: { chat_id: chatID } }
     )
 
     if (!response) {

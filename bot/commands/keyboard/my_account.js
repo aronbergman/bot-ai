@@ -9,6 +9,7 @@ import { referralLevelCreator } from '../../utils/payments/referralLevelCreator.
 import { keyboardQuiz } from './quiz.js'
 import Stripe from 'stripe'
 import { createFullName } from '../../utils/createFullName.js'
+import { numberWithSpaces } from '../../utils/numberWithSpaces.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -97,7 +98,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
 
     eventEmitter.on(`get_first_level_A_${msgId}`, async function() {
       await bot.editMessageText(
-        t('account', { tokens, paid_days }),
+        t('account', { tokens: numberWithSpaces(tokens), paid_days }),
         {
           message_id: accountMessage.message_id,
           chat_id: chatId,
@@ -218,7 +219,7 @@ Payok - оплачивайте следующими способами:
       }).then(res => {
         clearTimeout(timeout)
         bot.editMessageText(
-          changeDescription ? changeDescription : t('account', { tokens, paid_days }),
+          changeDescription ? changeDescription : t('account', { tokens: numberWithSpaces(tokens), paid_days }),
           {
             message_id: accountMessage.message_id,
             chat_id: chatId,

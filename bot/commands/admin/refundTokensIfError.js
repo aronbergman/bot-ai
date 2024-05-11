@@ -1,6 +1,6 @@
 import { INITIAL_SESSION } from '../../constants/index.js'
 import { db } from '../../db/index.js'
-import { Sequelize } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { ct } from '../../utils/createTranslate.js'
 
 export const refundTokensIfError = bot => {
@@ -16,7 +16,7 @@ export const refundTokensIfError = bot => {
       }
       msg['ctx'] = INITIAL_SESSION
       try {
-        const errors = await db.convertor_requests.findAll({ where: { status: 'error' } })
+        const errors = await db.convertor_requests.findAll({ where: { [Op.or]: [{ status: 'work' }, { status: 'error' }] } })
 
         if (errors.length) {
           errors.map(async error => {

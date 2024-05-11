@@ -2,9 +2,12 @@ import dotenv from 'dotenv'
 import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
 import { sudoChecker } from '../../utils/sudoChecker.js'
 import { spinnerOn } from '../../utils/spinner.js'
-import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
+import { REQUEST_TYPES_COST, TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import { loaderOn } from '../../utils/loader.js'
 import { OpenAI } from '../../utils/openAi.js'
+import { calculationOfNumberOfTokens } from '../../utils/checkTokens.js'
+import { db } from '../../db/index.js'
+import { Sequelize } from 'sequelize'
 
 dotenv.config()
 
@@ -44,6 +47,13 @@ export const modeDalle = async (bot, sudoUser, msg, match) => {
     const openAi = new OpenAI()
 
     const response = await openAi.image(prompt)
+
+    const tokenCounts = await calculationOfNumberOfTokens(' ', REQUEST_TYPES_COST.DALLE)
+
+    await db.subscriber.update(
+      { tokens: Sequelize.literal(`tokens - ${tokenCounts}`) },
+      { where: { chat_id: chatID } }
+    )
 
     const imgUrl = response
     const imgDir = './dalle'

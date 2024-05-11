@@ -9,9 +9,11 @@ import { formats, formatsConvertor } from '../constants/formatsConterter.js'
 import { stepperOn } from '../utils/stepper.js'
 import { sleep } from '../utils/sleep.js'
 import { db } from '../db/index.js'
-import { Op } from 'sequelize'
+import { Op, Sequelize } from 'sequelize'
 import { nanoid } from 'nanoid'
 import { ct } from '../utils/createTranslate.js'
+import { calculationOfNumberOfTokens } from '../utils/checkTokens.js'
+import { REQUEST_TYPES_COST } from '../constants/index.js'
 
 // TODO: определять тип файла от типа в meta telegram
 
@@ -126,7 +128,12 @@ export const onMessageDocument = async (bot, msg) => {
           price_tokens: settings['cost_converter']
         })
 
-        console.log('createTask', createTask)
+        const tokenCounts = await calculationOfNumberOfTokens(' ', REQUEST_TYPES_COST.CONVERTOR)
+
+        await db.subscriber.update(
+          { tokens: Sequelize.literal(`tokens - ${tokenCounts}`) },
+          { where: { chat_id: msg.from.id } }
+        )
 
         await bot.deleteMessage(msg.from.id, msg.message.message_id).catch((error) => console.log('error dm', error))
         const waiting = await stepperOn(bot, msg, 0) // верочтно логичнее будет сохранить прошлое сообщение msg.message.message_id

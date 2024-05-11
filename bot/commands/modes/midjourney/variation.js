@@ -10,10 +10,10 @@ export const variation = async (prompt, Imagine, client, query, bot, chatID, pre
     let waiting = await loaderOn(0, bot, chatID)
 
   try {
-    if (prevMessageId)
-      await bot.deleteMessage(chatID, prevMessageId).catch(() => {
-        console.log("🔺 variation | error remove loader ", prevMessageId)
-      })
+    // if (prevMessageId)
+    //   await bot.deleteMessage(chatID, prevMessageId).catch(() => {
+    //     console.log("🔺 variation | error remove loader ", prevMessageId)
+    //   })
 
     const { id: chat_id, title: chat_name } = query.message.chat
     const { message_id } = query.message

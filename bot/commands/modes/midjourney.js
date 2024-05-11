@@ -1,11 +1,14 @@
 import { Midjourney } from 'midjourney'
 import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
 import { loaderOn } from '../../utils/loader.js'
-import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
+import { REQUEST_TYPES_COST, TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import { upscale } from './midjourney/upscale.js'
 import events from 'events'
 import { variation } from './midjourney/variation.js'
 import dotenv from 'dotenv'
+import { calculationOfNumberOfTokens } from '../../utils/checkTokens.js'
+import { db } from '../../db/index.js'
+import { Sequelize } from 'sequelize'
 
 dotenv.config()
 
@@ -83,6 +86,13 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const filePath = `${imgDir}/${userMessageId}.png`
 
     const prevMessage = await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, waiting)
+
+    const tokenCounts = await calculationOfNumberOfTokens(' ', REQUEST_TYPES_COST.MIDJOURNEY)
+
+    await db.subscriber.update(
+      { tokens: Sequelize.literal(`tokens - ${tokenCounts}`) },
+      { where: { chat_id: chatID } }
+    )
 
     for (let i = 1; i < 5; i++) {
       eventEmitter.on(`V${i}++${waiting.message_id}`, async function(query) {
