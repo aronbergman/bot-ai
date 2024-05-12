@@ -10,6 +10,7 @@ import { keyboardQuiz } from './quiz.js'
 import Stripe from 'stripe'
 import { createFullName } from '../../utils/createFullName.js'
 import { numberWithSpaces } from '../../utils/numberWithSpaces.js'
+import { createStartKeyboardForReplyMarkup } from '../../utils/createStartKeyboard.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -29,7 +30,8 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
   const generalOptions = {
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
-    disable_web_page_preview: true
+    disable_web_page_preview: true,
+    reply_markup: await createStartKeyboardForReplyMarkup(msg)
   }
   try {
     const inlineKeyboard = [

@@ -1,13 +1,8 @@
-import {
-  COMMAND_DALL_E,
-  COMMAND_GPT,
-  COMMAND_MIDJOURNEY,
-  INITIAL_SESSION
-} from '../constants/index.js'
+import { INITIAL_SESSION } from '../constants/index.js'
 import { db } from '../db/index.js'
 import dotenv from 'dotenv'
 import { ct } from '../utils/createTranslate.js'
-import { stepperOn } from '../utils/stepper.js'
+import { createStartKeyboardForReplyMarkup } from '../utils/createStartKeyboard.js'
 
 dotenv.config()
 
@@ -20,26 +15,7 @@ export const startBot = bot => {
     const options = {
       parse_mode: 'HTML',
       reply_to_message_id: msgId,
-      reply_markup: {
-        resize_keyboard: true,
-        one_time_keyboard: false,
-        keyboard: [
-          [
-            { text: COMMAND_GPT },
-            { text: COMMAND_DALL_E },
-            { text: COMMAND_MIDJOURNEY }
-          ],
-          [
-            { text: t('keyboard_tts') },
-            { text: t('keyboard_convertor') }
-          ],
-          [
-            { text: t('keyboard_quiz') },
-            { text: t('keyboard_acc') },
-            { text: t('keyboard_help') }
-          ]
-        ]
-      }
+      reply_markup: await createStartKeyboardForReplyMarkup(msg)
     }
     msg['ctx'] = INITIAL_SESSION
     try {

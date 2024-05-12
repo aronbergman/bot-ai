@@ -1,8 +1,7 @@
 import events from 'events'
 import { db } from '../../db/index.js'
 import { modesChatGPT } from '../../constants/modes.js'
-import { saveAndSendPhoto } from '../../utils/saveAndSendPhoto.js'
-import { TYPE_RESPONSE_MJ } from '../../constants/index.js'
+import { createStartKeyboardForReplyMarkup } from '../../utils/createStartKeyboard.js'
 import { ct } from '../../utils/createTranslate.js'
 
 export const keyboardChatGPT = async (bot, msg) => {
@@ -99,7 +98,8 @@ export const keyboardChatGPT = async (bot, msg) => {
   const msgId = msg.message_id
   const options = {
     parse_mode: 'HTML',
-    reply_to_message_id: msgId
+    reply_to_message_id: msgId,
+    reply_markup: await createStartKeyboardForReplyMarkup(msg)
   }
   try {
     db.subscriber.findOne({
@@ -124,7 +124,7 @@ export const keyboardChatGPT = async (bot, msg) => {
           { where: { chat_id: chatId } }
         ).then(res => {
           bot.select_mode = 'GPT'
-          return sendChatGPT(bot, chatId, options, "assistant")
+          return sendChatGPT(bot, chatId, options, 'assistant')
         })
       } else {
         db.subscriber.create({

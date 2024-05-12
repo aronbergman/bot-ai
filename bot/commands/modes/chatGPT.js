@@ -1,4 +1,4 @@
-import { INITIAL_SESSION } from '../../constants/index.js'
+import { INITIAL_SESSION, REQUEST_TYPES } from '../../constants/index.js'
 import { OpenAI } from '../../utils/openAi.js'
 import { spinnerOff, spinnerOn } from '../../utils/spinner.js'
 import { errorMessage } from '../hoc/errorMessage.js'
@@ -6,9 +6,8 @@ import { modesChatGPT } from '../../constants/modes.js'
 import { db } from '../../db/index.js'
 import { exceptionForHistoryLogging } from '../../utils/exceptionForHistoryLogging.js'
 import { createFullName } from '../../utils/createFullName.js'
-import { calculationOfNumberOfTokens } from '../../utils/checkTokens.js'
 import { ct } from '../../utils/createTranslate.js'
-import { Sequelize } from 'sequelize'
+import { writingOffTokens } from '../../utils/checkTokens.js'
 
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   const t = await ct(msg)
@@ -64,12 +63,8 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
     const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID, x.parse_mode)
 
     const textSum = (response + newMessage)
-    const tokenCounts = await calculationOfNumberOfTokens(textSum)
 
-    await db.subscriber.update(
-      { tokens: Sequelize.literal(`tokens - ${tokenCounts}`) },
-      { where: { chat_id: chatID } }
-    )
+    await writingOffTokens(bot, msg, REQUEST_TYPES.GPT, textSum)
 
     if (!response) {
       throw new Error('Something went wrong please try again.')

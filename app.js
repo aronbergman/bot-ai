@@ -15,22 +15,9 @@ import authRoutes from './api/routes/auth.routes.js'
 import userRoutes from './api/routes/user.routes.js'
 import subsRoutes from './api/routes/subs.routes.js'
 import {
-  COMMAND_ACCOUNT_EN,
-  COMMAND_ACCOUNT_FR,
-  COMMAND_ACCOUNT_RU,
   COMMAND_DALL_E,
-  COMMAND_FILE_CONVERTOR_EN,
-  COMMAND_FILE_CONVERTOR_FR,
-  COMMAND_FILE_CONVERTOR_RU,
   COMMAND_GPT,
-  COMMAND_HELP_EN,
-  COMMAND_HELP_FR,
-  COMMAND_HELP_RU,
   COMMAND_MIDJOURNEY,
-  COMMAND_QUIZ_EN, COMMAND_QUIZ_FR, COMMAND_QUIZ_RU,
-  COMMAND_TEXT_TO_SPEECH_EN,
-  COMMAND_TEXT_TO_SPEECH_FR,
-  COMMAND_TEXT_TO_SPEECH_RU,
   REQUEST_TYPES
 } from './bot/constants/index.js'
 import { keyboardChatGPT } from './bot/commands/keyboard/chat_gpt.js'
@@ -115,36 +102,24 @@ bot.on('message', async (msg, match) => {
   })
 
   switch (msg.text) {
-    case COMMAND_ACCOUNT_RU:
-    case COMMAND_ACCOUNT_FR:
-    case COMMAND_ACCOUNT_EN:
+    case t('keyboard_acc'):
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardMyAccount(bot, msg)
     case COMMAND_GPT:
       return keyboardChatGPT(bot, msg)
-    case COMMAND_FILE_CONVERTOR_FR:
-    case COMMAND_FILE_CONVERTOR_EN:
-    case COMMAND_FILE_CONVERTOR_RU:
+    case t('keyboard_convertor'):
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardConverter(bot, msg)
     case COMMAND_MIDJOURNEY:
       return keyboardMidjourney(bot, msg)
-    case COMMAND_TEXT_TO_SPEECH_EN:
-    case COMMAND_TEXT_TO_SPEECH_RU:
-    case COMMAND_TEXT_TO_SPEECH_FR:
+    case t('keyboard_tts'):
       return keyboardTextToSpeech(bot, msg)
     case COMMAND_DALL_E:
-      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardDalle(bot, msg)
-      break
-    case COMMAND_HELP_RU:
-    case COMMAND_HELP_EN:
-    case COMMAND_HELP_FR:
+    case t('keyboard_help'):
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardHelp(bot, msg, t)
-    case COMMAND_QUIZ_RU:
-    case COMMAND_QUIZ_EN:
-    case COMMAND_QUIZ_FR:
+    case t('keyboard_quiz'):
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardQuiz(bot, msg, true)
     default:

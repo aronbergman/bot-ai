@@ -20,13 +20,10 @@ export const isModeMidjourney = async (bot, msg, match, sudoUser, t) => {
       return isTokensEmpty(bot, msg, tokensAvailable, price)
 
     if (res.mode === REQUEST_TYPES.MIDJOURNEY) {
-      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return modeMidjourney(bot, sudoUser, msg, match)
     } else if (res.mode === REQUEST_TYPES.DALLE) {
-      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return modeDalle(bot, sudoUser, msg, match)
     } else if (res.mode === REQUEST_TYPES.TTS) {
-      switchToMode(REQUEST_TYPES.GPT, msg.chat.id, msg.from)
       return textToSpeech(bot, msg.chat.id, msg, msg.text, res.tts_voice)
     } else {
       return onMessageTextDefault(bot, msg, match, sudoUser, t)

@@ -1,4 +1,4 @@
-export const autoRemoveMessage = async (content, bot, chatId, options, duration = 5000) => {
+export const autoRemoveMessage = async (content, bot, chatId, options = {}, duration = 5000) => {
   const message = await bot.sendMessage(chatId, `・ \n${content}`, options)
   const durationTemplate = '・'
 

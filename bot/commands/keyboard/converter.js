@@ -1,7 +1,6 @@
-import { Converter } from '../../utils/converter.js'
 import { errorMessage } from '../hoc/errorMessage.js'
-import { formats } from '../../constants/formatsConterter.js'
 import { ct } from '../../utils/createTranslate.js'
+import { createStartKeyboardForReplyMarkup } from '../../utils/createStartKeyboard.js'
 
 export const keyboardConverter = async (bot, msg) => {
   const t = await ct(msg)
@@ -11,20 +10,21 @@ export const keyboardConverter = async (bot, msg) => {
   ).catch(err => console.log(err))
 
   try {
-    const timeout = setTimeout((chatId, message_id) => {
+    const timeout = setTimeout(async (msg, message_id) => {
       bot.editMessageText(
         t('desc_converter'),
         {
-          chat_id: chatId,
+          chat_id: msg.chat.id,
           message_id: message_id,
-          parse_mode: 'HTML'
+          parse_mode: 'HTML',
+          reply_markup: await createStartKeyboardForReplyMarkup(msg)
         }).catch(() => {
         return true
       })
       clearTimeout(timeout)
-    }, 1500, msg.chat.id, accountMessage?.message_id)
+    }, 1500, msg, accountMessage?.message_id)
   } catch (e) {
-     bot.deleteMessage(msg.chat.id, accountMessage.message_id)
+    bot.deleteMessage(msg.chat.id, accountMessage.message_id)
     return errorMessage(bot, e.message, msg, 'keybourd/converter')
   }
 }
