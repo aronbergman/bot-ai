@@ -27,11 +27,12 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
     }
   })
 
+  const keys = await createStartKeyboardForReplyMarkup(msg)
+
   const generalOptions = {
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
-    disable_web_page_preview: true,
-    reply_markup: createStartKeyboardForReplyMarkup(msg)
+    disable_web_page_preview: true
   }
   try {
     const inlineKeyboard = [
@@ -208,7 +209,7 @@ Payok - оплачивайте следующими способами:
     accountMessage = prevMessageForEdit ?? await bot.sendMessage(
       chatId,
       changeDescription ? '🧃' : '🔐',
-      generalOptions
+      { ...generalOptions, keys }
     ).catch(err => console.log(err))
 
     const timeout = setTimeout(async (accountMessage) => {

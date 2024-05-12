@@ -6,7 +6,7 @@ import { createStartKeyboardForReplyMarkup } from '../utils/createStartKeyboard.
 
 dotenv.config()
 
-export const startBot = bot => {
+export const startBot = async bot => {
   bot.onText(/\/start|\/echo/, async msg => {
     const t = await ct(msg)
     const { id: chatId } = msg.chat
@@ -15,7 +15,7 @@ export const startBot = bot => {
     const options = {
       parse_mode: 'HTML',
       reply_to_message_id: msgId,
-      reply_markup: createStartKeyboardForReplyMarkup(msg)
+      reply_markup: await createStartKeyboardForReplyMarkup(msg)
     }
 
     try {

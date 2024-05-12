@@ -101,25 +101,26 @@ bot.on('message', async (msg, match) => {
     })
   })
 
-  switch (msg.text) {
-    case t('keyboard_acc'):
+  switch (msg.text.trim()) {
+    case await t('keyboard_acc').trim():
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardMyAccount(bot, msg)
     case COMMAND_GPT:
       return keyboardChatGPT(bot, msg)
-    case t('keyboard_convertor'):
+    case t('keyboard_convertor').trim():
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardConverter(bot, msg)
     case COMMAND_MIDJOURNEY:
+      switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardMidjourney(bot, msg)
-    case t('keyboard_tts'):
+    case t('keyboard_tts').trim():
       return keyboardTextToSpeech(bot, msg)
     case COMMAND_DALL_E:
       return keyboardDalle(bot, msg)
-    case t('keyboard_help'):
+    case t('keyboard_help').trim():
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardHelp(bot, msg, t)
-    case t('keyboard_quiz'):
+    case t('keyboard_quiz').trim():
       switchToMode('GPT', msg.chat.id, msg.from)
       return keyboardQuiz(bot, msg, true)
     default:
