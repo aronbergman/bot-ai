@@ -1,5 +1,5 @@
 import { Midjourney } from 'midjourney'
-import { saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
+import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
 import { loaderOn } from '../../utils/loader.js'
 import { REQUEST_TYPES } from '../../constants/index.js'
 import { upscale } from './midjourney/upscale.js'
@@ -82,6 +82,8 @@ export const modeMidjourney = async (bot, sudoUser, msg, match) => {
     const imgUrl = Imagine.uri
     const imgDir = './Imagines'
     const filePath = `${imgDir}/${userMessageId}.png`
+
+    const prevMessage = await saveAndSendPhoto(imgUrl, imgDir, filePath, chatID, bot, options, TYPE_RESPONSE_MJ.PHOTO, waiting)
 
     await writingOffTokens(bot, msg, REQUEST_TYPES.MIDJOURNEY)
 
