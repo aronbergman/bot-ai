@@ -65,7 +65,6 @@ export const keyboardDalle = async (bot, msg) => {
   const options = {
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
-    reply_markup: await createStartKeyboardForReplyMarkup(msg)
   }
   try {
     db.subscriber.findOne({

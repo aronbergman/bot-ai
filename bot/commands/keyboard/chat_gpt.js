@@ -99,7 +99,7 @@ export const keyboardChatGPT = async (bot, msg) => {
   const options = {
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
-    reply_markup: await createStartKeyboardForReplyMarkup(msg)
+    reply_markup: createStartKeyboardForReplyMarkup(msg)
   }
   try {
     db.subscriber.findOne({

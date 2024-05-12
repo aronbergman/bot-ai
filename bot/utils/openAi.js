@@ -3,6 +3,7 @@ import { OpenAI as OpenAIApi } from 'openai'
 import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs'
+import { db } from '../db/index.js'
 
 dotenv.config({ path: '../.env' })
 
@@ -41,7 +42,6 @@ export class OpenAI {
   // TODO: BILL: Если куплена подписка и есть доступные запросы из лимитов ставить 4
   // chatGPTVersion = 'gpt-4'
 
-  chatGPTVersion = 'gpt-3.5-turbo'
 
   constructor(filepath) {
     this.openai = new OpenAIApi({
@@ -51,11 +51,21 @@ export class OpenAI {
   }
 
   async chat(messages, bot, editMessage, chatId, parceMode) {
+    const { dataValues: { GPT_model } } = await db.subscriber.findOne({
+      where: {
+        user_id: chatId
+      }
+    })
+
+    if (!GPT_model)
+     return 'Error: 403'
+
     const response = await this.openai.chat.completions.create({
-      model: this.chatGPTVersion,
+      model: GPT_model,
       messages,
       stream: true
     })
+
     let answer = ''
     let prevAnswer = ''
     for await (const chunk of response) {

@@ -15,7 +15,7 @@ export const setQuizModeForSubs = (bot) => {
         const options = {
           parse_mode: 'HTML'
         }
-        msg['ctx'] = INITIAL_SESSION
+
         try {
           await db.subscriber.update(
             { quiz_subs_available, quiz_token_available },

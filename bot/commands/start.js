@@ -15,9 +15,9 @@ export const startBot = bot => {
     const options = {
       parse_mode: 'HTML',
       reply_to_message_id: msgId,
-      reply_markup: await createStartKeyboardForReplyMarkup(msg)
+      reply_markup: createStartKeyboardForReplyMarkup(msg)
     }
-    msg['ctx'] = INITIAL_SESSION
+
     try {
       await bot.sendMessage(
         chatId,

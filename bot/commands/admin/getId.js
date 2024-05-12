@@ -10,7 +10,7 @@ export const getId = bot => {
         parse_mode: 'HTML',
         reply_to_message_id: msgId
       }
-      msg['ctx'] = INITIAL_SESSION
+
       try {
         await bot.sendMessage(
           chatId,

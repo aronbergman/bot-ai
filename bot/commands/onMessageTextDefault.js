@@ -1,8 +1,11 @@
-import { modeChatGPT } from './modes/chatGPT.js'
+import { cleanContext, modeChatGPT } from './modes/chatGPT.js'
 import events from 'events'
 import { db } from '../db/index.js'
 import { removeQueryFromPrevMessage } from './hoc/removeQueryFromPrevMsg.js'
 import { modesChatGPT } from '../constants/modes.js'
+import { INITIAL_SESSION } from '../constants/index.js'
+import { autoRemoveMessage } from './hoc/autoRemoveMessage.js'
+import { keyboardChatGPT } from './keyboard/chat_gpt.js'
 
 export const onMessageTextDefault = async (bot, msg, match, sudoUser, t) => {
   const { id: chatID } = msg.chat
@@ -24,8 +27,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser, t) => {
       ...optionsGeneral,
       reply_markup: {
         inline_keyboard: [
-          [{ text: t('btn_new_chat'), callback_data: 'create_new_chat' },
-            { text: t('btn_change_mode'), callback_data: 'change_chat_mode' }]
+          [{ text: t('btn_new_chat'), callback_data: `create_new_chat${msgId}` },
+            { text: t('btn_change_mode'), callback_data: `change_chat_mode${msgId}` }]
         ]
       }
     }
@@ -41,14 +44,19 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser, t) => {
 
     const eventEmitter = new events.EventEmitter()
 
-    eventEmitter.on('change_chat_mode', async function() {
+    eventEmitter.on(`create_new_chat${msgId}`, async function() {
+      await autoRemoveMessage('✅ ' + t('btn_new_chat'), bot, chatID, {},10000)
+      await cleanContext(chatID)
+    })
+
+    eventEmitter.on(`change_chat_mode${msgId}`, async function() {
       await bot.editMessageText(
         firstMessage.text,
         {
           message_id: firstMessage.message_id,
           chat_id: chatID,
           reply_markup: {
-            inline_keyboard: modesChatGPT.map((mode) => [{ text: mode.name, callback_data: mode.code }])
+            inline_keyboard: modesChatGPT.map((mode) => [{ text: t(mode.name), callback_data: mode.code }])
           }
         }
       ).catch((err) => {
@@ -76,7 +84,8 @@ export const onMessageTextDefault = async (bot, msg, match, sudoUser, t) => {
         await db.subscriber.update(
           { modeGPT: modesChatGPT[i].code },
           { where: { chat_id: chatID } }
-        ).then(res => {
+        ).then(async res => {
+          await removeQueryFromPrevMessage(bot, msg.chat.id, firstMessage)
           // bot.deleteMessage(chatID, firstMessage.message_id).catch(err => console.error(err))
           firstMessage = modeChatGPT(bot, msg, {
             message_id: firstMessage.message_id,

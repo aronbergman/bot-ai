@@ -14,13 +14,13 @@ export const createStartKeyboardForReplyMarkup = async (msg) => {
         { text: COMMAND_MIDJOURNEY }
       ],
       [
-        { text: t('keyboard_tts') },
-        { text: t('keyboard_convertor') }
+        { text: await t('keyboard_tts') },
+        { text: await t('keyboard_convertor') }
       ],
       [
-        { text: t('keyboard_quiz') },
-        { text: t('keyboard_acc') },
-        { text: t('keyboard_help') }
+        { text: await t('keyboard_quiz') },
+        { text:await t('keyboard_acc') },
+        { text:await t('keyboard_help') }
       ]
     ]
   }

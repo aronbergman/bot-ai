@@ -14,7 +14,7 @@ export const refundTokensIfError = bot => {
         parse_mode: 'HTML',
         reply_to_message_id: msgId
       }
-      msg['ctx'] = INITIAL_SESSION
+
       try {
         const errors = await db.convertor_requests.findAll({ where: { [Op.or]: [{ status: 'work' }, { status: 'error' }] } })
 

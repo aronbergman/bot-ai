@@ -31,7 +31,7 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
     parse_mode: 'HTML',
     reply_to_message_id: msgId,
     disable_web_page_preview: true,
-    reply_markup: await createStartKeyboardForReplyMarkup(msg)
+    reply_markup: createStartKeyboardForReplyMarkup(msg)
   }
   try {
     const inlineKeyboard = [
@@ -42,7 +42,6 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
     const prevKeyboard = [{ text: t('prev_component'), callback_data: `prev_component_${msgId}` }] // только если prevLevel
     const referralLevel = await referralLevelCreator(msg, generalOptions, msgId, 'my_account')
     const eventEmitter = new events.EventEmitter()
-    msg['ctx'] = INITIAL_SESSION
 
     if (prevLevel)
       inlineKeyboard.push(prevKeyboard)

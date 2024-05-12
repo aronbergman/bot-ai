@@ -17,7 +17,6 @@ export const keyboardConverter = async (bot, msg) => {
           chat_id: msg.chat.id,
           message_id: message_id,
           parse_mode: 'HTML',
-          reply_markup: await createStartKeyboardForReplyMarkup(msg)
         }).catch(() => {
         return true
       })

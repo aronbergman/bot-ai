@@ -58,16 +58,16 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         defaultValue: 0
       },
-      GPT_count: {
-        type: DataTypes.DOUBLE,
-        defaultValue: 0
+      GPT_model: {
+        type: DataTypes.STRING,
+        defaultValue: 'gpt-3.5-turbo'
       },
       FILES_count: {
         type: DataTypes.DOUBLE,
         defaultValue: 0
       },
       comment: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
       tags: {
         type: DataTypes.STRING,

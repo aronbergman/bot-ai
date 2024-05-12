@@ -9,11 +9,19 @@ import { createFullName } from '../../utils/createFullName.js'
 import { ct } from '../../utils/createTranslate.js'
 import { writingOffTokens } from '../../utils/checkTokens.js'
 
+export async function cleanContext (chatID) {
+  await db.subscriber.update(
+      { comment: null },
+      { where: { chat_id: chatID } }
+    )
+}
+
 export const modeChatGPT = async (bot, msg, qweryOptions) => {
   const t = await ct(msg)
   let res
   let modeGPT
   let newMessage
+  let ctx
   const { id: userId } = msg.from
   const { id: chatID } = msg.chat
   const msgId = msg.message_id
@@ -23,17 +31,20 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
   }
 
   try {
-    db.subscriber.findOne({
+    await db.subscriber.findOne({
       where: {
         chat_id: chatID,
         user_id: msg.from.id
       }
     }).then(async response => {
       modeGPT = response.dataValues.modeGPT
+      ctx = await JSON.parse(response.dataValues.comment)
     })
 
     // TODO: Запоминать контекст беседы пользователя или всегда начинать новый чат
-    msg.ctx ??= INITIAL_SESSION
+    ctx ??= INITIAL_SESSION
+
+    console.log('🔺ctx', ctx.messages.length)
 
     res = await spinnerOn(bot, chatID, null, 'chatGPT')
     let message = await bot.sendMessage(chatID, '...').catch(() => {
@@ -47,7 +58,7 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
 
     if (modeGPT === 'assistant') {
       newMessage = msg.text ?? msg.sticker?.emoji
-      msg.ctx = INITIAL_SESSION
+      await cleanContext(chatID)
     } else if (msg.text) {
       newMessage = await t(x?.prompt_start)
       newMessage = newMessage + '\n\n' + msg.text
@@ -55,12 +66,12 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       newMessage = msg.sticker.emoji
     }
 
-    await msg?.ctx.messages.push({
+    ctx.messages.push({
       role: openAi.roles.User,
       content: newMessage
     })
 
-    const response = await openAi.chat(msg?.ctx.messages, bot, message, chatID, x.parse_mode)
+    const response = await openAi.chat(ctx.messages, bot, message, chatID, x.parse_mode)
 
     const textSum = (response + newMessage)
 
@@ -70,10 +81,15 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       throw new Error('Something went wrong please try again.')
     }
 
-    msg?.ctx.messages.push({
+    ctx.messages.push({
       role: openAi.roles.Assistant,
       content: response
     })
+
+    await db.subscriber.update(
+      { comment: JSON.stringify(ctx) },
+      { where: { chat_id: chatID } }
+    )
 
     await spinnerOff(bot, chatID, res)
 
