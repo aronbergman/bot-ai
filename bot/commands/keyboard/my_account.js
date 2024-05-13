@@ -14,7 +14,7 @@ import { createStartKeyboardForReplyMarkup } from '../../utils/createStartKeyboa
 
 dotenv.config({ path: '../.env' })
 
-export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel, changeDescription) => {
+export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel, changeDescription, setPrices) => {
   const t = await ct(msg)
   let accountMessage
   const { id: chatId } = msg.chat
@@ -220,14 +220,26 @@ Payok - оплачивайте следующими способами:
         }
       }).then(res => {
         clearTimeout(timeout)
-        bot.editMessageText(
-          changeDescription ? changeDescription : t('account', { tokens: numberWithSpaces(tokens), paid_days }),
-          {
-            message_id: accountMessage.message_id,
-            chat_id: chatId,
-            ...firstLevel.options
-          }
-        ).catch(err => console.log(err))
+
+        if (setPrices) {
+          bot.editMessageText(
+            buyLevel.message,
+            {
+              message_id: accountMessage.message_id,
+              chat_id: chatId,
+              ...buyLevel.options
+            }
+          ).catch(err => console.log(err))
+        } else {
+          bot.editMessageText(
+            changeDescription ? changeDescription : t('account', { tokens: numberWithSpaces(tokens), paid_days }),
+            {
+              message_id: accountMessage.message_id,
+              chat_id: chatId,
+              ...firstLevel.options
+            }
+          ).catch(err => console.log(err))
+        }
       })
     }, prevMessageForEdit ? 0 : 1500, accountMessage)
   } catch (error) {

@@ -250,6 +250,5 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
     eventEmitter.emit(callbackQuery.data)
     bot.answerCallbackQuery(callbackQuery.id, 'quiz', false)
     eventEmitter.removeAllListeners()
-    // TODO: исправить баг. запуск нескольких игр одновременно
   })
 }

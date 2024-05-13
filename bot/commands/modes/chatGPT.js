@@ -41,7 +41,6 @@ export const modeChatGPT = async (bot, msg, qweryOptions) => {
       ctx = await JSON.parse(response.dataValues.comment)
     })
 
-    // TODO: Запоминать контекст беседы пользователя или всегда начинать новый чат
     ctx ??= INITIAL_SESSION
 
     console.log('🔺ctx', ctx.messages.length)

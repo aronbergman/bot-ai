@@ -71,7 +71,7 @@ export const keyboardChatGPT = async (bot, msg) => {
           { modeGPT: modesChatGPT[i].code },
           { where: { chat_id: chatId } }
         ).then(async res => {
-          // TODO: отправить сообщение приветствие
+          // TODO: если это премиум то нужно менять на нужную модель чата в заголовке
           await bot.editMessageText(
             `<b>ChatGPT</b> 3.5 – ${t(character(modesChatGPT[i].code)?.name)}\n${t(character(modesChatGPT[i].code)?.welcome)}`,
             {

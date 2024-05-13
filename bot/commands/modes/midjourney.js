@@ -1,7 +1,7 @@
 import { Midjourney } from 'midjourney'
 import { saveAndSendPhoto, saveAndSendPreloaderPhoto } from '../../utils/saveAndSendPhoto.js'
 import { loaderOn } from '../../utils/loader.js'
-import { REQUEST_TYPES } from '../../constants/index.js'
+import { REQUEST_TYPES, TYPE_RESPONSE_MJ } from '../../constants/index.js'
 import { upscale } from './midjourney/upscale.js'
 import events from 'events'
 import { variation } from './midjourney/variation.js'

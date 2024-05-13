@@ -33,7 +33,7 @@ export default (sequelize, DataTypes) => {
       },
       tokens: {
         type: DataTypes.DOUBLE,
-        defaultValue: 10000,
+        defaultValue: 20000,
       },
       paid_days: {
         type: DataTypes.DOUBLE,

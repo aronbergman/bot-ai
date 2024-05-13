@@ -25,7 +25,7 @@ export const keyboardDalle = async (bot, msg) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_M_${chatId}` }],
-            [{ text: t('exit_key'), callback_data: `${COMMAND_GPT}_M_${chatId}` }]
+            [{ text: t('exit_to_gpt'), callback_data: `${COMMAND_GPT}_M_${chatId}` }]
           ]
         }
       }
@@ -46,7 +46,7 @@ export const keyboardDalle = async (bot, msg) => {
 
     eventEmitter.on(`buy_subscription_M_${chatId}`, async function() {
       eventEmitter.removeAllListeners()
-      return keyboardMyAccount(bot, msg, accountMessage, keyboardDalle)
+      return keyboardMyAccount(bot, msg, accountMessage, keyboardDalle, null, 'buy')
     })
 
     eventEmitter.on(`${COMMAND_GPT}_M_${chatId}`, function() {
