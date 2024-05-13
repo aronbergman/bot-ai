@@ -33,14 +33,13 @@ export const checkTokens = async (typeRequest, userID, text = '') => {
 export async function writingOffTokens(bot, msg, type, prompt = '') {
   const t = await ct(msg)
   const {price} = await checkTokens(type, msg.from.id, prompt)
-  const { GPT_model } = await db.subscriber.findOne({ where: { user_id: msg.from.id } })
 
   await db.subscriber.update(
     { tokens: Sequelize.literal(`tokens - ${price}`) },
     { where: { chat_id: msg.from.id } }
   )
 
-  await autoRemoveMessage(t('msg:writing-off-tokens', {price}) + ` ${GPT_model}`, bot, msg.from.id)
+  await autoRemoveMessage(t('msg:writing-off-tokens', {price}), bot, msg.from.id)
 }
 
 async function calculationOfNumberOfTokens(text, type = REQUEST_TYPES_COST.GPT, model = 'gpt-3.5-turbo') {

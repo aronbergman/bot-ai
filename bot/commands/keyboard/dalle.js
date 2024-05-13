@@ -25,7 +25,7 @@ export const keyboardDalle = async (bot, msg) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: t('keyboard_buy_subscription'), callback_data: `buy_subscription_M_${chatId}` }],
-            [{ text: t('exit_to_gpt'), callback_data: `${COMMAND_GPT}_M_${chatId}` }]
+            [{ text: t('btn:exit_to_menu'), callback_data: `${COMMAND_GPT}_M_${chatId}` }]
           ]
         }
       }

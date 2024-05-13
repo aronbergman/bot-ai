@@ -6,6 +6,8 @@ import { ct } from '../../utils/createTranslate.js'
 
 export const keyboardChatGPT = async (bot, msg) => {
   const t = await ct(msg)
+    const { GPT_model } = await db.subscriber.findOne({ where: { user_id: msg.from.id } })
+
   const sendChatGPT = async (bot, chatId, options, modeGPT) => {
 
     const character = (mGPT) => modesChatGPT.find(mode => mode.code === mGPT)
@@ -17,7 +19,7 @@ export const keyboardChatGPT = async (bot, msg) => {
     )
 
     const firstMessage = {
-      text: `<b>ChatGPT</b> 3.5 – ${t(character(modeGPT)?.name)}\n${t(character(modeGPT)?.welcome)}`,
+      text: `<b>ChatGPT</b> ${GPT_model === 'gpt-4' ? '4' : '3.5'} – ${t(character(modeGPT)?.name)}\n${t(character(modeGPT)?.welcome)}`,
       options: {
         ...options,
         reply_markup: {
