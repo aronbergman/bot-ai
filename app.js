@@ -135,9 +135,9 @@ getId(bot)
 sendMessage(bot)
 midjourneyInfo(bot)
 setQuizModeForSubs(bot)
-addSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
-removeSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
-listSudoers(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+//addSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+//removeSudoer(bot, sudoUser) // TODO: Удалить этот метод и таблицу
+//listSudoers(bot, sudoUser) // TODO: Удалить этот метод и таблицу
 refundTokensIfError(bot)
 
 const app = express()
