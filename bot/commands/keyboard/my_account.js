@@ -173,14 +173,8 @@ export const keyboardMyAccount = async (bot, msg, prevMessageForEdit, prevLevel,
           })
 
           bot.editMessageText(
-            `🔗 Осталось только оплатить
-
-Подписка ${tariff[0]['text']}
-Номер платежа: ${invoice.dataValues.payment_id}
-
-Payok - оплачивайте следующими способами:
-   └ VISA, Mastercard, MIR, QIWI, YooMoney, Crypto
-`, {
+            t('dsc:invoice_pay', {name:tariff[0]['text'], id: invoice.dataValues.payment_id}),
+            {
               ...generalOptions,
               message_id: accountMessage.message_id,
               chat_id: chatId,
