@@ -4,10 +4,16 @@ import { getStringOrDist } from '../../utils/quiz/getStringOrDist.js'
 import dotenv from 'dotenv'
 import { ct } from '../../utils/createTranslate.js'
 import { createNewQuizKeyboard } from '../../utils/quiz/createNewQuizKeyboard.js'
+import { Sequelize } from 'sequelize'
 
 dotenv.config()
 
 const miniGames = ['🏀', '🏀', '🏀', '⚽', '⚽', '⚽', '🎳', '🎲', '🎯']
+
+const getRebootDateForUser = (count) => {
+  if (count !== 0) return null;
+  return Sequelize.literal('CURRENT_TIMESTAMP')
+}
 
 export const keyboardQuiz = async (bot, msg, isDescription) => {
   const t = await ct(msg)
@@ -30,10 +36,9 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
       where: {
         chat_id: chatId
       }
-    }).then(res => {
-      const keyboard = createNewQuizKeyboard(res, msgId, t)
+    }).then(async res => {
+      const keyboard = await createNewQuizKeyboard(res, msgId, t, chatId)
       const timeout = setTimeout(async () => {
-        // TODO: Сделать подсчет колличества бесплатных запросов в сутки на бесплатном режиме
         await bot.deleteMessage(chatId, accountMessage.message_id)
         accountMessage = await bot.sendMessage(
           chatId,
@@ -101,7 +106,8 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
 
           await db.subscriber.update(
             {
-              quiz_token_available: available
+              quiz_token_available: available,
+              quiz_reboot_date: getRebootDateForUser(available)
             },
             { where: { chat_id: chatId } }
           ).then(res => {
@@ -202,7 +208,8 @@ export const keyboardQuiz = async (bot, msg, isDescription) => {
 
           await db.subscriber.update(
             {
-              quiz_subs_available: available
+              quiz_subs_available: available,
+              quiz_reboot_date: getRebootDateForUser(available)
             },
             { where: { chat_id: chatId } }
           ).then(res => {

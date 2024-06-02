@@ -54,6 +54,9 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         defaultValue: 0
       },
+      quiz_reboot_date: {
+        type: DataTypes.DATE,
+      },
       MI_count: {
         type: DataTypes.DOUBLE,
         defaultValue: 0

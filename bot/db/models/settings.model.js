@@ -33,6 +33,11 @@ export default (sequelize, DataTypes) => {
        type: DataTypes.DOUBLE,
       required: true
     },
+    days_freez: {
+       type: DataTypes.DOUBLE,
+      defaultValue: 7,
+      required: true
+    },
   })
 
   return SettingsSchema
